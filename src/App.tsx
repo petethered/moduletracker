@@ -2,6 +2,8 @@ import { useStore } from "./store";
 import { TabBar } from "./components/ui/TabBar";
 import { Button } from "./components/ui/Button";
 import { PullModal } from "./features/pulls/PullModal";
+import { Dashboard } from "./features/dashboard/Dashboard";
+import { History } from "./features/history/History";
 
 function App() {
   const activeTab = useStore((s) => s.activeTab);
@@ -34,18 +36,8 @@ function App() {
 
       {/* Tab Content */}
       <main className="p-4 max-w-7xl mx-auto">
-        {activeTab === "dashboard" && (
-          <div>
-            <h2 className="text-lg font-bold mb-4">Dashboard</h2>
-            <p className="text-gray-500">No pulls recorded yet. Click "Add 10x Pull" to get started.</p>
-          </div>
-        )}
-        {activeTab === "history" && (
-          <div>
-            <h2 className="text-lg font-bold mb-4">Pull History</h2>
-            <p className="text-gray-500">No pulls recorded yet.</p>
-          </div>
-        )}
+        {activeTab === "dashboard" && <Dashboard />}
+        {activeTab === "history" && <History />}
         {activeTab === "modules" && (
           <div>
             <h2 className="text-lg font-bold mb-4">Module Collection</h2>
