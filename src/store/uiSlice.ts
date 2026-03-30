@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import type { StateCreator } from "zustand/vanilla";
 import type { TabId } from "../types";
 
 export interface UiSlice {

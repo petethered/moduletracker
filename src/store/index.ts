@@ -1,10 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { createPullsSlice, PullsSlice } from "./pullsSlice";
-import { createModulesSlice, ModulesSlice } from "./modulesSlice";
-import { createUiSlice, UiSlice } from "./uiSlice";
-import { createSettingsSlice, SettingsSlice } from "./settingsSlice";
+import { createPullsSlice } from "./pullsSlice";
+import type { PullsSlice } from "./pullsSlice";
+import { createModulesSlice } from "./modulesSlice";
+import type { ModulesSlice } from "./modulesSlice";
+import { createUiSlice } from "./uiSlice";
+import type { UiSlice } from "./uiSlice";
+import { createSettingsSlice } from "./settingsSlice";
+import type { SettingsSlice } from "./settingsSlice";
 
 export type AppStore = PullsSlice & ModulesSlice & UiSlice & SettingsSlice;
 

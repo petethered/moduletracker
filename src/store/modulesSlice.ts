@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import type { StateCreator } from "zustand/vanilla";
 import type { ModuleProgress, ModuleRarity } from "../types";
 
 export interface ModulesSlice {

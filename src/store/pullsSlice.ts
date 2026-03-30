@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import type { StateCreator } from "zustand/vanilla";
 import { v4 as uuidv4 } from "uuid";
 import type { PullRecord } from "../types";
 

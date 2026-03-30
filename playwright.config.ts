@@ -7,11 +7,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   webServer: {
     command: "npm run dev",
-    port: 5173,
+    port: 5175,
     reuseExistingServer: !process.env.CI,
   },
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: "http://localhost:5175",
     trace: "on-first-retry",
   },
   projects: [
