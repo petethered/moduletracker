@@ -16,7 +16,7 @@ export function DateInput({ value, onChange, label }: DateInputProps) {
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)]"
+        className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)] cursor-pointer [color-scheme:dark]"
       />
     </div>
   );

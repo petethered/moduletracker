@@ -13,17 +13,23 @@ test.describe("Module collection", () => {
     await expect(page.getByText("Dimension Core")).toBeVisible();
   });
 
-  test("updates module rarity", async ({ page }) => {
+  test("updates module rarity via modal", async ({ page }) => {
     await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
     await page.click("[data-tab='modules']");
 
-    // Click rarity cell for first module
+    // Click rarity cell to open modal
     await page.click("[data-testid='rarity-astral-deliverance']");
 
-    // Select legendary from dropdown
-    await page.selectOption("[data-testid='rarity-select-astral-deliverance']", "legendary");
+    // Modal should show with module name
+    await expect(page.getByRole("heading", { name: /Astral Deliverance/ })).toBeVisible();
 
-    // Verify it updated (the text should now show "legendary")
+    // Click legendary option
+    await page.click("[data-testid='rarity-option-legendary']");
+
+    // Modal closes, rarity shows in table
+    await expect(page.getByRole("heading", { name: /Astral Deliverance/ })).not.toBeVisible();
     await expect(page.locator("[data-testid='rarity-astral-deliverance']")).toContainText("legendary");
   });
 });
