@@ -1,45 +1,63 @@
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
-import { selectRarityPercentages } from "../../store/selectors";
+import { selectRarityPercentages, selectRarityCounts } from "../../store/selectors";
 import { RARITY_COLORS } from "../../config/rarityColors";
 
 export function RarityBreakdownBar() {
   const pulls = useStore((s) => s.pulls);
   const pcts = selectRarityPercentages(pulls);
+  const counts = selectRarityCounts(pulls);
 
   if (pulls.length === 0) return null;
 
+  const data = [
+    { name: "Common", value: counts.common, color: RARITY_COLORS.common, pct: pcts.common },
+    { name: "Rare", value: counts.rare, color: RARITY_COLORS.rare, pct: pcts.rare },
+    { name: "Epic", value: counts.epic, color: RARITY_COLORS.epic, pct: pcts.epic },
+  ].filter((d) => d.value > 0);
+
   return (
-    <div>
-      <div className="flex rounded-lg overflow-hidden h-6">
-        {pcts.common > 0 && (
-          <div
-            style={{ width: `${pcts.common}%`, backgroundColor: RARITY_COLORS.common }}
-            className="flex items-center justify-center text-xs font-bold text-black"
+    <div className="flex items-center gap-4">
+      <ResponsiveContainer width={140} height={140}>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            cx="50%"
+            cy="50%"
+            outerRadius={60}
+            innerRadius={30}
+            strokeWidth={0}
           >
-            {pcts.common.toFixed(1)}%
+            {data.map((entry) => (
+              <Cell key={entry.name} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#16213e",
+              border: "1px solid #0f3460",
+              borderRadius: 8,
+            }}
+            formatter={(value: number, name: string) => {
+              const entry = data.find((d) => d.name === name);
+              return [`${entry?.pct.toFixed(1)}% (${value})`, name];
+            }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="space-y-2 text-sm">
+        {data.map((d) => (
+          <div key={d.name} className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: d.color }}
+            />
+            <span className="text-gray-300">{d.name}</span>
+            <span className="text-gray-500">{d.pct.toFixed(1)}%</span>
+            <span className="text-gray-600">({d.value})</span>
           </div>
-        )}
-        {pcts.rare > 0 && (
-          <div
-            style={{ width: `${pcts.rare}%`, backgroundColor: RARITY_COLORS.rare }}
-            className="flex items-center justify-center text-xs font-bold text-white"
-          >
-            {pcts.rare.toFixed(1)}%
-          </div>
-        )}
-        {pcts.epic > 0 && (
-          <div
-            style={{ width: `${pcts.epic}%`, backgroundColor: RARITY_COLORS.epic }}
-            className="flex items-center justify-center text-xs font-bold text-white"
-          >
-            {pcts.epic.toFixed(1)}%
-          </div>
-        )}
-      </div>
-      <div className="flex justify-between text-xs text-gray-400 mt-1">
-        <span>Common: {pcts.common.toFixed(1)}%</span>
-        <span>Rare: {pcts.rare.toFixed(1)}%</span>
-        <span>Epic: {pcts.epic.toFixed(1)}%</span>
+        ))}
       </div>
     </div>
   );
