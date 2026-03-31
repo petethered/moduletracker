@@ -65,7 +65,8 @@ export function ModuleDistributionChart() {
                 border: "1px solid #0f3460",
                 borderRadius: 8,
               }}
-              formatter={(value: number, name: string) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any, name: any) => {
                 const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
                 return [`${value} (${pct}%)`, name];
               }}

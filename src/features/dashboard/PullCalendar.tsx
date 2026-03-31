@@ -82,7 +82,6 @@ export function PullCalendar() {
     }
   });
 
-  const totalWidth = columns.length * (DAY_SIZE + DAY_GAP);
   const dayLabelWidth = 28;
 
   return (

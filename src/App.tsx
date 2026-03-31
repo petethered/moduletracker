@@ -1,12 +1,14 @@
+import { lazy, Suspense } from "react";
 import { useStore } from "./store";
 import { TabBar } from "./components/ui/TabBar";
 import { Button } from "./components/ui/Button";
-import { PullModal } from "./features/pulls/PullModal";
-import { SettingsPanel } from "./features/settings/SettingsPanel";
-import { Dashboard } from "./features/dashboard/Dashboard";
-import { History } from "./features/history/History";
-import { Modules } from "./features/modules/Modules";
-import { Analytics } from "./features/analytics/Analytics";
+
+const Dashboard = lazy(() => import("./features/dashboard/Dashboard").then(m => ({ default: m.Dashboard })));
+const History = lazy(() => import("./features/history/History").then(m => ({ default: m.History })));
+const Modules = lazy(() => import("./features/modules/Modules").then(m => ({ default: m.Modules })));
+const Analytics = lazy(() => import("./features/analytics/Analytics").then(m => ({ default: m.Analytics })));
+const PullModal = lazy(() => import("./features/pulls/PullModal").then(m => ({ default: m.PullModal })));
+const SettingsPanel = lazy(() => import("./features/settings/SettingsPanel").then(m => ({ default: m.SettingsPanel })));
 
 function App() {
   const activeTab = useStore((s) => s.activeTab);
@@ -54,16 +56,20 @@ function App() {
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Tab Content */}
-      <main className="p-4 md:p-6 max-w-7xl mx-auto animate-fade-in" key={activeTab}>
-        {activeTab === "dashboard" && <Dashboard />}
-        {activeTab === "history" && <History />}
-        {activeTab === "modules" && <Modules />}
-        {activeTab === "analytics" && <Analytics />}
-      </main>
+      <Suspense fallback={<div className="p-4 md:p-6 max-w-7xl mx-auto text-gray-500">Loading...</div>}>
+        <main className="p-4 md:p-6 max-w-7xl mx-auto animate-fade-in" key={activeTab}>
+          {activeTab === "dashboard" && <Dashboard />}
+          {activeTab === "history" && <History />}
+          {activeTab === "modules" && <Modules />}
+          {activeTab === "analytics" && <Analytics />}
+        </main>
+      </Suspense>
 
       {/* Pull Modal */}
-      <PullModal />
-      <SettingsPanel />
+      <Suspense fallback={null}>
+        <PullModal />
+        <SettingsPanel />
+      </Suspense>
     </div>
   );
 }

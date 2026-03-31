@@ -9,13 +9,10 @@ import { MODULES_BY_TYPE, MODULE_BY_ID } from "../../config/modules";
 import {
   MODULE_RARITY_ORDER,
   getModuleRarityColor,
-  getRarityForCopies,
 } from "../../config/rarityColors";
 import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
-import type { ModuleType, ModuleRarity } from "../../types";
-
-const COPIES_FOR_5_STAR = 18;
+import type { ModuleType } from "../../types";
 
 const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
 const TYPE_LABELS: Record<ModuleType, string> = {

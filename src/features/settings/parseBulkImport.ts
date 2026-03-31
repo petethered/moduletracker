@@ -77,7 +77,6 @@ export function parseBulkImport(text: string): BulkImportResult {
       continue;
     }
 
-    const epicCountFromData = parts[3] ? parseInt(parts[3], 10) : 0;
     const epicModuleNames = parts.slice(4).filter((s) => s.length > 0);
 
     // Resolve module names to IDs

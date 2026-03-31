@@ -4,4 +4,15 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rolldownOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
+            return "recharts";
+          }
+        },
+      },
+    },
+  },
 });
