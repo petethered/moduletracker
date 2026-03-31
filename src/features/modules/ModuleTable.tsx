@@ -47,12 +47,12 @@ export function ModuleTable() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
                 <colgroup>
-                  <col style={{ width: "26%" }} />
-                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "35%" }} />
                   <col style={{ width: "12%" }} />
-                  <col style={{ width: "16%" }} />
-                  <col style={{ width: "22%" }} />
-                  <col style={{ width: "14%" }} />
+                  <col style={{ width: "15%" }} />
+                  <col style={{ width: "20%" }} />
+                  {/* Progress column hidden - kept for future use */}
+                  <col style={{ width: "18%" }} />
                 </colgroup>
                 <thead>
                   <tr className="border-b border-[var(--color-navy-500)]">
@@ -60,7 +60,7 @@ export function ModuleTable() {
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Count</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">% of Epics</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Last Pulled</th>
-                    <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Progress</th>
+                    {/* Progress header hidden - kept for future use */}
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Rarity</th>
                   </tr>
                 </thead>
@@ -78,6 +78,7 @@ export function ModuleTable() {
                         <td className="px-3 py-2">{count}</td>
                         <td className="px-3 py-2">{count > 0 ? `${pct.toFixed(1)}%` : "-"}</td>
                         <td className="px-3 py-2 text-gray-400">{lastPulled || "-"}</td>
+                        {/* Progress cell hidden - kept for future use
                         <td className="px-3 py-2">
                           {count > 0 ? (() => {
                             const achievable = getRarityForCopies(count);
@@ -105,6 +106,7 @@ export function ModuleTable() {
                             <span className="text-gray-600">-</span>
                           )}
                         </td>
+                        */}
                         <td
                           className="px-3 py-2 cursor-pointer"
                           data-testid={`rarity-${mod.id}`}
