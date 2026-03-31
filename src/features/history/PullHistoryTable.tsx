@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Table, Column } from "../../components/ui/Table";
+import { Table } from "../../components/ui/Table";
+import type { Column } from "../../components/ui/Table";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";

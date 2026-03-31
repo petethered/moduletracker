@@ -4,6 +4,8 @@ import { Button } from "./components/ui/Button";
 import { PullModal } from "./features/pulls/PullModal";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { History } from "./features/history/History";
+import { Modules } from "./features/modules/Modules";
+import { Analytics } from "./features/analytics/Analytics";
 
 function App() {
   const activeTab = useStore((s) => s.activeTab);
@@ -38,18 +40,8 @@ function App() {
       <main className="p-4 max-w-7xl mx-auto">
         {activeTab === "dashboard" && <Dashboard />}
         {activeTab === "history" && <History />}
-        {activeTab === "modules" && (
-          <div>
-            <h2 className="text-lg font-bold mb-4">Module Collection</h2>
-            <p className="text-gray-500">No data yet.</p>
-          </div>
-        )}
-        {activeTab === "analytics" && (
-          <div>
-            <h2 className="text-lg font-bold mb-4">Analytics</h2>
-            <p className="text-gray-500">No data yet.</p>
-          </div>
-        )}
+        {activeTab === "modules" && <Modules />}
+        {activeTab === "analytics" && <Analytics />}
       </main>
 
       {/* Pull Modal */}
