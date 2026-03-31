@@ -1,24 +1,136 @@
 @import "tailwindcss";
 
 :root {
-  --color-navy-900: #0a0a1a;
-  --color-navy-800: #111827;
-  --color-navy-700: #1a1a2e;
-  --color-navy-600: #16213e;
-  --color-navy-500: #0f3460;
-  --color-accent-gold: #ffd700;
+  --color-navy-900: #06060f;
+  --color-navy-800: #0c0c1d;
+  --color-navy-700: #13132b;
+  --color-navy-600: #1a1a3e;
+  --color-navy-500: #252560;
+  --color-accent-gold: #f0c040;
   --color-accent-crimson: #e94560;
-  --color-rarity-common: #ffffff;
-  --color-rarity-rare: #3b82f6;
-  --color-rarity-epic: #a855f7;
-  --color-rarity-legendary: #eab308;
-  --color-rarity-mythic: #ef4444;
-  --color-rarity-ancestral: #22c55e;
+  --color-rarity-common: #d4d4d8;
+  --color-rarity-rare: #60a5fa;
+  --color-rarity-epic: #c084fc;
+  --color-rarity-legendary: #fbbf24;
+  --color-rarity-mythic: #f87171;
+  --color-rarity-ancestral: #4ade80;
+
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Outfit", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Fira Code", monospace;
+
+  --glow-gold: 0 0 20px rgba(240, 192, 64, 0.15);
+  --glow-crimson: 0 0 20px rgba(233, 69, 96, 0.15);
+  --glow-epic: 0 0 16px rgba(192, 132, 252, 0.2);
 }
 
+/* Base */
 body {
   background-color: var(--color-navy-900);
-  color: #e5e7eb;
-  font-family: system-ui, -apple-system, sans-serif;
+  color: #c8c8d8;
+  font-family: var(--font-body);
+  font-weight: 400;
   margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Cosmic background atmosphere */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 60, 180, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(233, 69, 96, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(240, 192, 64, 0.02) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle noise texture */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-navy-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-navy-500);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-gold);
+}
+
+/* Selection */
+::selection {
+  background: rgba(240, 192, 64, 0.25);
+  color: white;
+}
+
+/* Dark date picker */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(240, 192, 64, 0.3); }
+  33% { border-color: rgba(192, 132, 252, 0.3); }
+  66% { border-color: rgba(233, 69, 96, 0.3); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(240, 192, 64, 0.1); }
+  50% { box-shadow: 0 0 20px rgba(240, 192, 64, 0.25); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out both;
+}
+
+/* Staggered entrance for cards */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }

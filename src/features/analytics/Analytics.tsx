@@ -12,7 +12,7 @@ export function Analytics() {
   if (pulls.length === 0) {
     return (
       <div>
-        <h2 className="text-lg font-bold mb-4">Analytics</h2>
+        <h2 className="text-lg text-[var(--color-accent-gold)]/80 mb-6" style={{ fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em" }}>Analytics</h2>
         <p className="text-gray-500">Add some pulls to see analytics.</p>
       </div>
     );
@@ -20,7 +20,7 @@ export function Analytics() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold">Analytics</h2>
+      <h2 className="text-lg text-[var(--color-accent-gold)]/80" style={{ fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em" }}>Analytics</h2>
       <div className="grid md:grid-cols-2 gap-6">
         <PityTracker />
         <PredictedGemsCard />

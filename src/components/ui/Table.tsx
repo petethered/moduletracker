@@ -50,25 +50,31 @@ export function Table<T>({
 
   if (data.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-12">{emptyMessage}</div>
+      <div className="text-center text-gray-600 py-16" style={{ fontFamily: "var(--font-body)" }}>
+        {emptyMessage}
+      </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-xl border border-[var(--color-navy-500)]/30 bg-[var(--color-navy-800)]/40">
+      <table className="w-full text-sm" style={{ fontFamily: "var(--font-body)" }}>
         <thead>
-          <tr className="border-b border-[var(--color-navy-500)]">
+          <tr className="border-b border-[var(--color-navy-500)]/40">
             {columns.map((col) => (
               <th
                 key={col.key}
                 onClick={col.sortable ? () => handleSort(col.key) : undefined}
-                className={`px-3 py-3 text-left text-xs uppercase tracking-wider text-gray-400 font-medium ${
-                  col.sortable ? "cursor-pointer hover:text-gray-200" : ""
+                className={`px-3 py-3 text-left text-[10px] uppercase tracking-[0.15em] text-gray-500 font-medium ${
+                  col.sortable ? "cursor-pointer hover:text-gray-300 transition-colors" : ""
                 }`}
               >
                 {col.header}
-                {sortKey === col.key && (sortDir === "asc" ? " ↑" : " ↓")}
+                {sortKey === col.key && (
+                  <span className="text-[var(--color-accent-gold)] ml-1">
+                    {sortDir === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
               </th>
             ))}
           </tr>
@@ -78,9 +84,9 @@ export function Table<T>({
             <tr
               key={keyExtractor(item)}
               onClick={onRowClick ? () => onRowClick(item) : undefined}
-              className={`border-b border-[var(--color-navy-600)] ${
+              className={`border-b border-[var(--color-navy-600)]/30 transition-colors ${
                 onRowClick
-                  ? "cursor-pointer hover:bg-[var(--color-navy-600)]"
+                  ? "cursor-pointer hover:bg-[var(--color-navy-600)]/40"
                   : ""
               }`}
             >
