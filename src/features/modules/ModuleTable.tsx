@@ -42,7 +42,14 @@ export function ModuleTable() {
               {TYPE_LABELS[type]}
             </h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: "35%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "15%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "18%" }} />
+                </colgroup>
                 <thead>
                   <tr className="border-b border-[var(--color-navy-500)]">
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Module</th>
