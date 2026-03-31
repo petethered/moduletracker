@@ -32,6 +32,7 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
     initialData?.commonCount ?? 7
   );
   const [rareCount, setRareCount] = useState(initialData?.rareCount ?? 3);
+  const [rareManuallySet, setRareManuallySet] = useState(!!initialData);
   const [epicModules, setEpicModules] = useState<string[]>(
     initialData?.epicModules || []
   );
@@ -89,7 +90,12 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
         <NumberSelect
           label="Common"
           value={commonCount}
-          onChange={setCommonCount}
+          onChange={(val) => {
+            setCommonCount(val);
+            if (!rareManuallySet) {
+              setRareCount(Math.max(0, 10 - val));
+            }
+          }}
           min={0}
           max={10}
           data-testid="common-count"
@@ -97,7 +103,10 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
         <NumberSelect
           label="Rare"
           value={rareCount}
-          onChange={setRareCount}
+          onChange={(val) => {
+            setRareCount(val);
+            setRareManuallySet(true);
+          }}
           min={0}
           max={10}
           data-testid="rare-count"
