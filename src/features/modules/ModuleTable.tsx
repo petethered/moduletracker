@@ -14,6 +14,9 @@ import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import type { ModuleType, ModuleRarity } from "../../types";
 
+const COPIES_FOR_5_STAR = 18;
+const COPIES_FOR_ANCESTRAL = 8;
+
 const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
 const TYPE_LABELS: Record<ModuleType, string> = {
   cannon: "Cannon (Attack)",
@@ -44,11 +47,12 @@ export function ModuleTable() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
                 <colgroup>
-                  <col style={{ width: "35%" }} />
+                  <col style={{ width: "26%" }} />
+                  <col style={{ width: "10%" }} />
                   <col style={{ width: "12%" }} />
-                  <col style={{ width: "15%" }} />
-                  <col style={{ width: "20%" }} />
-                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "22%" }} />
+                  <col style={{ width: "14%" }} />
                 </colgroup>
                 <thead>
                   <tr className="border-b border-[var(--color-navy-500)]">
@@ -56,6 +60,7 @@ export function ModuleTable() {
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Count</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">% of Epics</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Last Pulled</th>
+                    <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Progress</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Rarity</th>
                   </tr>
                 </thead>
@@ -73,6 +78,31 @@ export function ModuleTable() {
                         <td className="px-3 py-2">{count}</td>
                         <td className="px-3 py-2">{count > 0 ? `${pct.toFixed(1)}%` : "-"}</td>
                         <td className="px-3 py-2 text-gray-400">{lastPulled || "-"}</td>
+                        <td className="px-3 py-2">
+                          {count > 0 ? (
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <div className="flex-1 bg-[var(--color-navy-800)] rounded-full h-2 overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full"
+                                    style={{
+                                      width: `${Math.min((count / COPIES_FOR_5_STAR) * 100, 100)}%`,
+                                      backgroundColor:
+                                        count >= COPIES_FOR_5_STAR
+                                          ? "var(--color-rarity-ancestral)"
+                                          : count >= COPIES_FOR_ANCESTRAL
+                                            ? "var(--color-rarity-legendary)"
+                                            : "var(--color-rarity-epic)",
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-xs text-gray-400 w-10 text-right">{count}/18</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-gray-600">-</span>
+                          )}
+                        </td>
                         <td
                           className="px-3 py-2 cursor-pointer"
                           data-testid={`rarity-${mod.id}`}

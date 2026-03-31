@@ -213,3 +213,79 @@ export function selectGemsPerEpicOverTime(
 
   return points;
 }
+
+const COPIES_FOR_ANCESTRAL = 8;
+const COPIES_FOR_5_STAR = 18;
+
+export function selectMergeProgress(
+  pulls: PullRecord[],
+  totalModuleCount: number
+) {
+  const counts = selectModulePullCounts(pulls);
+  let totalCopiesForAncestral = 0;
+  let totalCopiesFor5Star = 0;
+  let modulesAtAncestral = 0;
+  let modulesAt5Star = 0;
+
+  const moduleIds = new Set<string>();
+  for (const p of pulls) {
+    for (const id of p.epicModules) moduleIds.add(id);
+  }
+
+  for (const id of moduleIds) {
+    const c = counts[id] || 0;
+    totalCopiesForAncestral += Math.min(c, COPIES_FOR_ANCESTRAL);
+    totalCopiesFor5Star += Math.min(c, COPIES_FOR_5_STAR);
+    if (c >= COPIES_FOR_ANCESTRAL) modulesAtAncestral++;
+    if (c >= COPIES_FOR_5_STAR) modulesAt5Star++;
+  }
+
+  const neededForAllAncestral = totalModuleCount * COPIES_FOR_ANCESTRAL;
+  const neededForAll5Star = totalModuleCount * COPIES_FOR_5_STAR;
+
+  return {
+    copiesForAncestral: totalCopiesForAncestral,
+    neededForAllAncestral,
+    modulesAtAncestral,
+    copiesFor5Star: totalCopiesFor5Star,
+    neededForAll5Star,
+    modulesAt5Star,
+  };
+}
+
+export function selectPredictedGemsForMerge(
+  pulls: PullRecord[],
+  totalModuleCount: number,
+  copiesPerModule: number
+) {
+  const counts = selectModulePullCounts(pulls);
+  const gemsPerEpic = selectGemsPerEpic(pulls);
+  const rate = gemsPerEpic > 0 ? gemsPerEpic : 200 / 0.025;
+
+  let totalCopiesNeeded = 0;
+  const moduleIds = new Set<string>();
+  for (const p of pulls) {
+    for (const id of p.epicModules) moduleIds.add(id);
+  }
+
+  // Copies still needed for modules we've already found
+  for (const id of moduleIds) {
+    const c = counts[id] || 0;
+    totalCopiesNeeded += Math.max(0, copiesPerModule - c);
+  }
+
+  // Modules we haven't found yet need full copies
+  const unfound = totalModuleCount - moduleIds.size;
+  totalCopiesNeeded += unfound * copiesPerModule;
+
+  // For unfound modules, use coupon collector for the "find" cost
+  let couponCost = 0;
+  for (let i = 1; i <= unfound; i++) {
+    couponCost += totalModuleCount / i;
+  }
+
+  // couponCost includes the 1st copy of each unfound module
+  const totalEpics = totalCopiesNeeded + couponCost - unfound;
+
+  return Math.round(Math.max(0, totalEpics) * rate);
+}
