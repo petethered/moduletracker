@@ -27,6 +27,7 @@ export function SearchSelect({
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setIsOpen(false);
+        setSearch("");
       }
     };
     document.addEventListener("mousedown", handleClick);

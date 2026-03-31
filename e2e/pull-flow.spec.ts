@@ -50,3 +50,32 @@ test.describe("Add pull flow", () => {
     await expect(page.locator("button:has-text('Save Pull')")).toBeDisabled();
   });
 });
+
+test.describe("Edit pull flow", () => {
+  test("edits an existing pull", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+
+    // Add a pull first
+    await page.click("button:has-text('Add 10x Pull')");
+    await page.selectOption("[data-testid='common-count']", "7");
+    await page.selectOption("[data-testid='rare-count']", "3");
+    await page.click("button:has-text('Save Pull')");
+
+    // Go to history and click edit
+    await page.click("[data-tab='history']");
+    await page.click("[data-testid='edit-pull']");
+
+    // Should show Edit Pull modal
+    await expect(page.getByRole("heading", { name: "Edit Pull" })).toBeVisible();
+
+    // Change common to 8, rare to 2
+    await page.selectOption("[data-testid='common-count']", "8");
+    await page.selectOption("[data-testid='rare-count']", "2");
+    await page.click("button:has-text('Save Pull')");
+
+    // Verify modal closed
+    await expect(page.getByRole("heading", { name: "Edit Pull" })).not.toBeVisible();
+  });
+});

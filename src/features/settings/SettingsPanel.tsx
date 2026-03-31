@@ -45,6 +45,23 @@ export function SettingsPanel() {
           setImportError("Invalid file: missing pulls array");
           return;
         }
+        const isValidPull = (p: unknown): boolean => {
+          if (!p || typeof p !== "object") return false;
+          const record = p as Record<string, unknown>;
+          return (
+            typeof record.id === "string" &&
+            typeof record.date === "string" &&
+            typeof record.commonCount === "number" &&
+            typeof record.rareCount === "number" &&
+            Array.isArray(record.epicModules) &&
+            typeof record.gemsSpent === "number" &&
+            typeof record.bannerType === "string"
+          );
+        };
+        if (!data.pulls.every(isValidPull)) {
+          setImportError("Invalid file: pull records have missing or invalid fields");
+          return;
+        }
         importPulls(data.pulls);
         if (data.moduleProgress) {
           importModuleProgress(data.moduleProgress);

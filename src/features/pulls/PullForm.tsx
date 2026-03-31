@@ -5,6 +5,7 @@ import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
 import { MODULES } from "../../config/modules";
 import { validatePullForm } from "./validation";
+import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
 
 interface PullFormProps {
@@ -20,11 +21,12 @@ const moduleOptions = MODULES.map((m) => ({
 }));
 
 export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
+  const bannerDefault = useStore((s) => s.bannerDefault);
   const [date, setDate] = useState(
     initialData?.date || new Date().toISOString().split("T")[0]
   );
   const [bannerType, setBannerType] = useState<BannerType>(
-    initialData?.bannerType || "standard"
+    initialData?.bannerType || bannerDefault
   );
   const [commonCount, setCommonCount] = useState(
     initialData?.commonCount ?? 7
@@ -40,19 +42,14 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
   // Keep epicModules array in sync with epicCount
   useEffect(() => {
     if (epicCount < 0) return;
-    if (epicCount === 0) {
-      setEpicModules([]);
-    } else if (epicModules.length !== epicCount) {
-      const newModules = [...epicModules];
-      if (newModules.length > epicCount) {
-        setEpicModules(newModules.slice(0, epicCount));
-      } else {
-        while (newModules.length < epicCount) {
-          newModules.push("");
-        }
-        setEpicModules(newModules);
+    setEpicModules((prev) => {
+      if (epicCount === 0) return [];
+      if (prev.length > epicCount) return prev.slice(0, epicCount);
+      if (prev.length < epicCount) {
+        return [...prev, ...Array(epicCount - prev.length).fill("")];
       }
-    }
+      return prev;
+    });
   }, [epicCount]);
 
   const allEpicsSelected =
