@@ -18,7 +18,7 @@ export function GemsPerEpicChart() {
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1a1a2e" />
-          <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} />
+          <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} tickFormatter={(d: string) => { const [, m, day] = d.split("-"); return `${parseInt(m)}/${parseInt(day)}`; }} />
           <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} />
           <Tooltip
             contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
