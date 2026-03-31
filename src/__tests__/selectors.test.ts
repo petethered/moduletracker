@@ -100,18 +100,18 @@ describe("epic selectors", () => {
 });
 
 describe("pity counter", () => {
-  it("counts pulls since last epic", () => {
+  it("counts individual module pulls since last epic (10 per 10x pull)", () => {
     const pulls = [
       makePull({ date: "2026-03-01", epicModules: ["a"] }),
       makePull({ date: "2026-03-02", epicModules: [] }),
       makePull({ date: "2026-03-03", epicModules: [] }),
     ];
-    expect(selectPitySinceLastEpic(pulls)).toBe(2);
+    expect(selectPitySinceLastEpic(pulls)).toBe(20);
   });
 
-  it("counts all pulls when no epics ever", () => {
+  it("counts all module pulls when no epics ever", () => {
     const pulls = [makePull(), makePull(), makePull()];
-    expect(selectPitySinceLastEpic(pulls)).toBe(3);
+    expect(selectPitySinceLastEpic(pulls)).toBe(30);
   });
 
   it("returns 0 when last pull had epic", () => {

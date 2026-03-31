@@ -50,7 +50,7 @@ export function selectPitySinceLastEpic(pulls: PullRecord[]): number {
   let count = 0;
   for (let i = sorted.length - 1; i >= 0; i--) {
     if (sorted[i].epicModules.length > 0) break;
-    count++;
+    count += 10;
   }
   return count;
 }
