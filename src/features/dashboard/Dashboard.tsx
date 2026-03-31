@@ -1,6 +1,11 @@
 import { StatCardGrid } from "./StatCardGrid";
 import { RecentPullsList } from "./RecentPullsList";
 import { RarityBreakdownBar } from "./RarityBreakdownBar";
+import { ModuleCollectionGrid } from "./ModuleCollectionGrid";
+import { MergeProgressSummary } from "./MergeProgressSummary";
+import { PullHighlights } from "./PullHighlights";
+import { PullCalendar } from "./PullCalendar";
+import { TypeBalance } from "./TypeBalance";
 
 export function Dashboard() {
   return (
@@ -20,6 +25,15 @@ export function Dashboard() {
           </h3>
           <RarityBreakdownBar />
         </div>
+      </div>
+      <ModuleCollectionGrid />
+      <div className="grid md:grid-cols-2 gap-6">
+        <MergeProgressSummary />
+        <PullHighlights />
+      </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        <TypeBalance />
+        <PullCalendar />
       </div>
     </div>
   );
