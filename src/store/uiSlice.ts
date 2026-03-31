@@ -6,10 +6,12 @@ export interface UiSlice {
   isAddPullModalOpen: boolean;
   editingPullId: string | null;
   settingsOpen: boolean;
+  lastUsedDate: string | null;
   setActiveTab: (tab: TabId) => void;
   openAddPullModal: () => void;
   openEditPullModal: (pullId: string) => void;
   closePullModal: () => void;
+  setLastUsedDate: (date: string) => void;
   toggleSettings: () => void;
   closeSettings: () => void;
 }
@@ -24,6 +26,7 @@ export const createUiSlice: StateCreator<
   isAddPullModalOpen: false,
   editingPullId: null,
   settingsOpen: false,
+  lastUsedDate: null,
 
   setActiveTab: (tab) =>
     set((state) => {
@@ -46,6 +49,11 @@ export const createUiSlice: StateCreator<
     set((state) => {
       state.isAddPullModalOpen = false;
       state.editingPullId = null;
+    }),
+
+  setLastUsedDate: (date) =>
+    set((state) => {
+      state.lastUsedDate = date;
     }),
 
   toggleSettings: () =>

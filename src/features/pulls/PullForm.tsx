@@ -22,8 +22,10 @@ const moduleOptions = MODULES.map((m) => ({
 
 export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
   const bannerDefault = useStore((s) => s.bannerDefault);
+  const lastUsedDate = useStore((s) => s.lastUsedDate);
+  const setLastUsedDate = useStore((s) => s.setLastUsedDate);
   const [date, setDate] = useState(
-    initialData?.date || new Date().toISOString().split("T")[0]
+    initialData?.date || lastUsedDate || new Date().toISOString().split("T")[0]
   );
   const [bannerType, setBannerType] = useState<BannerType>(
     initialData?.bannerType || bannerDefault
@@ -58,6 +60,7 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
 
   const handleSubmit = () => {
     if (errors.length > 0 || !allEpicsSelected) return;
+    setLastUsedDate(date);
     onSubmit({
       date,
       commonCount,

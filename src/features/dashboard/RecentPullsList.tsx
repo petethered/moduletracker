@@ -6,6 +6,7 @@ import { RARITY_COLORS } from "../../config/rarityColors";
 
 export function RecentPullsList() {
   const pulls = useStore((s) => s.pulls);
+  const openEditPullModal = useStore((s) => s.openEditPullModal);
   const sorted = sortPullsNewest(pulls).slice(0, 5);
 
   if (sorted.length === 0) {
@@ -21,7 +22,8 @@ export function RecentPullsList() {
       {sorted.map((pull) => (
         <div
           key={pull.id}
-          className="flex items-center gap-3 bg-[var(--color-navy-600)] rounded-lg px-3 py-2 text-sm"
+          onClick={() => openEditPullModal(pull.id)}
+          className="flex items-center gap-3 bg-[var(--color-navy-600)] rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-[var(--color-navy-500)] transition-colors"
         >
           <span className="text-gray-400 w-24 shrink-0">{pull.date}</span>
           <Badge color={RARITY_COLORS.common}>{pull.commonCount}C</Badge>
