@@ -19,7 +19,7 @@ test.describe("Analytics", () => {
     await page.selectOption("[data-testid='rare-count']", "2");
     await page.click("[data-testid='epic-select-0'] button");
     await page.fill("[data-testid='epic-select-0'] input", "Death");
-    await page.click("text=Death Penalty");
+    await page.locator("[data-testid='epic-select-0']").getByText("Death Penalty").click();
     await page.click("button:has-text('Save Pull')");
 
     await page.click("[data-tab='analytics']");

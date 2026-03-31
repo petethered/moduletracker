@@ -12,16 +12,6 @@ const TYPE_COLORS: Record<string, string> = {
 
 const TYPE_ORDER = ["cannon", "armor", "generator", "core"] as const;
 
-/** Abbreviate a module name to 2-4 chars for compact display */
-function abbrev(name: string): string {
-  const words = name.split(/[\s-]+/);
-  if (words.length === 1) return name.slice(0, 4);
-  if (words.length >= 2 && words[0].length + words[1].length <= 5) {
-    return (words[0].slice(0, 2) + words[1].slice(0, 2)).toUpperCase();
-  }
-  return words.map((w) => w[0]).join("").toUpperCase().slice(0, 4);
-}
-
 export function ModuleCollectionGrid() {
   const pulls = useStore((s) => s.pulls);
   const moduleProgress = useStore((s) => s.moduleProgress);
@@ -30,53 +20,27 @@ export function ModuleCollectionGrid() {
   const totalCount = MODULES.length;
 
   return (
-    <div
-      style={{
-        backgroundColor: "var(--color-navy-800)",
-        borderRadius: 12,
-        padding: 16,
-        border: "1px solid var(--color-navy-500)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 12,
-        }}
-      >
-        <span style={{ fontWeight: 600, fontSize: 14 }}>Collection</span>
-        <span style={{ fontSize: 13, color: "#9ca3af" }}>
+    <div className="bg-[var(--color-navy-800)] rounded-xl p-4 border border-[var(--color-navy-500)]">
+      <div className="flex justify-between items-center mb-3">
+        <span className="font-semibold text-sm">Collection</span>
+        <span className="text-sm text-gray-400">
           {foundCount}/{totalCount}
         </span>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div className="flex flex-col gap-3">
         {TYPE_ORDER.map((type) => {
           const typeColor = TYPE_COLORS[type];
           const modules = MODULES_BY_TYPE[type];
           return (
             <div key={type}>
               <div
-                style={{
-                  fontSize: 10,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  color: typeColor,
-                  marginBottom: 4,
-                  fontWeight: 600,
-                }}
+                className="text-[10px] uppercase tracking-wider font-semibold mb-1"
+                style={{ color: typeColor }}
               >
                 {type}
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(6, 1fr)",
-                  gap: 4,
-                }}
-              >
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5">
                 {modules.map((mod) => {
                   const found = (counts[mod.id] || 0) > 0;
                   const progress = moduleProgress[mod.id];
@@ -96,36 +60,25 @@ export function ModuleCollectionGrid() {
                     <div
                       key={mod.id}
                       title={`${mod.name}${rarity ? ` (${rarity})` : ""}`}
+                      className="rounded-lg text-center select-none px-1.5 py-1.5"
                       style={{
-                        padding: "2px 4px",
-                        borderRadius: 6,
-                        fontSize: 9,
-                        fontWeight: 500,
-                        textAlign: "center",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
                         backgroundColor: bgColor,
                         border: `1px solid ${borderColor}`,
                         color: displayColor,
-                        cursor: "default",
-                        userSelect: "none",
-                        lineHeight: 1.2,
                       }}
                     >
-                      <div style={{ fontSize: 10 }}>{abbrev(mod.name)}</div>
+                      <div className="text-[10px] sm:text-[11px] md:text-xs font-medium leading-tight truncate">
+                        {mod.name}
+                      </div>
                       {rarity ? (
                         <div
-                          style={{
-                            fontSize: 8,
-                            color: rarityColor,
-                            fontWeight: 600,
-                          }}
+                          className="text-[8px] sm:text-[9px] md:text-[10px] font-semibold mt-0.5"
+                          style={{ color: rarityColor }}
                         >
                           {rarity}
                         </div>
                       ) : found ? (
-                        <div style={{ fontSize: 8, color: "#6b7280" }}>
+                        <div className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 mt-0.5">
                           epic
                         </div>
                       ) : null}

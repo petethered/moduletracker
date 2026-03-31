@@ -35,7 +35,7 @@ test.describe("Add pull flow", () => {
     // Click to open the select, type to search, click result
     await page.click("[data-testid='epic-select-0'] button");
     await page.fill("[data-testid='epic-select-0'] input", "Death");
-    await page.click("text=Death Penalty");
+    await page.locator("[data-testid='epic-select-0']").getByText("Death Penalty").click();
 
     await page.click("button:has-text('Save Pull')");
     await expect(page.getByRole("heading", { name: "Add 10x Pull" })).not.toBeVisible();
