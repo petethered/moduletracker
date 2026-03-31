@@ -85,8 +85,49 @@ export function SettingsPanel() {
   };
 
   const handleBulkImport = () => {
-    if (!bulkText.trim()) return;
-    const result = parseBulkImport(bulkText);
+    const trimmed = bulkText.trim();
+    if (!trimmed) return;
+
+    // Detect JSON (starts with { or [)
+    if (trimmed[0] === "{" || trimmed[0] === "[") {
+      try {
+        const data = JSON.parse(trimmed);
+        if (!data.pulls || !Array.isArray(data.pulls)) {
+          setBulkResult({ count: 0, errors: ["Invalid JSON: missing pulls array"], correctedNames: [] });
+          return;
+        }
+        const isValidPull = (p: unknown): boolean => {
+          if (!p || typeof p !== "object") return false;
+          const record = p as Record<string, unknown>;
+          return (
+            typeof record.id === "string" &&
+            typeof record.date === "string" &&
+            typeof record.commonCount === "number" &&
+            typeof record.rareCount === "number" &&
+            Array.isArray(record.epicModules) &&
+            typeof record.gemsSpent === "number" &&
+            typeof record.bannerType === "string"
+          );
+        };
+        if (!data.pulls.every(isValidPull)) {
+          setBulkResult({ count: 0, errors: ["Invalid JSON: pull records have missing or invalid fields"], correctedNames: [] });
+          return;
+        }
+        importPulls(data.pulls);
+        if (data.moduleProgress) {
+          importModuleProgress(data.moduleProgress);
+        }
+        setBulkResult({ count: data.pulls.length, errors: [], correctedNames: [] });
+        setBulkText("");
+        return;
+      } catch {
+        setBulkResult({ count: 0, errors: ["Invalid JSON format"], correctedNames: [] });
+        return;
+      }
+    }
+
+    // Tab-separated text import
+    const result = parseBulkImport(trimmed);
     if (result.errors.length > 0) {
       setBulkResult({
         count: 0,
@@ -95,7 +136,6 @@ export function SettingsPanel() {
       });
       return;
     }
-    // Append to existing pulls
     for (const pull of result.pulls) {
       addPull({
         date: pull.date,
@@ -138,7 +178,7 @@ export function SettingsPanel() {
           <div className="border-t border-[var(--color-navy-500)] pt-4">
             <h3 className="text-sm font-medium text-gray-300 mb-2">Bulk Import</h3>
             <p className="text-xs text-gray-500 mb-2">
-              Paste tab-separated data: Date, Common, Rare, Epic count, Epic names...
+              Paste tab-separated data or exported JSON
             </p>
             <textarea
               value={bulkText}
