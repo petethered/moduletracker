@@ -1,37 +1,93 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
+
+const TYPE_COLORS: Record<string, string> = {
+  cannon: "#e94560",
+  armor: "#3b82f6",
+  generator: "#eab308",
+  core: "#a855f7",
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  cannon: "Cannon",
+  armor: "Armor",
+  generator: "Generator",
+  core: "Core",
+};
 
 export function ModuleDistributionChart() {
   const pulls = useStore((s) => s.pulls);
   const counts = selectModulePullCounts(pulls);
 
-  const data = MODULES.map((m) => ({
-    name: m.name,
-    count: counts[m.id] || 0,
-    type: m.type,
-  })).filter((d) => d.count > 0);
+  const typeCounts: Record<string, number> = { cannon: 0, armor: 0, generator: 0, core: 0 };
+  for (const m of MODULES) {
+    typeCounts[m.type] += counts[m.id] || 0;
+  }
+
+  const data = Object.entries(typeCounts)
+    .filter(([, count]) => count > 0)
+    .map(([type, count]) => ({
+      name: TYPE_LABELS[type],
+      value: count,
+      color: TYPE_COLORS[type],
+    }));
+
+  const total = data.reduce((sum, d) => sum + d.value, 0);
 
   if (data.length === 0) return null;
 
   return (
     <div data-testid="module-distribution-chart">
       <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">
-        Module Pull Distribution
+        Epic Pulls by Type
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} layout="vertical">
-          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a2e" />
-          <XAxis type="number" tick={{ fill: "#6b7280", fontSize: 11 }} />
-          <YAxis type="category" dataKey="name" tick={{ fill: "#6b7280", fontSize: 10 }} width={150} />
-          <Tooltip
-            contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
-            labelStyle={{ color: "#ffd700" }}
-          />
-          <Bar dataKey="count" fill="#a855f7" radius={[0, 4, 4, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="flex items-center gap-6">
+        <ResponsiveContainer width={160} height={160}>
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              cx="50%"
+              cy="50%"
+              outerRadius={70}
+              innerRadius={35}
+              strokeWidth={0}
+            >
+              {data.map((entry) => (
+                <Cell key={entry.name} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#16213e",
+                border: "1px solid #0f3460",
+                borderRadius: 8,
+              }}
+              formatter={(value: number, name: string) => {
+                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
+                return [`${value} (${pct}%)`, name];
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="space-y-3 text-sm">
+          {data.map((d) => (
+            <div key={d.name} className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: d.color }}
+              />
+              <span className="text-gray-300 w-20">{d.name}</span>
+              <span className="text-white font-medium">{d.value}</span>
+              <span className="text-gray-500">
+                ({total > 0 ? ((d.value / total) * 100).toFixed(1) : "0"}%)
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
