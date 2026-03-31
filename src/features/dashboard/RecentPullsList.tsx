@@ -1,13 +1,12 @@
 import { useStore } from "../../store";
+import { sortPullsNewest } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { Badge } from "../../components/ui/Badge";
 import { RARITY_COLORS } from "../../config/rarityColors";
 
 export function RecentPullsList() {
   const pulls = useStore((s) => s.pulls);
-  const sorted = [...pulls]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5);
+  const sorted = sortPullsNewest(pulls).slice(0, 5);
 
   if (sorted.length === 0) {
     return (

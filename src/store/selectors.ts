@@ -1,5 +1,35 @@
 import type { PullRecord } from "../types";
 
+/**
+ * Sort pulls chronologically (oldest first).
+ * Same-date pulls preserve insertion order (later entries = newer).
+ */
+export function sortPullsChronological(pulls: PullRecord[]): PullRecord[] {
+  return pulls
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => {
+      const dateCmp =
+        new Date(a.p.date).getTime() - new Date(b.p.date).getTime();
+      return dateCmp !== 0 ? dateCmp : a.i - b.i;
+    })
+    .map(({ p }) => p);
+}
+
+/**
+ * Sort pulls reverse-chronologically (newest first).
+ * Same-date pulls: later entries appear first.
+ */
+export function sortPullsNewest(pulls: PullRecord[]): PullRecord[] {
+  return pulls
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => {
+      const dateCmp =
+        new Date(b.p.date).getTime() - new Date(a.p.date).getTime();
+      return dateCmp !== 0 ? dateCmp : b.i - a.i;
+    })
+    .map(({ p }) => p);
+}
+
 export function selectTotalPulls(pulls: PullRecord[]): number {
   return pulls.length;
 }
@@ -44,9 +74,7 @@ export function selectGemsPerEpic(pulls: PullRecord[]): number {
 }
 
 export function selectPitySinceLastEpic(pulls: PullRecord[]): number {
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sorted = sortPullsChronological(pulls);
   let count = 0;
   for (let i = sorted.length - 1; i >= 0; i--) {
     if (sorted[i].epicModules.length > 0) break;
@@ -81,9 +109,7 @@ export function selectLastPullDateForModule(
   pulls: PullRecord[],
   moduleId: string
 ): string | null {
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sorted = sortPullsNewest(pulls);
   for (const p of sorted) {
     if (p.epicModules.includes(moduleId)) return p.date;
   }
@@ -103,9 +129,7 @@ export function selectModuleEpicPercentage(
 export function selectPullStreaks(pulls: PullRecord[]) {
   if (pulls.length === 0) return { bestEpicStreak: 0, worstDryStreak: 0 };
 
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sorted = sortPullsChronological(pulls);
 
   let bestEpicStreak = 0;
   let worstDryStreak = 0;
@@ -149,9 +173,7 @@ export function selectPredictedGemsToComplete(
 export function selectEpicRateOverTime(
   pulls: PullRecord[]
 ): { date: string; rate: number }[] {
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sorted = sortPullsChronological(pulls);
 
   let totalModules = 0;
   let totalEpics = 0;
@@ -172,9 +194,7 @@ export function selectEpicRateOverTime(
 export function selectGemsPerEpicOverTime(
   pulls: PullRecord[]
 ): { date: string; gemsPerEpic: number }[] {
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sorted = sortPullsChronological(pulls);
 
   let totalGems = 0;
   let totalEpics = 0;

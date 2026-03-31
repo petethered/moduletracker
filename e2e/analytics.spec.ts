@@ -2,18 +2,16 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Analytics", () => {
   test("shows empty state with no data", async ({ page }) => {
+    await page.addInitScript(() => localStorage.clear());
     await page.goto("/");
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
     await page.click("[data-tab='analytics']");
     await expect(page.getByRole("heading", { name: "Analytics" })).toBeVisible();
     await expect(page.getByText(/add some pulls to see analytics/i)).toBeVisible();
   });
 
   test("shows charts with data", async ({ page }) => {
+    await page.addInitScript(() => localStorage.clear());
     await page.goto("/");
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
 
     // Add a pull with an epic
     await page.click("button:has-text('Add 10x Pull')");

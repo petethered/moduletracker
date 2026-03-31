@@ -5,6 +5,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
+import { sortPullsNewest } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { RARITY_COLORS } from "../../config/rarityColors";
 import type { PullRecord } from "../../types";
@@ -15,9 +16,7 @@ export function PullHistoryTable() {
   const openEditPullModal = useStore((s) => s.openEditPullModal);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const sorted = [...pulls].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sorted = sortPullsNewest(pulls);
 
   const columns: Column<PullRecord>[] = [
     {
