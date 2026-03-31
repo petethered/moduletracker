@@ -3,6 +3,7 @@ import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
+import { parseBulkImport } from "./parseBulkImport";
 
 export function SettingsPanel() {
   const settingsOpen = useStore((s) => s.settingsOpen);
@@ -13,10 +14,17 @@ export function SettingsPanel() {
   const importModuleProgress = useStore((s) => s.importModuleProgress);
   const clearPulls = useStore((s) => s.clearPulls);
   const clearModuleProgress = useStore((s) => s.clearModuleProgress);
+  const addPull = useStore((s) => s.addPull);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [bulkText, setBulkText] = useState("");
+  const [bulkResult, setBulkResult] = useState<{
+    count: number;
+    errors: string[];
+    correctedNames: { line: number; from: string; to: string }[];
+  } | null>(null);
 
   const handleExport = () => {
     const data = { pulls, moduleProgress, exportedAt: new Date().toISOString() };
@@ -76,6 +84,36 @@ export function SettingsPanel() {
     e.target.value = "";
   };
 
+  const handleBulkImport = () => {
+    if (!bulkText.trim()) return;
+    const result = parseBulkImport(bulkText);
+    if (result.errors.length > 0) {
+      setBulkResult({
+        count: 0,
+        errors: result.errors,
+        correctedNames: result.correctedNames,
+      });
+      return;
+    }
+    // Append to existing pulls
+    for (const pull of result.pulls) {
+      addPull({
+        date: pull.date,
+        commonCount: pull.commonCount,
+        rareCount: pull.rareCount,
+        epicModules: pull.epicModules,
+        gemsSpent: pull.gemsSpent,
+        bannerType: pull.bannerType,
+      });
+    }
+    setBulkResult({
+      count: result.pulls.length,
+      errors: [],
+      correctedNames: result.correctedNames,
+    });
+    setBulkText("");
+  };
+
   const handleReset = () => {
     clearPulls();
     clearModuleProgress();
@@ -95,6 +133,56 @@ export function SettingsPanel() {
               <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} className="hidden" />
               {importError && <p className="text-red-400 text-sm">{importError}</p>}
             </div>
+          </div>
+
+          <div className="border-t border-[var(--color-navy-500)] pt-4">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Bulk Import</h3>
+            <p className="text-xs text-gray-500 mb-2">
+              Paste tab-separated data: Date, Common, Rare, Epic count, Epic names...
+            </p>
+            <textarea
+              value={bulkText}
+              onChange={(e) => {
+                setBulkText(e.target.value);
+                setBulkResult(null);
+              }}
+              placeholder={"3/17/2026\t7\t2\t1\tDeath Penalty"}
+              rows={6}
+              className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-xs font-mono focus:outline-none focus:border-[var(--color-accent-gold)] resize-y"
+            />
+            <Button
+              variant="secondary"
+              onClick={handleBulkImport}
+              disabled={!bulkText.trim()}
+              className="w-full mt-2"
+            >
+              Import Pasted Data
+            </Button>
+            {bulkResult && bulkResult.errors.length > 0 && (
+              <div className="mt-2 text-xs">
+                <p className="text-red-400 font-medium">Errors found — nothing imported:</p>
+                <ul className="text-red-400 mt-1 space-y-0.5 max-h-32 overflow-y-auto">
+                  {bulkResult.errors.map((e, i) => (
+                    <li key={i}>{e}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {bulkResult && bulkResult.count > 0 && (
+              <div className="mt-2 text-xs">
+                <p className="text-green-400">Imported {bulkResult.count} pulls.</p>
+                {bulkResult.correctedNames.length > 0 && (
+                  <div className="mt-1">
+                    <p className="text-yellow-400">Corrected names:</p>
+                    <ul className="text-yellow-400 mt-0.5 space-y-0.5">
+                      {bulkResult.correctedNames.map((c, i) => (
+                        <li key={i}>Line {c.line}: "{c.from}" → "{c.to}"</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="border-t border-[var(--color-navy-500)] pt-4">
