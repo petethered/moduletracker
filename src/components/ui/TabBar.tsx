@@ -19,13 +19,13 @@ interface TabBarProps {
 
 export function TabBar({ activeTab, onTabChange }: TabBarProps) {
   return (
-    <nav className="flex gap-0.5 px-4 bg-[var(--color-navy-900)]/60 backdrop-blur-sm border-b border-[var(--color-navy-500)]/40">
+    <nav className="flex bg-[var(--color-navy-900)]/60 backdrop-blur-sm border-b border-[var(--color-navy-500)]/40">
       {TABS.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           data-tab={tab.id}
-          className={`relative px-5 py-3.5 text-xs tracking-widest uppercase transition-all duration-300 ${
+          className={`relative flex-1 md:flex-none px-3 md:px-5 py-3.5 text-[10px] md:text-xs tracking-wider md:tracking-widest uppercase transition-all duration-300 ${
             activeTab === tab.id
               ? "text-[var(--color-accent-gold)]"
               : "text-gray-500 hover:text-gray-300"

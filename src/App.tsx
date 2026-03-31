@@ -38,7 +38,7 @@ function App() {
           Module Tracker
         </h1>
         <div className="flex items-center gap-3">
-          <Button onClick={openAddPullModal}>+ Add 10x Pull</Button>
+          <Button onClick={openAddPullModal}><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>
           <button
             onClick={toggleSettings}
             className="text-gray-500 hover:text-[var(--color-accent-gold)] text-lg transition-colors duration-200"

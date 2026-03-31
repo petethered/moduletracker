@@ -6,7 +6,7 @@ test.describe("Responsive layout", () => {
     await page.goto("/");
 
     await expect(page.getByText("Module Tracker")).toBeVisible();
-    await expect(page.getByRole("button", { name: /add 10x pull/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /add.*pull/i })).toBeVisible();
 
     // Tabs should be visible
     await expect(page.locator("[data-tab='dashboard']")).toBeVisible();
