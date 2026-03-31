@@ -2,6 +2,7 @@ import { useStore } from "./store";
 import { TabBar } from "./components/ui/TabBar";
 import { Button } from "./components/ui/Button";
 import { PullModal } from "./features/pulls/PullModal";
+import { SettingsPanel } from "./features/settings/SettingsPanel";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { History } from "./features/history/History";
 import { Modules } from "./features/modules/Modules";
@@ -46,6 +47,7 @@ function App() {
 
       {/* Pull Modal */}
       <PullModal />
+      <SettingsPanel />
     </div>
   );
 }
