@@ -29,8 +29,7 @@ test.describe("Import/Export", () => {
     const data = JSON.parse(content);
     expect(data.pulls).toHaveLength(1);
 
-    // Clear data
-    await page.click("[aria-label='Settings']");
+    // Clear data (settings modal is already open from export step)
     await page.click("button:has-text('Reset All Data')");
     await page.click("button:has-text('Delete')");
 

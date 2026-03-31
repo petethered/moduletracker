@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { createModulesSlice, ModulesSlice } from "../store/modulesSlice";
+import { createModulesSlice, type ModulesSlice } from "../store/modulesSlice";
 
 function createTestStore() {
   return create<ModulesSlice>()(immer((...a) => createModulesSlice(...a)));

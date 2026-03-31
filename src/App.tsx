@@ -12,7 +12,6 @@ function App() {
   const activeTab = useStore((s) => s.activeTab);
   const setActiveTab = useStore((s) => s.setActiveTab);
   const openAddPullModal = useStore((s) => s.openAddPullModal);
-  const settingsOpen = useStore((s) => s.settingsOpen);
   const toggleSettings = useStore((s) => s.toggleSettings);
 
   return (

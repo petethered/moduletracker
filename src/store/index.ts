@@ -15,10 +15,14 @@ export type AppStore = PullsSlice & ModulesSlice & UiSlice & SettingsSlice;
 export const useStore = create<AppStore>()(
   persist(
     immer((...a) => ({
-      ...createPullsSlice(...a),
-      ...createModulesSlice(...a),
-      ...createUiSlice(...a),
-      ...createSettingsSlice(...a),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...createPullsSlice(...(a as Parameters<typeof createPullsSlice>)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...createModulesSlice(...(a as Parameters<typeof createModulesSlice>)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...createUiSlice(...(a as Parameters<typeof createUiSlice>)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...createSettingsSlice(...(a as Parameters<typeof createSettingsSlice>)),
     })),
     {
       name: "module-tracker-storage",

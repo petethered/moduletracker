@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { createPullsSlice, PullsSlice } from "../store/pullsSlice";
+import { createPullsSlice, type PullsSlice } from "../store/pullsSlice";
 
 function createTestStore() {
   return create<PullsSlice>()(immer((...a) => createPullsSlice(...a)));
