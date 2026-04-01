@@ -194,7 +194,7 @@ export function SettingsPanel() {
               }}
               placeholder={"3/17/2026\t7\t2\t1\tDeath Penalty"}
               rows={6}
-              className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-xs font-mono focus:outline-none focus:border-[var(--color-accent-gold)] resize-y"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-base font-mono focus:outline-none focus:border-[var(--color-accent-gold)] resize-y"
             />
             <Button
               variant="secondary"

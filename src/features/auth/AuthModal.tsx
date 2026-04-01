@@ -141,7 +141,7 @@ export function AuthModal({ isOpen, onClose, initialView = "login", resetToken =
   };
 
   const inputClass =
-    "w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-sm focus:outline-none focus:border-[var(--color-accent-gold)] transition-colors";
+    "w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-base focus:outline-none focus:border-[var(--color-accent-gold)] transition-colors";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={
