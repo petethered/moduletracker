@@ -4,3 +4,5 @@ dist
 .claude
 *.local
 .env
+src/assets/
+test-results/
