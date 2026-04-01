@@ -26,16 +26,20 @@ function App() {
           animation: "borderGlow 8s ease-in-out infinite",
         }}
       >
-        <h1
-          className="text-lg text-[var(--color-accent-gold)]"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-            textShadow: "0 0 30px rgba(240, 192, 64, 0.15)",
-          }}
-        >
-          Module Tracker
+        <h1 className="text-lg text-[var(--color-accent-gold)]">
+          <button
+            onClick={() => setActiveTab("dashboard")}
+            className="cursor-pointer"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textShadow: "0 0 30px rgba(240, 192, 64, 0.15)",
+            }}
+            aria-label="Go to dashboard"
+          >
+            Module Tracker
+          </button>
         </h1>
         <div className="flex items-center gap-3">
           <Button onClick={openAddPullModal}><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>

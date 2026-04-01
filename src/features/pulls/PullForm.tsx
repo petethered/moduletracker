@@ -7,6 +7,7 @@ import { MODULES } from "../../config/modules";
 import { validatePullForm } from "./validation";
 import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
+import { getLocalDateString } from "../../utils/formatDate";
 
 interface PullFormProps {
   initialData?: PullRecord;
@@ -25,7 +26,7 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
   const lastUsedDate = useStore((s) => s.lastUsedDate);
   const setLastUsedDate = useStore((s) => s.setLastUsedDate);
   const [date, setDate] = useState(
-    initialData?.date || lastUsedDate || new Date().toISOString().split("T")[0]
+    initialData?.date || lastUsedDate || getLocalDateString()
   );
   const [bannerType, setBannerType] = useState<BannerType>(
     initialData?.bannerType || bannerDefault

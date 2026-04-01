@@ -9,6 +9,7 @@ import { sortPullsNewest } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { RARITY_COLORS } from "../../config/rarityColors";
 import type { PullRecord } from "../../types";
+import { formatDisplayDate } from "../../utils/formatDate";
 
 export function PullHistoryTable() {
   const pulls = useStore((s) => s.pulls);
@@ -22,7 +23,7 @@ export function PullHistoryTable() {
     {
       key: "date",
       header: "Date",
-      render: (p) => p.date,
+      render: (p) => formatDisplayDate(p.date),
       sortable: true,
       sortValue: (p) => p.date,
     },

@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
 import { parseBulkImport } from "./parseBulkImport";
+import { getLocalDateString } from "../../utils/formatDate";
 
 export function SettingsPanel() {
   const settingsOpen = useStore((s) => s.settingsOpen);
@@ -32,7 +33,7 @@ export function SettingsPanel() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `module-tracker-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `module-tracker-${getLocalDateString()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

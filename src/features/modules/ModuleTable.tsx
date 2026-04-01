@@ -13,6 +13,7 @@ import {
 import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import type { ModuleType } from "../../types";
+import { formatDisplayDate } from "../../utils/formatDate";
 
 const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
 const TYPE_LABELS: Record<ModuleType, string> = {
@@ -74,7 +75,7 @@ export function ModuleTable() {
                         <td className="px-3 py-2 font-medium">{mod.name}</td>
                         <td className="px-3 py-2">{count}</td>
                         <td className="px-3 py-2">{count > 0 ? `${pct.toFixed(1)}%` : "-"}</td>
-                        <td className="px-3 py-2 text-gray-400">{lastPulled || "-"}</td>
+                        <td className="px-3 py-2 text-gray-400">{lastPulled ? formatDisplayDate(lastPulled) : "-"}</td>
                         {/* Progress cell hidden - kept for future use
                         <td className="px-3 py-2">
                           {count > 0 ? (() => {

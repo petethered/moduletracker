@@ -1,4 +1,5 @@
 import { useStore } from "../../store";
+import { formatDisplayDate, toDateString } from "../../utils/formatDate";
 
 const DAYS_TO_SHOW = 90;
 const DAY_SIZE = 11;
@@ -13,13 +14,6 @@ function getPullsPerDay(
     map.set(key, (map.get(key) || 0) + 1);
   }
   return map;
-}
-
-function formatDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
 }
 
 function addDays(d: Date, n: number): Date {
@@ -59,7 +53,7 @@ export function PullCalendar() {
   while (current <= today) {
     const week: { date: string; count: number }[] = [];
     for (let d = 0; d < 7; d++) {
-      const dateStr = formatDate(current);
+      const dateStr = toDateString(current);
       const isFuture = current > today;
       week.push({
         date: dateStr,
@@ -165,7 +159,7 @@ export function PullCalendar() {
                   return (
                     <div
                       key={date}
-                      title={count >= 0 ? `${date}: ${count} pull${count !== 1 ? "s" : ""}` : ""}
+                      title={count >= 0 ? `${formatDisplayDate(date)}: ${count} pull${count !== 1 ? "s" : ""}` : ""}
                       style={{
                         width: DAY_SIZE,
                         height: DAY_SIZE,
