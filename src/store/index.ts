@@ -9,8 +9,10 @@ import { createUiSlice } from "./uiSlice";
 import type { UiSlice } from "./uiSlice";
 import { createSettingsSlice } from "./settingsSlice";
 import type { SettingsSlice } from "./settingsSlice";
+import { createAuthSlice } from "./authSlice";
+import type { AuthSlice } from "./authSlice";
 
-export type AppStore = PullsSlice & ModulesSlice & UiSlice & SettingsSlice;
+export type AppStore = PullsSlice & ModulesSlice & UiSlice & SettingsSlice & AuthSlice;
 
 export const useStore = create<AppStore>()(
   persist(
@@ -23,6 +25,8 @@ export const useStore = create<AppStore>()(
       ...createUiSlice(...(a as Parameters<typeof createUiSlice>)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...createSettingsSlice(...(a as Parameters<typeof createSettingsSlice>)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...createAuthSlice(...(a as Parameters<typeof createAuthSlice>)),
     })),
     {
       name: "module-tracker-storage",
@@ -30,6 +34,9 @@ export const useStore = create<AppStore>()(
         pulls: state.pulls,
         moduleProgress: state.moduleProgress,
         bannerDefault: state.bannerDefault,
+        storageChoice: state.storageChoice,
+        syncEnabled: state.syncEnabled,
+        user: state.user,
       }),
     }
   )

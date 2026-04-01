@@ -1,7 +1,12 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { useStore } from "./store";
 import { TabBar } from "./components/ui/TabBar";
 import { Button } from "./components/ui/Button";
+import { StorageChoiceModal } from "./features/auth/StorageChoiceModal";
+import { AuthModal } from "./features/auth/AuthModal";
+import { SyncStatus } from "./features/auth/SyncStatus";
+import { SyncInitializer } from "./features/auth/SyncInitializer";
+import { isAuthenticated } from "./services/api";
 
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard").then(m => ({ default: m.Dashboard })));
 const History = lazy(() => import("./features/history/History").then(m => ({ default: m.History })));
@@ -15,6 +20,30 @@ function App() {
   const setActiveTab = useStore((s) => s.setActiveTab);
   const openAddPullModal = useStore((s) => s.openAddPullModal);
   const toggleSettings = useStore((s) => s.toggleSettings);
+  const storageChoice = useStore((s) => s.storageChoice);
+  const user = useStore((s) => s.user);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [resetToken, setResetToken] = useState<string | undefined>();
+  const [authInitialView, setAuthInitialView] = useState<"login" | "reset-confirm">("login");
+
+  // Check for password reset token in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("reset");
+    if (token) {
+      setResetToken(token);
+      setAuthInitialView("reset-confirm");
+      setAuthModalOpen(true);
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
+
+  // Show auth modal when cloud is chosen but not authenticated
+  useEffect(() => {
+    if (storageChoice === "cloud" && !user && !isAuthenticated()) {
+      setAuthModalOpen(true);
+    }
+  }, [storageChoice, user]);
 
   return (
     <div className="min-h-screen bg-[var(--color-navy-900)] text-gray-200">
@@ -42,6 +71,7 @@ function App() {
           </button>
         </h1>
         <div className="flex items-center gap-3">
+          <SyncStatus />
           <Button onClick={openAddPullModal}><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>
           <button
             onClick={toggleSettings}
@@ -90,6 +120,16 @@ function App() {
         <PullModal />
         <SettingsPanel />
       </Suspense>
+
+      {/* Auth */}
+      <SyncInitializer />
+      <StorageChoiceModal />
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialView={authInitialView}
+        resetToken={resetToken}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useStore } from "../../store";
 import { parseBulkImport } from "./parseBulkImport";
 import { getLocalDateString } from "../../utils/formatDate";
 import { ScreenshotButton } from "../screenshot/ScreenshotButton";
+import { AccountSettings } from "./AccountSettings";
 
 export function SettingsPanel() {
   const settingsOpen = useStore((s) => s.settingsOpen);
@@ -167,7 +168,9 @@ export function SettingsPanel() {
     <>
       <Modal isOpen={settingsOpen} onClose={closeSettings} title="Settings">
         <div className="space-y-4">
-          <div>
+          <AccountSettings />
+
+          <div className="border-t border-[var(--color-navy-500)] pt-4">
             <h3 className="text-sm font-medium text-gray-300 mb-2">Data Management</h3>
             <div className="space-y-2">
               <Button variant="secondary" onClick={handleExport} className="w-full">Export Data</Button>

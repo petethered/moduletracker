@@ -1,0 +1,17 @@
+name = "moduletracker-api"
+main = "src/index.ts"
+compatibility_date = "2025-12-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "moduletracker"
+database_id = "7194f9a7-cca1-44d6-85da-1f39684f752d"
+
+
+[vars]
+FRONTEND_ORIGIN = "https://moduletracker.com"
+FROM_EMAIL = "help@meezer.com"
+
+# Secrets (set via `wrangler secret put`):
+# - JWT_SECRET
+# - POSTMARK_API_KEY
