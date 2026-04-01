@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
@@ -53,6 +54,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         </div>
         <div className="p-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
