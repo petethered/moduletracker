@@ -6,9 +6,17 @@ import { selectEpicRateOverTime } from "../../store/selectors";
 
 export function PullRateChart() {
   const pulls = useStore((s) => s.pulls);
-  const data = selectEpicRateOverTime(pulls);
+  const raw = selectEpicRateOverTime(pulls);
 
-  if (data.length < 2) return null;
+  if (raw.length < 2) return null;
+
+  const data = raw.map((d, i) => ({ ...d, idx: i }));
+  const formatTick = (idx: number) => {
+    const d = data[idx];
+    if (!d) return "";
+    const [, m, day] = d.date.split("-");
+    return `${parseInt(m)}/${parseInt(day)}`;
+  };
 
   return (
     <div data-testid="pull-rate-chart">
@@ -18,11 +26,14 @@ export function PullRateChart() {
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1a1a2e" />
-          <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} tickFormatter={(d: string) => { const [, m, day] = d.split("-"); return `${parseInt(m)}/${parseInt(day)}`; }} />
+          <XAxis dataKey="idx" tick={{ fill: "#6b7280", fontSize: 11 }} tickFormatter={formatTick} />
           <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} domain={[0, "auto"]} unit="%" />
           <Tooltip
             contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
             labelStyle={{ color: "#ffd700" }}
+            labelFormatter={(idx: unknown) => data[Number(idx)]?.date ?? ""}
+            formatter={(value?: number | string | readonly (number | string)[]) => [`${Number(value).toFixed(3)}%`, "Epic Rate"]}
+            isAnimationActive={false}
           />
           <ReferenceLine y={2.5} stroke="#ef4444" strokeDasharray="5 5" label={{ value: "Expected 2.5%", fill: "#ef4444", fontSize: 10 }} />
           <Line type="monotone" dataKey="rate" stroke="#a855f7" strokeWidth={2} dot={{ fill: "#a855f7", r: 3 }} name="Epic Rate %" />

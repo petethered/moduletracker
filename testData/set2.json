@@ -1,0 +1,2490 @@
+{
+  "pulls": [
+    {
+      "date": "2025-11-01",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6f43d8ee-455a-41fa-a590-dc7df90bbfaf"
+    },
+    {
+      "date": "2025-11-03",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "84c20202-7f4b-4ade-8145-5b35c54b41fc"
+    },
+    {
+      "date": "2025-11-04",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "a3d8dd8b-6c03-488c-b481-04fbdc14d150"
+    },
+    {
+      "date": "2025-11-03",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "multiverse-nexus"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "dc63f9a9-b15b-4d2f-915a-01fab6ae8507"
+    },
+    {
+      "date": "2025-11-04",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "0b15d769-d8e6-4f40-953e-3754c7140190"
+    },
+    {
+      "date": "2025-11-05",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6f8ff6b5-2ac9-479b-8785-296c661871f1"
+    },
+    {
+      "date": "2025-11-06",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "469275b5-596b-48d7-a043-6d8ebf8db468"
+    },
+    {
+      "date": "2025-11-05",
+      "commonCount": 7,
+      "rareCount": 1,
+      "epicModules": [
+        "black-hole-digestor",
+        "harmony-conductor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ecca5f5b-7c64-4963-a409-b1521704c817"
+    },
+    {
+      "date": "2025-11-05",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8d34fe7d-ff61-435c-99d7-14e62384e167"
+    },
+    {
+      "date": "2025-11-08",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a164f1c3-2534-41ef-9a43-2f0956323e2b"
+    },
+    {
+      "date": "2025-11-08",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "afac05b0-6d68-4683-888b-19118a5b17b6"
+    },
+    {
+      "date": "2025-11-09",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "92a64d3d-fdf0-4d8e-9b5d-15a679942b2e"
+    },
+    {
+      "date": "2025-11-08",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "89a87cad-86ea-496a-9551-c01b8e09179c"
+    },
+    {
+      "date": "2025-11-10",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5b148f1e-e97c-4ad3-b925-5a513480510c"
+    },
+    {
+      "date": "2025-11-11",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "dimension-core"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "a4cecb4b-b7e7-4193-b04b-f2fb64bffb90"
+    },
+    {
+      "date": "2025-11-10",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "94612778-f25a-4242-9641-ae9ec3185f9f"
+    },
+    {
+      "date": "2025-11-11",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b1d63f92-4424-4b5b-b467-36d857d4b3ac"
+    },
+    {
+      "date": "2025-11-13",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "sharp-fortitude"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ede94f02-dbc2-4937-8978-ac2bc73cbb99"
+    },
+    {
+      "date": "2025-11-12",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "harmony-conductor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "73fdb2a4-28b0-41fb-bbb2-f9089b4bd7e4"
+    },
+    {
+      "date": "2025-11-13",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "1a2b5656-f266-4881-9cc7-c3fdd5280140"
+    },
+    {
+      "date": "2025-11-15",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e0501127-326f-4ffa-94b0-df598f0acad8"
+    },
+    {
+      "date": "2025-11-13",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "48bfdda8-d6b5-4c29-98b3-2f9a31adba05"
+    },
+    {
+      "date": "2025-11-15",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "9f5d0389-c2d7-4283-9404-26ae2f42fd28"
+    },
+    {
+      "date": "2025-11-16",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5cb89f24-4be6-4e16-83a8-e82026be668e"
+    },
+    {
+      "date": "2025-11-16",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "galaxy-compressor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "f289fdff-8ffc-40dc-844c-d797f9d5f2ba"
+    },
+    {
+      "date": "2025-11-17",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e0cd4f55-a4a3-46ea-ac08-3cbf7b3cf377"
+    },
+    {
+      "date": "2025-11-18",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "bd058625-3e6f-43b2-b734-5a25270e43d4"
+    },
+    {
+      "date": "2025-11-19",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5edf7f51-1bfb-43df-8374-7008b79900bc"
+    },
+    {
+      "date": "2025-11-18",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3d046ae6-6d5b-4dbb-a982-5339dfaf529e"
+    },
+    {
+      "date": "2025-11-19",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "10d32404-d85e-491a-872b-e8d324823d3a"
+    },
+    {
+      "date": "2025-11-20",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6e327d32-f45a-456c-a197-5328209b8bab"
+    },
+    {
+      "date": "2025-11-21",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "0a5515ea-805e-46e6-9984-bc2a0ec54e40"
+    },
+    {
+      "date": "2025-11-20",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "06d74155-2e94-4bd4-a12c-0ab9223b4738"
+    },
+    {
+      "date": "2025-11-22",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a321169a-257b-468a-8b2c-ad858bb0cf7e"
+    },
+    {
+      "date": "2025-11-23",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "240121c6-adbb-4ef3-a4c5-72e927703f1a"
+    },
+    {
+      "date": "2025-11-23",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "being-annihilator"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2d30b001-54e7-4c9a-884e-97bb400fd7cf"
+    },
+    {
+      "date": "2025-11-23",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9bb87702-a929-4d6a-8bcb-55c84e1d9b5a"
+    },
+    {
+      "date": "2025-11-23",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "cf8e262b-3096-4791-aa49-4e55803ef12e"
+    },
+    {
+      "date": "2025-11-24",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "8717ccfa-49a1-4207-8886-face40c52821"
+    },
+    {
+      "date": "2025-11-24",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "dimension-core"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7bf1a691-a72b-40ff-8eca-45d30b74ea74"
+    },
+    {
+      "date": "2025-11-27",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "amplifying-strike",
+        "galaxy-compressor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "91063dec-590a-4f87-b2cc-17534f0374b6"
+    },
+    {
+      "date": "2025-11-26",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "astral-deliverance"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "30356603-5c43-434e-96af-16f734822463"
+    },
+    {
+      "date": "2025-11-28",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2290e90e-6ae3-4375-a58b-037ac45574c0"
+    },
+    {
+      "date": "2025-11-26",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "faffcbdd-7435-4f46-be63-c9f111986098"
+    },
+    {
+      "date": "2025-11-27",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "black-hole-digestor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "79fc3f42-a4a4-467e-a8e7-31bb49eb28bd"
+    },
+    {
+      "date": "2025-11-28",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3a0f7790-98ed-443c-b9c0-1ba53074945c"
+    },
+    {
+      "date": "2025-11-28",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "4cc43214-9b9c-4307-bdc9-eab018213de5"
+    },
+    {
+      "date": "2025-12-01",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b6a78169-2907-46d0-84b6-fd1a8a37112c"
+    },
+    {
+      "date": "2025-11-29",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8ce26240-f669-4b6a-a398-49bf1f372f7d"
+    },
+    {
+      "date": "2025-11-30",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "negative-mass-projector"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "31e42297-d915-4a3d-904c-5788028d05be"
+    },
+    {
+      "date": "2025-12-01",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b1225888-f7b5-4e97-8b79-76c18bab24cd"
+    },
+    {
+      "date": "2025-12-01",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5e1a5fe3-06d9-4d5f-86bb-ced774e34476"
+    },
+    {
+      "date": "2025-12-02",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "singularity-harness",
+        "galaxy-compressor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "46ce88ac-1745-49f3-94ff-6d5a6c595930"
+    },
+    {
+      "date": "2025-12-04",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "2e40a45d-2a47-4f97-94e3-7634460239f8"
+    },
+    {
+      "date": "2025-12-05",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ed5d961b-dbab-42eb-9b55-4365c2103e22"
+    },
+    {
+      "date": "2025-12-04",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "primordial-collapse"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "93b929a8-b836-443a-821b-c5fb77e31529"
+    },
+    {
+      "date": "2025-12-04",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "cc6f0cda-bf9e-43bc-9452-6b4bd64efd8c"
+    },
+    {
+      "date": "2025-12-07",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "1e54feac-81c9-40b2-9bb0-485628c924d3"
+    },
+    {
+      "date": "2025-12-08",
+      "commonCount": 5,
+      "rareCount": 3,
+      "epicModules": [
+        "death-penalty",
+        "pulsar-harvester"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "77e2fcd2-f8bf-4f11-97a3-244f67782c89"
+    },
+    {
+      "date": "2025-12-07",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7d222ffb-e5ae-4c48-94bf-d776ac962246"
+    },
+    {
+      "date": "2025-12-08",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "restorative-bonus"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "648e5a91-087a-4ae5-b1e5-8627f1bcad39"
+    },
+    {
+      "date": "2025-12-09",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "negative-mass-projector"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9f8c3296-1ca2-41e4-bf53-678805b3d4e7"
+    },
+    {
+      "date": "2025-12-08",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "44f1d6a9-adb5-4d4b-b22c-0e1139dd6360"
+    },
+    {
+      "date": "2025-12-11",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b6e636f4-65a7-46f2-ab05-e933a046f597"
+    },
+    {
+      "date": "2025-12-09",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6a4f068d-f904-4527-afb6-086241b29b9c"
+    },
+    {
+      "date": "2025-12-10",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "be172298-d5fa-49a4-bae1-24dff3026761"
+    },
+    {
+      "date": "2025-12-11",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "pulsar-harvester",
+        "death-penalty"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "df8cff0d-fa54-4663-bed9-78cc0fbfcc40"
+    },
+    {
+      "date": "2025-12-13",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "bad08d02-500e-4539-b556-50c88212910c"
+    },
+    {
+      "date": "2025-12-13",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "being-annihilator"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e9174bed-f2d8-494d-a4a0-1c9712efa1f5"
+    },
+    {
+      "date": "2025-12-14",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7750e2e6-e23f-43d6-8b2f-41706304f1eb"
+    },
+    {
+      "date": "2025-12-14",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "fb292f0b-d500-4488-8387-6ca09b206510"
+    },
+    {
+      "date": "2025-12-13",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "cddd5b5b-9148-49f3-ade1-f581cb116f13"
+    },
+    {
+      "date": "2025-12-15",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "d8c65f9a-4675-41c0-8d2b-7cc647c620d4"
+    },
+    {
+      "date": "2025-12-17",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "primordial-collapse"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "88493388-8068-4a37-a610-4f299c6a1cf3"
+    },
+    {
+      "date": "2025-12-17",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b48c5cca-e876-4be7-b757-f93eb0d206db"
+    },
+    {
+      "date": "2025-12-16",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "31a3e00b-c794-4e04-ada9-60aecca6dd3d"
+    },
+    {
+      "date": "2025-12-17",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d6eff1a4-5fe9-4960-b011-db1154946557"
+    },
+    {
+      "date": "2025-12-17",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "shrink-ray"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ac60be66-6391-4093-9896-c03ae2dabbcf"
+    },
+    {
+      "date": "2025-12-20",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3c3d97ba-5159-48f9-afbf-42ee870631c0"
+    },
+    {
+      "date": "2025-12-19",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "dc3ee8fb-88d0-424f-9fa8-96a4eb69437c"
+    },
+    {
+      "date": "2025-12-19",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "849994a2-fa5e-467a-86b7-864373ad2273"
+    },
+    {
+      "date": "2025-12-19",
+      "commonCount": 7,
+      "rareCount": 1,
+      "epicModules": [
+        "pulsar-harvester",
+        "magnetic-hook"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9a57de9e-bce8-4622-87a9-354c2882a641"
+    },
+    {
+      "date": "2025-12-21",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "63b5960a-7681-418a-90d2-08953a56be64"
+    },
+    {
+      "date": "2025-12-21",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "4ffc66a6-71e8-4cf4-8490-2dc31506927f"
+    },
+    {
+      "date": "2025-12-22",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "83dc8034-f7c3-4477-940b-87ca319bccb1"
+    },
+    {
+      "date": "2025-12-23",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8cae3650-bc01-41c0-b5a8-8ae69b77b65e"
+    },
+    {
+      "date": "2025-12-23",
+      "commonCount": 5,
+      "rareCount": 3,
+      "epicModules": [
+        "orbital-augment",
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a9b96b56-2e89-4fec-b6dd-dc0905d3e60a"
+    },
+    {
+      "date": "2025-12-23",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "project-funding"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ea3a577c-ac37-47e2-9403-6d41d2d1adfb"
+    },
+    {
+      "date": "2025-12-26",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "12aab795-a183-4651-9129-a9d986c90786"
+    },
+    {
+      "date": "2025-12-25",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3e416755-c848-4a4a-bffd-4933b70064fe"
+    },
+    {
+      "date": "2025-12-25",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "negative-mass-projector"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "07190c3c-454c-42ee-94d7-4ef1a14cf180"
+    },
+    {
+      "date": "2025-12-25",
+      "commonCount": 8,
+      "rareCount": 0,
+      "epicModules": [
+        "restorative-bonus",
+        "space-displacer"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "4886f679-e0cd-453f-91fb-b0dc4aeefb34"
+    },
+    {
+      "date": "2025-12-28",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "53de57e9-32eb-41ac-8bf6-05ae2a835dc5"
+    },
+    {
+      "date": "2025-12-28",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7ac97165-9024-4422-b069-0d6b801a9efe"
+    },
+    {
+      "date": "2025-12-29",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "79ba3f42-8571-4fd6-8156-ec5a578f080b"
+    },
+    {
+      "date": "2025-12-30",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "being-annihilator"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7ecddb3e-be41-49a4-889a-f789a926d3ff"
+    },
+    {
+      "date": "2025-12-29",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "baaca9b1-0304-4919-82f5-2f0489dae6e7"
+    },
+    {
+      "date": "2025-12-29",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "436736f5-9e3c-4a57-ac85-f9cf6b49182f"
+    },
+    {
+      "date": "2026-01-01",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "c676d7fa-8492-4f23-b000-3fd23c7e7c18"
+    },
+    {
+      "date": "2025-12-30",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a6424df4-905b-41de-a12d-cd3dab5b41d3"
+    },
+    {
+      "date": "2026-01-01",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "orbital-augment"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "f2af07a3-2d96-46b1-8702-ba5eb32f8f85"
+    },
+    {
+      "date": "2026-01-01",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "22e6e31b-a06d-4151-ae80-0c7f9d9f9cbc"
+    },
+    {
+      "date": "2026-01-02",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "eadf7aad-db18-4c2e-bdbb-30fd4c60c816"
+    },
+    {
+      "date": "2026-01-03",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "26814ae6-f413-4ae2-92c4-7a57da39ef1d"
+    },
+    {
+      "date": "2026-01-03",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "4cc4bab8-7ced-446b-bc02-bd761f5d32d8"
+    },
+    {
+      "date": "2026-01-03",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "anti-cube-portal"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "da9917fc-e8aa-46eb-afdd-8c4b856703f1"
+    },
+    {
+      "date": "2026-01-05",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "647c6b86-9830-4a65-accd-0a0f7e53e6dc"
+    },
+    {
+      "date": "2026-01-06",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "1e964d6d-cf7f-474a-9c5e-f81c3b5be636"
+    },
+    {
+      "date": "2026-01-05",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2056a0c9-bff1-445a-9b15-b32f0b50cf71"
+    },
+    {
+      "date": "2026-01-06",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7f1fa851-009b-496e-8742-7466feb00751"
+    },
+    {
+      "date": "2026-01-06",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "sharp-fortitude"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "57be9e7c-5eae-4cd0-982f-6db02429fc18"
+    },
+    {
+      "date": "2026-01-09",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "90451bd2-198e-4fd4-a38c-2104074522b3"
+    },
+    {
+      "date": "2026-01-09",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "07092c13-11e3-434c-bf64-e33acddeeebd"
+    },
+    {
+      "date": "2026-01-09",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "c77d1ca4-483b-470a-9d1b-15e83aa56c25"
+    },
+    {
+      "date": "2026-01-10",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "magnetic-hook"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "deb0fde7-51ee-4a1b-800b-a013a620cae1"
+    },
+    {
+      "date": "2026-01-11",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "112a8419-cc05-49fd-8a30-02b991955b7a"
+    },
+    {
+      "date": "2026-01-11",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "singularity-harness"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "b95f95d8-f58a-4ce5-843d-289bd6f97c51"
+    },
+    {
+      "date": "2026-01-12",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "717df7db-ebc9-4489-94ac-640600c687ae"
+    },
+    {
+      "date": "2026-01-12",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "597900b8-60ec-433d-a300-aa9ab7dcde1a"
+    },
+    {
+      "date": "2026-01-12",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ba74dc4e-7d92-452b-8daa-23c833e33bd6"
+    },
+    {
+      "date": "2026-01-14",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a3d6c8d1-c11c-4b97-866a-90b82043f871"
+    },
+    {
+      "date": "2026-01-13",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "dimension-core"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d8cbdd8e-8f72-4db4-8adc-3d39cb6c40b5"
+    },
+    {
+      "date": "2026-01-14",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "ef61d3b7-ff4c-4915-9695-7e1715a26a8d"
+    },
+    {
+      "date": "2026-01-16",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3b5fec22-3981-4af2-adef-a5abf8f30c14"
+    },
+    {
+      "date": "2026-01-15",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "31d2646e-c362-4a16-8a71-d9793229831f"
+    },
+    {
+      "date": "2026-01-17",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "33b96372-43f4-48e7-a653-136faf96ba20"
+    },
+    {
+      "date": "2026-01-16",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "58b0d443-cf64-4827-a630-4db2068cfde4"
+    },
+    {
+      "date": "2026-01-18",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a313f0ee-50a1-4aa4-8e02-87d769f770ad"
+    },
+    {
+      "date": "2026-01-17",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "singularity-harness"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "a1a7b733-98dd-4195-a48c-0571a1b02eec"
+    },
+    {
+      "date": "2026-01-17",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "f001f0dd-742a-4ee5-b4ed-02709c12cbf4"
+    },
+    {
+      "date": "2026-01-20",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e5fb2642-d00d-4790-a416-003aab3437f4"
+    },
+    {
+      "date": "2026-01-20",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a8a121f2-24ea-409c-b987-fb4d0422d7d9"
+    },
+    {
+      "date": "2026-01-21",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "galaxy-compressor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "0b6a2897-9ef4-411a-8e8f-a3af93d67edf"
+    },
+    {
+      "date": "2026-01-21",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9ae12f81-9db9-4424-8496-8668d4406f26"
+    },
+    {
+      "date": "2026-01-20",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d5256d36-9938-46d5-87ae-e5d0334a039d"
+    },
+    {
+      "date": "2026-01-21",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "39c1338b-ebc0-443c-8757-a22060597b70"
+    },
+    {
+      "date": "2026-01-23",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "eaf7271a-616c-4372-835d-3d8b566495fa"
+    },
+    {
+      "date": "2026-01-22",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "havoc-bringer"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "51bd005d-17bc-432f-a87e-68062085a601"
+    },
+    {
+      "date": "2026-01-23",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "magnetic-hook"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "017d18a5-24fa-4e23-affd-e49ffae4e99b"
+    },
+    {
+      "date": "2026-01-24",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "dimension-core",
+        "harmony-conductor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "cd3cb65d-70c7-4094-9067-e1a20b707634"
+    },
+    {
+      "date": "2026-01-25",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "15f646a6-7776-4c00-9292-008ad7f4cfa1"
+    },
+    {
+      "date": "2026-01-25",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "e5939be5-e617-472d-8e2e-ab0005c704be"
+    },
+    {
+      "date": "2026-01-27",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3fa5aa87-414c-46ec-afa9-da3eb955a1d9"
+    },
+    {
+      "date": "2026-01-27",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2b7c901f-cec7-49ce-a41c-f475f8dc8461"
+    },
+    {
+      "date": "2026-01-26",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d85c3ee3-4981-47b6-a08f-b18ce4aafb71"
+    },
+    {
+      "date": "2026-01-29",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5dc9de89-6617-4491-9db1-52a444b6d8fe"
+    },
+    {
+      "date": "2026-01-29",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "bb7a3f46-3f23-4bf2-82d0-e4267dbc585e"
+    },
+    {
+      "date": "2026-01-30",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "653592ee-0b4d-4a3d-a2ff-a630f66e54b0"
+    },
+    {
+      "date": "2026-01-30",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "5cec48a6-94e2-461c-89b2-d943a864f389"
+    },
+    {
+      "date": "2026-01-30",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "df00ccd5-3b86-464c-8c24-b895ddc7c25d"
+    },
+    {
+      "date": "2026-02-01",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "15009901-1e58-4c6e-9331-bce38d2b5271"
+    },
+    {
+      "date": "2026-02-02",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "f13f8ca8-ac39-45d7-9009-bd2f07b57889"
+    },
+    {
+      "date": "2026-01-31",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "5f4cb0d3-384d-4268-b80b-24bf77627c34"
+    },
+    {
+      "date": "2026-02-03",
+      "commonCount": 5,
+      "rareCount": 3,
+      "epicModules": [
+        "orbital-augment",
+        "magnetic-hook"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "f727c6a3-3cf0-4f8e-a31f-f8c747478c50"
+    },
+    {
+      "date": "2026-02-03",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e639f989-20f9-43aa-b957-95a746b40314"
+    },
+    {
+      "date": "2026-02-03",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "b3ca29e1-5eda-48b1-8b61-1699c05db39a"
+    },
+    {
+      "date": "2026-02-03",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "b7f890cb-035b-4168-8447-c61b22350126"
+    },
+    {
+      "date": "2026-02-03",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "32509920-d7fe-4f87-bbf0-5482161ceb2f"
+    },
+    {
+      "date": "2026-02-05",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "0840b6c5-3c87-4f64-974c-03b1e4d916f8"
+    },
+    {
+      "date": "2026-02-06",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "47ebe8b2-9ff3-4d3c-9fe6-ed3ee96df0ae"
+    },
+    {
+      "date": "2026-02-05",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d01f6cdc-7f92-4bb3-b1f8-1e008593abec"
+    },
+    {
+      "date": "2026-02-07",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "35db85c5-0266-4725-a1f5-e2abbc5e9fd2"
+    },
+    {
+      "date": "2026-02-07",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "c985a164-7f11-4bb7-824a-c143cfc7d1cb"
+    },
+    {
+      "date": "2026-02-08",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "31d98ad1-8f6f-4c3c-bc74-6e03525bfd23"
+    },
+    {
+      "date": "2026-02-08",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a5e0ba2f-2155-46e8-b703-0c680b2c8168"
+    },
+    {
+      "date": "2026-02-10",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "33442a4a-7fca-4549-adab-4d00c5382ccd"
+    },
+    {
+      "date": "2026-02-09",
+      "commonCount": 7,
+      "rareCount": 2,
+      "epicModules": [
+        "space-displacer"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "f3de4caa-9cf3-407b-b81e-0c5555fb2b2c"
+    },
+    {
+      "date": "2026-02-11",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9cfe43b7-3a42-4b25-9fb0-4cd1fce042aa"
+    },
+    {
+      "date": "2026-02-11",
+      "commonCount": 8,
+      "rareCount": 0,
+      "epicModules": [
+        "astral-deliverance",
+        "restorative-bonus"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "c74e1e5d-a20d-4379-9c42-73189500648d"
+    },
+    {
+      "date": "2026-02-12",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "23dde07c-8271-45bd-a8ef-49bf7af9e57d"
+    },
+    {
+      "date": "2026-02-13",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "07158309-0874-481b-98eb-d59a95727b7c"
+    },
+    {
+      "date": "2026-02-14",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "44a47feb-282a-4d1f-9809-bdc45e47903e"
+    },
+    {
+      "date": "2026-02-14",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "25df056c-93d8-4312-896d-8c942a2b4d45"
+    },
+    {
+      "date": "2026-02-14",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8459839c-c4d7-4a38-a673-c4e7dd6056a9"
+    },
+    {
+      "date": "2026-02-15",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "62280287-3545-492c-86b4-75fb78984634"
+    },
+    {
+      "date": "2026-02-15",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5a989e43-d634-4209-b60d-cf5bc9c93386"
+    },
+    {
+      "date": "2026-02-15",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "0e9fd2e8-5645-4fe1-805d-293c78485a32"
+    },
+    {
+      "date": "2026-02-16",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "32529808-7a88-4bbc-a09b-2a814485b1f1"
+    },
+    {
+      "date": "2026-02-18",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "059ea1b7-74f7-414f-bea9-6574c64a87b6"
+    },
+    {
+      "date": "2026-02-19",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "a5b11e91-3098-49cd-8669-f1ae69e78bc1"
+    },
+    {
+      "date": "2026-02-17",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8c10d6be-dbc8-4dc2-82cd-e63937e9916a"
+    },
+    {
+      "date": "2026-02-20",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "2a986f77-8272-418a-98a4-cb61350019aa"
+    },
+    {
+      "date": "2026-02-20",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6ea7a1dc-4e9e-4428-9750-636618a2b290"
+    },
+    {
+      "date": "2026-02-20",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "790b90a5-fa28-451b-8e91-03df82248f61"
+    },
+    {
+      "date": "2026-02-22",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "magnetic-hook"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e23a86ad-de29-4d56-a3e2-7c9b5b92ebc5"
+    },
+    {
+      "date": "2026-02-21",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "0cd27a30-e61d-4f00-883d-640569b60800"
+    },
+    {
+      "date": "2026-02-22",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3ae0e11e-f630-4244-9365-6d1563ca09ab"
+    },
+    {
+      "date": "2026-02-23",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7f2d54de-a871-4802-a3c6-370a3d74c082"
+    },
+    {
+      "date": "2026-02-23",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "c2f2c5f3-bf21-4aa6-a1b7-e73c941eba24"
+    },
+    {
+      "date": "2026-02-25",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "astral-deliverance",
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "ebdd3d8c-f92d-4609-abe0-c0b5ba7eaad9"
+    },
+    {
+      "date": "2026-02-24",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "being-annihilator"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "d437e826-bfcc-465e-b249-6f4ad3d9995a"
+    },
+    {
+      "date": "2026-02-24",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "de33726e-2d95-46c8-aff1-fb3f1b2ffee9"
+    },
+    {
+      "date": "2026-02-24",
+      "commonCount": 8,
+      "rareCount": 0,
+      "epicModules": [
+        "space-displacer",
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "e24e9d1a-aded-44d4-9bed-931a35e6d2ac"
+    },
+    {
+      "date": "2026-02-27",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "e8fdfed5-733e-4a81-9df2-9a8248fd28ba"
+    },
+    {
+      "date": "2026-02-27",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "havoc-bringer"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "cfd97ee6-83a3-4b00-b63e-f321a43e29be"
+    },
+    {
+      "date": "2026-02-27",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8001f7ec-21ed-4096-bb1e-c38fb4d21475"
+    },
+    {
+      "date": "2026-03-01",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "78a45763-825d-4152-939e-dbfddaae779c"
+    },
+    {
+      "date": "2026-02-27",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2970d87f-3546-4167-8d84-372c350370fa"
+    },
+    {
+      "date": "2026-02-28",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5f50414e-fc21-4728-a97c-dfd678e87509"
+    },
+    {
+      "date": "2026-03-02",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7b70bc0f-387a-436f-a73e-963ef6f1fe23"
+    },
+    {
+      "date": "2026-03-01",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6a7704cb-1e52-4bf2-82e5-335a6cbac6c2"
+    },
+    {
+      "date": "2026-03-02",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6f8a0013-0a9a-44c8-af81-7fa55a1ae419"
+    },
+    {
+      "date": "2026-03-04",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "sharp-fortitude"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "951ad57a-2b3c-4b42-98d1-b8e1091d7ef4"
+    },
+    {
+      "date": "2026-03-03",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "efda3b29-4661-4fbb-b78b-2748cf5dcf1c"
+    },
+    {
+      "date": "2026-03-06",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "844e4c4b-33ff-4008-b54b-c5c5df3338b2"
+    },
+    {
+      "date": "2026-03-06",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "249aeaf2-fc21-48fe-920f-2c6a71f7f7f8"
+    },
+    {
+      "date": "2026-03-07",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3ee84e10-fb53-4e49-b4ec-63c009b029b4"
+    },
+    {
+      "date": "2026-03-08",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "4cceeed9-877b-469c-a02d-3b66c2a7dcb9"
+    },
+    {
+      "date": "2026-03-08",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2d105b64-0f46-483a-9f81-e007e0a9abb1"
+    },
+    {
+      "date": "2026-03-08",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "13e45ee1-ce8a-45c8-a044-437a9d8a957f"
+    },
+    {
+      "date": "2026-03-07",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "wormhole-redirector"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "419cd76a-5f4b-463c-b887-6e3c8c4069e8"
+    },
+    {
+      "date": "2026-03-08",
+      "commonCount": 6,
+      "rareCount": 2,
+      "epicModules": [
+        "black-hole-digestor",
+        "primordial-collapse"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "fb26c652-9ff4-42fc-8048-7123a1f0c1a5"
+    },
+    {
+      "date": "2026-03-11",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8c97cef1-1cd0-4f23-a1a6-094eede6a878"
+    },
+    {
+      "date": "2026-03-09",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "shrink-ray"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7ead46e4-d2c6-403f-a0b5-c264ebc7477a"
+    },
+    {
+      "date": "2026-03-11",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "83dfef97-6c11-41e4-8a2e-f9273a004455"
+    },
+    {
+      "date": "2026-03-12",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "c90faaf0-040f-4641-9ba9-4472affc5279"
+    },
+    {
+      "date": "2026-03-12",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "being-annihilator"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "005d5686-f4d0-44c5-8e68-c3fe9abc95ff"
+    },
+    {
+      "date": "2026-03-13",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2a19352f-0672-463a-9f25-47ac9976bc76"
+    },
+    {
+      "date": "2026-03-12",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "1d6d4590-7a9c-4f28-9fae-5dcb8288cf69"
+    },
+    {
+      "date": "2026-03-14",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "9a7d548d-6647-4169-8541-34b1578da882"
+    },
+    {
+      "date": "2026-03-15",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "bc83d88f-056e-4266-ab79-90eeb9a3d747"
+    },
+    {
+      "date": "2026-03-14",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "99e5030e-234b-4125-9a3b-4419a0151f3b"
+    },
+    {
+      "date": "2026-03-15",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "6704b8a9-3051-41f5-8657-ee4ab1966407"
+    },
+    {
+      "date": "2026-03-16",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "space-displacer"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "b6ec5c60-9783-48ca-b4a3-90dd3f53d58e"
+    },
+    {
+      "date": "2026-03-17",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "62973f1a-3840-4c02-811e-fdeb88e21aaa"
+    },
+    {
+      "date": "2026-03-17",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "3dc49bf3-3923-483f-8f9d-e739753727c1"
+    },
+    {
+      "date": "2026-03-19",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "57f2f8db-6200-4832-aa2e-e6f6af40fcd0"
+    },
+    {
+      "date": "2026-03-18",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2efb2dff-f05e-424e-b099-446fcfaa9c3d"
+    },
+    {
+      "date": "2026-03-20",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "harmony-conductor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5762b877-14d3-4e3d-9c6b-e90eec67cde1"
+    },
+    {
+      "date": "2026-03-19",
+      "commonCount": 9,
+      "rareCount": 1,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "90b41ca7-8442-4d12-8c49-a7e9c0734547"
+    },
+    {
+      "date": "2026-03-20",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "orbital-augment"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "c73ea0bc-50c6-4e48-8df6-50f4f83f7379"
+    },
+    {
+      "date": "2026-03-22",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "8b5d5038-3ab9-4f36-9408-f50674bb33cc"
+    },
+    {
+      "date": "2026-03-23",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "harmony-conductor"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "76739576-9291-4ab4-9e59-177740a47f72"
+    },
+    {
+      "date": "2026-03-23",
+      "commonCount": 8,
+      "rareCount": 0,
+      "epicModules": [
+        "black-hole-digestor",
+        "wormhole-redirector"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "5309993e-69ba-4965-b007-2f7d20b0b9ba"
+    },
+    {
+      "date": "2026-03-22",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "7793d784-0f88-424f-927c-a39e1fcbebdb"
+    },
+    {
+      "date": "2026-03-22",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "be24d0a9-45f5-4d6e-9224-5c6a42b2c718"
+    },
+    {
+      "date": "2026-03-24",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "8528ef0b-fb08-4e12-80bd-efac1c23c317"
+    },
+    {
+      "date": "2026-03-24",
+      "commonCount": 8,
+      "rareCount": 1,
+      "epicModules": [
+        "primordial-collapse"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "cfad5c6b-acb9-45b2-978a-05d1cfd550e1"
+    },
+    {
+      "date": "2026-03-25",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "2ee3c33c-b9b0-4d4f-b72d-4517a31b23db"
+    },
+    {
+      "date": "2026-03-27",
+      "commonCount": 7,
+      "rareCount": 3,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "aa7506e1-db8c-4acc-b3ed-797d0249aa05"
+    },
+    {
+      "date": "2026-03-25",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "73a897e7-c219-46a1-aa69-d98c572cf89d"
+    },
+    {
+      "date": "2026-03-28",
+      "commonCount": 9,
+      "rareCount": 0,
+      "epicModules": [
+        "amplifying-strike"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "41b29f22-df73-4926-a1a5-6468d7df4a3d"
+    },
+    {
+      "date": "2026-03-27",
+      "commonCount": 6,
+      "rareCount": 3,
+      "epicModules": [
+        "anti-cube-portal"
+      ],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "1a1efced-344b-498b-8417-e3628d958931"
+    },
+    {
+      "date": "2026-03-28",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "bf8093d1-0b97-4836-b92e-cf0fda8e9800"
+    },
+    {
+      "date": "2026-03-30",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "c519ac03-38cb-4d45-9c0e-e5fb2f99ec93"
+    },
+    {
+      "date": "2026-03-28",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "78b270bd-cae0-4e1e-b181-3107e533badb"
+    },
+    {
+      "date": "2026-03-29",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "14e627a8-4b5b-45de-a802-48ecf68ce4c8"
+    },
+    {
+      "date": "2026-03-30",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "52483f2c-4956-44b4-8968-db2711ce7463"
+    },
+    {
+      "date": "2026-03-31",
+      "commonCount": 10,
+      "rareCount": 0,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "featured",
+      "id": "2df289a3-093e-4092-a61c-4ae32efd6a8a"
+    },
+    {
+      "date": "2026-03-31",
+      "commonCount": 8,
+      "rareCount": 2,
+      "epicModules": [],
+      "gemsSpent": 200,
+      "bannerType": "standard",
+      "id": "abfdcecd-7ead-42e3-acf1-b66231e452e0"
+    }
+  ],
+  "moduleProgress": {
+    "multiverse-nexus": {
+      "moduleId": "multiverse-nexus",
+      "currentRarity": "epic"
+    },
+    "black-hole-digestor": {
+      "moduleId": "black-hole-digestor",
+      "currentRarity": "mythic+"
+    },
+    "harmony-conductor": {
+      "moduleId": "harmony-conductor",
+      "currentRarity": "mythic+"
+    },
+    "dimension-core": {
+      "moduleId": "dimension-core",
+      "currentRarity": "mythic+"
+    },
+    "sharp-fortitude": {
+      "moduleId": "sharp-fortitude",
+      "currentRarity": "legendary"
+    },
+    "galaxy-compressor": {
+      "moduleId": "galaxy-compressor",
+      "currentRarity": "mythic+"
+    },
+    "being-annihilator": {
+      "moduleId": "being-annihilator",
+      "currentRarity": "mythic+"
+    },
+    "amplifying-strike": {
+      "moduleId": "amplifying-strike",
+      "currentRarity": "ancestral"
+    },
+    "astral-deliverance": {
+      "moduleId": "astral-deliverance",
+      "currentRarity": "legendary"
+    },
+    "negative-mass-projector": {
+      "moduleId": "negative-mass-projector",
+      "currentRarity": "legendary"
+    },
+    "singularity-harness": {
+      "moduleId": "singularity-harness",
+      "currentRarity": "legendary"
+    },
+    "primordial-collapse": {
+      "moduleId": "primordial-collapse",
+      "currentRarity": "mythic+"
+    },
+    "death-penalty": {
+      "moduleId": "death-penalty",
+      "currentRarity": "legendary"
+    },
+    "pulsar-harvester": {
+      "moduleId": "pulsar-harvester",
+      "currentRarity": "legendary"
+    },
+    "restorative-bonus": {
+      "moduleId": "restorative-bonus",
+      "currentRarity": "legendary"
+    },
+    "shrink-ray": {
+      "moduleId": "shrink-ray",
+      "currentRarity": "legendary"
+    },
+    "magnetic-hook": {
+      "moduleId": "magnetic-hook",
+      "currentRarity": "mythic+"
+    },
+    "orbital-augment": {
+      "moduleId": "orbital-augment",
+      "currentRarity": "mythic+"
+    },
+    "project-funding": {
+      "moduleId": "project-funding",
+      "currentRarity": "epic"
+    },
+    "space-displacer": {
+      "moduleId": "space-displacer",
+      "currentRarity": "mythic+"
+    },
+    "anti-cube-portal": {
+      "moduleId": "anti-cube-portal",
+      "currentRarity": "legendary"
+    },
+    "havoc-bringer": {
+      "moduleId": "havoc-bringer",
+      "currentRarity": "legendary"
+    },
+    "wormhole-redirector": {
+      "moduleId": "wormhole-redirector",
+      "currentRarity": "legendary"
+    }
+  },
+  "exportedAt": "2026-04-01T20:00:00.000Z"
+}
