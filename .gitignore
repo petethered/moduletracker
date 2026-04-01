@@ -6,3 +6,4 @@ dist
 .env
 src/assets/
 test-results/
+.DS_Store
