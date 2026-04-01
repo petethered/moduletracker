@@ -102,6 +102,7 @@ function App() {
       {/* Footer */}
       <footer className="flex items-center justify-center gap-3 px-5 py-4 text-xs text-gray-600 border-t border-[var(--color-navy-700)]">
         <span>&copy; {new Date().getFullYear()} ModuleTracker.com</span>
+        <span>Build: {__BUILD_DATE__}</span>
         <a
           href="https://github.com/petethered/moduletracker"
           target="_blank"

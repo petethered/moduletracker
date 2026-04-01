@@ -4,6 +4,9 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   base: "/",
+  define: {
+    __BUILD_DATE__: JSON.stringify(new Date().toLocaleString()),
+  },
   plugins: [react(), tailwindcss()],
   server: {
     port: 5200,

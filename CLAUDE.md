@@ -26,6 +26,10 @@
 - Rarity colors: `src/config/rarityColors.ts`
 - Types: `src/types/index.ts`
 
+## Build
+- The build timestamp is injected via Vite's `define` option (`__BUILD_DATE__` in `vite.config.ts`) and displayed in the footer
+- Every `npm run build` automatically captures the current date/time — no manual step needed
+
 ## Conventions
 - TDD: Write E2E test first for user flows, unit tests first for logic
 - All stats are derived via selectors, never stored in state
