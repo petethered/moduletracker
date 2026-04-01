@@ -68,7 +68,7 @@ export async function generateScreenshotImage(
   // Title
   ctx.font = "bold 20px Cinzel, serif";
   ctx.fillStyle = GOLD;
-  ctx.fillText("Module Tracker", PADDING, y + 24);
+  ctx.fillText("ModuleTracker.com", PADDING, y + 24);
 
   ctx.font = "12px Outfit, sans-serif";
   ctx.fillStyle = DARK_GRAY;
@@ -110,10 +110,24 @@ export async function generateScreenshotImage(
 
     ctx.font = "bold 12px Outfit, sans-serif";
     ctx.fillStyle = GOLD;
-    const sectionPct = section.pctOfPulls > 0
-      ? ` (${section.pctOfPulls.toFixed(1)}%)`
-      : "";
-    ctx.fillText(section.label + sectionPct, PADDING + 8, y + 21);
+    ctx.fillText(section.label, PADDING + 8, y + 21);
+
+    // Section copies total
+    ctx.textAlign = "center";
+    ctx.fillText(String(section.totalCopies), PADDING + COL_COPIES + 20, y + 21);
+    ctx.textAlign = "left";
+
+    // Section % of pulls
+    ctx.textAlign = "center";
+    ctx.fillText(
+      section.pctOfPulls > 0 ? `${section.pctOfPulls.toFixed(1)}%` : "-",
+      PADDING + COL_PCT + 30,
+      y + 21,
+    );
+    ctx.textAlign = "left";
+
+    // Section last pulled
+    ctx.fillText(section.lastPulled ?? "-", PADDING + COL_LAST_PULLED, y + 21);
 
     y += SECTION_HEADER_HEIGHT;
 

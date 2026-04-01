@@ -21,7 +21,9 @@ export interface ScreenshotModuleRow {
 
 export interface ScreenshotTypeSection {
   label: string;
+  totalCopies: number;
   pctOfPulls: number;
+  lastPulled: string | null;
   modules: ScreenshotModuleRow[];
 }
 
@@ -65,9 +67,18 @@ export function buildScreenshotData(
         (sum, m) => sum + (pullCounts[m.id] || 0),
         0,
       );
+      const lastDates = modules
+        .map((m) => selectLastPullDateForModule(pulls, m.id))
+        .filter((d): d is string => d !== null);
+      const latestDate = lastDates.length > 0
+        ? lastDates.sort().reverse()[0]
+        : null;
+
       return {
         label,
+        totalCopies: sectionCopies,
         pctOfPulls: totalEpics > 0 ? (sectionCopies / totalEpics) * 100 : 0,
+        lastPulled: latestDate ? formatDisplayDate(latestDate) : null,
         modules: modules.map((m) => {
           const copies = pullCounts[m.id] || 0;
           const lastDate = selectLastPullDateForModule(pulls, m.id);

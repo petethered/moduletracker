@@ -38,7 +38,7 @@ function App() {
             }}
             aria-label="Go to dashboard"
           >
-            Module Tracker
+            ModuleTracker.com
           </button>
         </h1>
         <div className="flex items-center gap-3">
