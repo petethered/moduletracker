@@ -61,8 +61,8 @@ export async function handleChangePassword(
   if (!currentPassword) {
     return jsonResponse({ error: "Current password is required" }, 400);
   }
-  if (!newPassword || newPassword.length < 8) {
-    return jsonResponse({ error: "New password must be at least 8 characters" }, 400);
+  if (!newPassword || newPassword.length < 8 || newPassword.length > 128) {
+    return jsonResponse({ error: "New password must be between 8 and 128 characters" }, 400);
   }
 
   const dbUser = await env.DB.prepare(
@@ -85,5 +85,12 @@ export async function handleChangePassword(
     "UPDATE users SET password = ?, salt = ?, updated_at = datetime('now') WHERE id = ?",
   ).bind(hash, salt, user.sub).run();
 
-  return jsonResponse({ ok: true });
+  const dbUser = await env.DB.prepare(
+    "SELECT email FROM users WHERE id = ?",
+  ).bind(user.sub).first<{ email: string }>();
+
+  const payload = createJWTPayload(user.sub, dbUser!.email);
+  const token = await signJWT(payload, env.JWT_SECRET);
+
+  return jsonResponse({ ok: true, token });
 }

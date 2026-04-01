@@ -23,9 +23,19 @@ function corsHeaders(request: Request): Record<string, string> {
   };
 }
 
+const SECURITY_HEADERS: Record<string, string> = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Cache-Control": "no-store",
+};
+
 function withCors(response: Response, request: Request): Response {
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(corsHeaders(request))) {
+    headers.set(key, value);
+  }
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
     headers.set(key, value);
   }
   return new Response(response.body, { status: response.status, headers });

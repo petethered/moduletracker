@@ -1,6 +1,6 @@
 import {
   generateSalt, hashPassword, verifyPassword,
-  signJWT, createJWTPayload, generateResetToken,
+  signJWT, createJWTPayload, generateResetToken, sha256,
 } from "./crypto";
 import { sendPasswordResetEmail } from "./password-reset-email";
 import { jsonResponse } from "./response";
@@ -14,13 +14,13 @@ export async function handleRegister(request: Request, env: Env): Promise<Respon
   if (!email || !EMAIL_REGEX.test(email)) {
     return jsonResponse({ error: "Invalid email format" }, 400);
   }
-  if (!password || password.length < 8) {
-    return jsonResponse({ error: "Password must be at least 8 characters" }, 400);
+  if (!password || password.length < 8 || password.length > 128) {
+    return jsonResponse({ error: "Password must be between 8 and 128 characters" }, 400);
   }
 
   const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
   if (existing) {
-    return jsonResponse({ error: "An account with this email already exists" }, 409);
+    return jsonResponse({ error: "Invalid email or password" }, 409);
   }
 
   const salt = generateSalt();
@@ -48,12 +48,12 @@ export async function handleLogin(request: Request, env: Env): Promise<Response>
   ).bind(email).first<UserRow>();
 
   if (!user) {
-    return jsonResponse({ error: "No account found with this email", code: "NOT_FOUND" }, 401);
+    return jsonResponse({ error: "Invalid email or password" }, 401);
   }
 
   const valid = await verifyPassword(password, user.salt, user.password);
   if (!valid) {
-    return jsonResponse({ error: "Invalid password", code: "BAD_PASSWORD" }, 401);
+    return jsonResponse({ error: "Invalid email or password" }, 401);
   }
 
   const payload = createJWTPayload(user.id, user.email);
@@ -88,11 +88,12 @@ export async function handleResetRequest(request: Request, env: Env): Promise<Re
   }
 
   const token = generateResetToken();
+  const tokenHash = await sha256(token);
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
   await env.DB.prepare(
     "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
-  ).bind(user.id, token, expiresAt).run();
+  ).bind(user.id, tokenHash, expiresAt).run();
 
   try {
     await sendPasswordResetEmail(env, email, token);
@@ -109,13 +110,14 @@ export async function handleResetConfirm(request: Request, env: Env): Promise<Re
   if (!token) {
     return jsonResponse({ error: "Reset token is required" }, 400);
   }
-  if (!newPassword || newPassword.length < 8) {
-    return jsonResponse({ error: "Password must be at least 8 characters" }, 400);
+  if (!newPassword || newPassword.length < 8 || newPassword.length > 128) {
+    return jsonResponse({ error: "Password must be between 8 and 128 characters" }, 400);
   }
 
+  const tokenHash = await sha256(token);
   const resetRow = await env.DB.prepare(
     "SELECT id, user_id, expires_at, used FROM password_reset_tokens WHERE token = ?",
-  ).bind(token).first<{ id: number; user_id: number; expires_at: string; used: number }>();
+  ).bind(tokenHash).first<{ id: number; user_id: number; expires_at: string; used: number }>();
 
   if (!resetRow || resetRow.used) {
     return jsonResponse({ error: "Invalid or already used reset token" }, 400);
@@ -131,8 +133,8 @@ export async function handleResetConfirm(request: Request, env: Env): Promise<Re
   await env.DB.batch([
     env.DB.prepare("UPDATE users SET password = ?, salt = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(hash, salt, resetRow.user_id),
-    env.DB.prepare("UPDATE password_reset_tokens SET used = 1 WHERE id = ?")
-      .bind(resetRow.id),
+    env.DB.prepare("UPDATE password_reset_tokens SET used = 1 WHERE user_id = ?")
+      .bind(resetRow.user_id),
   ]);
 
   const user = await env.DB.prepare(

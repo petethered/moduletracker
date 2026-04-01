@@ -48,8 +48,9 @@ export async function changeEmail(newEmail: string, password: string): Promise<v
 }
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
-  await apiFetch("/auth/password", {
+  const { token } = await apiFetch<{ ok: boolean; token: string }>("/auth/password", {
     method: "PUT",
     body: JSON.stringify({ currentPassword, newPassword }),
   });
+  setToken(token);
 }

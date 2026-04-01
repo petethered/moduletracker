@@ -65,11 +65,7 @@ export function AuthModal({ isOpen, onClose, initialView = "login", resetToken =
       handleSuccess();
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.code === "NOT_FOUND") {
-          setError("No account found with this email. Would you like to register?");
-        } else {
-          setError(err.message);
-        }
+        setError(err.message);
       } else {
         setError("Connection failed. Please try again.");
       }
@@ -173,20 +169,7 @@ export function AuthModal({ isOpen, onClose, initialView = "login", resetToken =
             className={inputClass}
             required
           />
-          {error && (
-            <div className="text-sm text-red-400">
-              <p>{error}</p>
-              {error.includes("register") && (
-                <button
-                  type="button"
-                  onClick={() => switchView("register")}
-                  className="text-[var(--color-accent-gold)] hover:underline mt-1"
-                >
-                  Create an account
-                </button>
-              )}
-            </div>
-          )}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Logging in..." : "Log In"}
           </Button>
