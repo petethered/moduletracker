@@ -147,7 +147,7 @@ export async function generateScreenshotImage(
       ctx.font = "13px Outfit, sans-serif";
       ctx.fillStyle = WHITE;
       ctx.textAlign = "left";
-      ctx.fillText(mod.name, PADDING + COL_NAME + 8, rowY);
+      ctx.fillText(mod.name, PADDING + COL_NAME + 16, rowY);
 
       // Copies
       ctx.textAlign = "center";
