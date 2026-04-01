@@ -214,7 +214,7 @@ export function selectGemsPerEpicOverTime(
   return points;
 }
 
-const COPIES_FOR_ANCESTRAL = 8;
+export const COPIES_FOR_ANCESTRAL = 8;
 const COPIES_FOR_5_STAR = 18;
 
 export function selectMergeProgress(

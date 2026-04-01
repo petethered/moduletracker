@@ -5,6 +5,7 @@ import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
 import { parseBulkImport } from "./parseBulkImport";
 import { getLocalDateString } from "../../utils/formatDate";
+import { ScreenshotButton } from "../screenshot/ScreenshotButton";
 
 export function SettingsPanel() {
   const settingsOpen = useStore((s) => s.settingsOpen);
@@ -171,6 +172,7 @@ export function SettingsPanel() {
             <div className="space-y-2">
               <Button variant="secondary" onClick={handleExport} className="w-full">Export Data</Button>
               <Button variant="secondary" onClick={handleImport} className="w-full">Import Data</Button>
+              <ScreenshotButton />
               <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} className="hidden" />
               {importError && <p className="text-red-400 text-sm">{importError}</p>}
             </div>
