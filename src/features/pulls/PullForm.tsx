@@ -13,6 +13,7 @@ interface PullFormProps {
   initialData?: PullRecord;
   onSubmit: (data: Omit<PullRecord, "id">) => void;
   onCancel: () => void;
+  onDelete?: () => void;
 }
 
 const moduleOptions = MODULES.map((m) => ({
@@ -21,7 +22,7 @@ const moduleOptions = MODULES.map((m) => ({
   group: m.type.charAt(0).toUpperCase() + m.type.slice(1),
 }));
 
-export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
+export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullFormProps) {
   const bannerDefault = useStore((s) => s.bannerDefault);
   const lastUsedDate = useStore((s) => s.lastUsedDate);
   const setLastUsedDate = useStore((s) => s.setLastUsedDate);
@@ -155,16 +156,23 @@ export function PullForm({ initialData, onSubmit, onCancel }: PullFormProps) {
         </p>
       </div>
 
-      <div className="flex justify-end gap-3 pt-2">
-        <Button variant="secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={errors.length > 0 || !allEpicsSelected}
-        >
-          Save Pull
-        </Button>
+      <div className="flex items-center pt-2">
+        {onDelete && (
+          <Button variant="danger" onClick={onDelete}>
+            Delete
+          </Button>
+        )}
+        <div className="flex gap-3 ml-auto">
+          <Button variant="secondary" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={errors.length > 0 || !allEpicsSelected}
+          >
+            Save Pull
+          </Button>
+        </div>
       </div>
     </div>
   );

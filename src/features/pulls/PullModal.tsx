@@ -8,6 +8,7 @@ export function PullModal() {
   const closePullModal = useStore((s) => s.closePullModal);
   const addPull = useStore((s) => s.addPull);
   const updatePull = useStore((s) => s.updatePull);
+  const deletePull = useStore((s) => s.deletePull);
   const pulls = useStore((s) => s.pulls);
 
   const editingPull = editingPullId
@@ -30,6 +31,7 @@ export function PullModal() {
           closePullModal();
         }}
         onCancel={closePullModal}
+        onDelete={editingPull ? () => { deletePull(editingPull.id); closePullModal(); } : undefined}
       />
     </Modal>
   );
