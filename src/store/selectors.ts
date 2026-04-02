@@ -83,6 +83,27 @@ export function selectPitySinceLastEpic(pulls: PullRecord[]): number {
   return count;
 }
 
+/**
+ * Returns a Set of pull IDs that are "pity" pulls — an epic pull
+ * where the previous 14+ pulls had zero epics.
+ */
+export function selectPityPullIds(pulls: PullRecord[]): Set<string> {
+  const sorted = sortPullsChronological(pulls);
+  const pityIds = new Set<string>();
+  let dryStreak = 0;
+
+  for (const p of sorted) {
+    if (p.epicModules.length > 0) {
+      if (dryStreak >= 14) pityIds.add(p.id);
+      dryStreak = 0;
+    } else {
+      dryStreak++;
+    }
+  }
+
+  return pityIds;
+}
+
 export function selectModulePullCounts(
   pulls: PullRecord[]
 ): Record<string, number> {

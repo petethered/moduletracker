@@ -5,7 +5,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
-import { sortPullsNewest } from "../../store/selectors";
+import { sortPullsNewest, selectPityPullIds } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { RARITY_COLORS } from "../../config/rarityColors";
 import type { PullRecord } from "../../types";
@@ -18,6 +18,7 @@ export function PullHistoryTable() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const sorted = sortPullsNewest(pulls);
+  const pityIds = selectPityPullIds(pulls);
 
   const columns: Column<PullRecord>[] = [
     {
@@ -59,6 +60,7 @@ export function PullHistoryTable() {
       render: (p) => (
         <span className="text-[var(--color-rarity-epic)] text-xs">
           {p.epicModules.map((id) => MODULE_BY_ID[id]?.name || id).join(", ") || "-"}
+          {pityIds.has(p.id) && <span className="text-red-400 ml-1">PITY :(</span>}
         </span>
       ),
     },

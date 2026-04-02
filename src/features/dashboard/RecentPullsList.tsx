@@ -1,5 +1,5 @@
 import { useStore } from "../../store";
-import { sortPullsNewest } from "../../store/selectors";
+import { sortPullsNewest, selectPityPullIds } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { Badge } from "../../components/ui/Badge";
 import { RARITY_COLORS } from "../../config/rarityColors";
@@ -7,6 +7,7 @@ import { RARITY_COLORS } from "../../config/rarityColors";
 export function RecentPullsList() {
   const pulls = useStore((s) => s.pulls);
   const openEditPullModal = useStore((s) => s.openEditPullModal);
+  const pityIds = selectPityPullIds(pulls);
   const sorted = sortPullsNewest(pulls).slice(0, 5);
 
   if (sorted.length === 0) {
@@ -38,6 +39,7 @@ export function RecentPullsList() {
               {pull.epicModules
                 .map((id) => MODULE_BY_ID[id]?.name || id)
                 .join(", ")}
+              {pityIds.has(pull.id) && <span className="text-red-400 ml-1">PITY :(</span>}
             </span>
           )}
         </div>
