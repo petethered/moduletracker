@@ -13,6 +13,7 @@ export function AccountSettings() {
   const setSyncEnabled = useStore((s) => s.setSyncEnabled);
   const setSyncStatus = useStore((s) => s.setSyncStatus);
   const setStorageChoice = useStore((s) => s.setStorageChoice);
+  const closeSettings = useStore((s) => s.closeSettings);
 
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -98,7 +99,7 @@ export function AccountSettings() {
         <h3 className="text-sm font-medium text-gray-300 mb-2">Cloud Sync</h3>
         <Button
           variant="secondary"
-          onClick={() => setStorageChoice("cloud")}
+          onClick={() => { closeSettings(); setStorageChoice("cloud"); }}
           className="w-full"
         >
           Set Up Cloud Sync
