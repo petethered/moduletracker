@@ -18,8 +18,25 @@ export function drawStatsPanel(
 ) {
   const panelWidth = STATS_WIDTH;
   const PIE_RADIUS = 50;
-  const PIE_SECTION_HEIGHT = PIE_RADIUS * 2 + 24;
-  const panelHeight = 260 + PIE_SECTION_HEIGHT;
+
+  // Layout constants — keep in sync with the helpers and draw sequence below
+  const TOP_PADDING = 24;
+  const BOTTOM_PADDING = 16;
+  const TITLE_HEIGHT = 28;
+  const ROW_HEIGHT = 24;
+  const DIVIDER_HEIGHT = 20; // 4 above the line + 16 below
+  const PIE_SECTION_HEIGHT = 8 + PIE_RADIUS * 2 + 8;
+
+  // Draw sequence: title, 6 stat/rarity rows, 4 dividers, pie section
+  const STAT_ROWS = 6; // Gems Spent, Total Pulls, Common, Rare, Epic, Gems/Epic
+  const DIVIDERS = 4;
+  const panelHeight =
+    TOP_PADDING +
+    TITLE_HEIGHT +
+    STAT_ROWS * ROW_HEIGHT +
+    DIVIDERS * DIVIDER_HEIGHT +
+    PIE_SECTION_HEIGHT +
+    BOTTOM_PADDING;
 
   // Panel background
   ctx.fillStyle = NAVY_800;
@@ -31,7 +48,48 @@ export function drawStatsPanel(
   drawRoundRect(ctx, x, y, panelWidth, panelHeight, 6);
   ctx.stroke();
 
-  let py = y + 24;
+  let py = y + TOP_PADDING;
+
+  const drawDivider = () => {
+    py += 4;
+    ctx.strokeStyle = NAVY_600;
+    ctx.beginPath();
+    ctx.moveTo(x + 16, py);
+    ctx.lineTo(x + panelWidth - 16, py);
+    ctx.stroke();
+    py += 16;
+  };
+
+  const drawStatRow = (label: string, value: string, valueColor = WHITE) => {
+    ctx.font = "13px Outfit, sans-serif";
+    ctx.fillStyle = GRAY;
+    ctx.fillText(label, x + 16, py);
+    ctx.fillStyle = valueColor;
+    ctx.textAlign = "right";
+    ctx.fillText(value, x + panelWidth - 16, py);
+    ctx.textAlign = "left";
+    py += 24;
+  };
+
+  const drawRarityRow = (
+    label: string,
+    count: number,
+    pct: number,
+    color: string,
+  ) => {
+    ctx.font = "13px Outfit, sans-serif";
+    ctx.fillStyle = color;
+    ctx.fillText(label, x + 16, py);
+    ctx.fillStyle = WHITE;
+    ctx.textAlign = "right";
+    ctx.fillText(
+      `${count.toLocaleString()}  (${pct.toFixed(1)}%)`,
+      x + panelWidth - 16,
+      py,
+    );
+    ctx.textAlign = "left";
+    py += 24;
+  };
 
   // Title
   ctx.font = "bold 14px Outfit, sans-serif";
@@ -39,49 +97,44 @@ export function drawStatsPanel(
   ctx.fillText("Summary", x + 16, py);
   py += 28;
 
+  // Gems Spent
+  drawStatRow("Gems Spent", data.stats.gemsSpent.toLocaleString());
+
+  drawDivider();
+
+  // Total Pulls
+  drawStatRow("Total Pulls", data.stats.totalPulls.toLocaleString());
+
+  drawDivider();
+
   // Rarity rows
-  const rarityRows = [
-    {
-      label: "Common",
-      count: data.stats.commonCount,
-      pct: data.stats.commonPct,
-      color: RARITY_COLORS.common,
-    },
-    {
-      label: "Rare",
-      count: data.stats.rareCount,
-      pct: data.stats.rarePct,
-      color: RARITY_COLORS.rare,
-    },
-    {
-      label: "Epic",
-      count: data.stats.epicCount,
-      pct: data.stats.epicPct,
-      color: RARITY_COLORS.epic,
-    },
-  ];
+  drawRarityRow(
+    "Common",
+    data.stats.commonCount,
+    data.stats.commonPct,
+    RARITY_COLORS.common,
+  );
+  drawRarityRow(
+    "Rare",
+    data.stats.rareCount,
+    data.stats.rarePct,
+    RARITY_COLORS.rare,
+  );
+  drawRarityRow(
+    "Epic",
+    data.stats.epicCount,
+    data.stats.epicPct,
+    RARITY_COLORS.epic,
+  );
 
-  for (const row of rarityRows) {
-    ctx.font = "13px Outfit, sans-serif";
-    ctx.fillStyle = row.color;
-    ctx.fillText(row.label, x + 16, py);
-
-    ctx.fillStyle = WHITE;
-    ctx.textAlign = "right";
-    ctx.fillText(
-      `${row.count.toLocaleString()}  (${row.pct.toFixed(1)}%)`,
-      x + panelWidth - 16,
-      py,
-    );
-    ctx.textAlign = "left";
-    py += 24;
-  }
+  drawDivider();
 
   // Pie chart
   py += 8;
   const pieCx = x + panelWidth / 2;
   const pieCy = py + PIE_RADIUS;
-  const total = data.stats.commonCount + data.stats.rareCount + data.stats.epicCount;
+  const total =
+    data.stats.commonCount + data.stats.rareCount + data.stats.epicCount;
 
   if (total > 0) {
     const slices = [
@@ -108,51 +161,16 @@ export function drawStatsPanel(
     ctx.fill();
   }
 
-  py += PIE_RADIUS * 2 + 16;
+  py += PIE_RADIUS * 2 + 8;
 
-  // Separator
-  py += 4;
-  ctx.strokeStyle = NAVY_600;
-  ctx.beginPath();
-  ctx.moveTo(x + 16, py);
-  ctx.lineTo(x + panelWidth - 16, py);
-  ctx.stroke();
-  py += 16;
-
-  // Total Pulls
-  ctx.font = "13px Outfit, sans-serif";
-  ctx.fillStyle = GRAY;
-  ctx.fillText("Total Pulls", x + 16, py);
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = "right";
-  ctx.fillText(data.stats.totalPulls.toLocaleString(), x + panelWidth - 16, py);
-  ctx.textAlign = "left";
-  py += 24;
-
-  // Gems Spent
-  ctx.fillStyle = GRAY;
-  ctx.fillText("Gems Spent", x + 16, py);
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = "right";
-  ctx.fillText(
-    data.stats.gemsSpent.toLocaleString(),
-    x + panelWidth - 16,
-    py,
-  );
-  ctx.textAlign = "left";
-  py += 24;
+  drawDivider();
 
   // Gems/Epic
-  ctx.fillStyle = GRAY;
-  ctx.fillText("Gems/Epic", x + 16, py);
-  ctx.fillStyle = GOLD;
-  ctx.textAlign = "right";
-  ctx.fillText(
+  drawStatRow(
+    "Gems/Epic",
     data.stats.gemsPerEpic > 0
       ? Math.round(data.stats.gemsPerEpic).toLocaleString()
       : "-",
-    x + panelWidth - 16,
-    py,
+    GOLD,
   );
-  ctx.textAlign = "left";
 }
