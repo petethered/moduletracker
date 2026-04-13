@@ -5,7 +5,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
-import { sortPullsNewest, selectPityPullIds } from "../../store/selectors";
+import { sortPullsNewest, selectPityPullIds, selectDryStreakByPullId, PITY_PULL_THRESHOLD } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { RARITY_COLORS } from "../../config/rarityColors";
 import type { PullRecord } from "../../types";
@@ -19,6 +19,7 @@ export function PullHistoryTable() {
 
   const sorted = sortPullsNewest(pulls);
   const pityIds = selectPityPullIds(pulls);
+  const pityCounters = selectDryStreakByPullId(pulls);
 
   const columns: Column<PullRecord>[] = [
     {
@@ -57,12 +58,19 @@ export function PullHistoryTable() {
     {
       key: "epics",
       header: "Epics Received",
-      render: (p) => (
-        <span className="text-[var(--color-rarity-epic)] text-xs">
-          {p.epicModules.map((id) => MODULE_BY_ID[id]?.name || id).join(", ") || "-"}
-          {pityIds.has(p.id) && <span className="text-red-400 ml-1">PITY :(</span>}
-        </span>
-      ),
+      render: (p) =>
+        p.epicModules.length > 0 ? (
+          <span className="text-[var(--color-rarity-epic)] text-xs">
+            {p.epicModules.map((id) => MODULE_BY_ID[id]?.name || id).join(", ")}
+            {pityIds.has(p.id) && <span className="text-red-400 ml-1">PITY :(</span>}
+          </span>
+        ) : pityCounters.has(p.id) ? (
+          <span className="text-gray-500 text-xs">
+            (pity {pityCounters.get(p.id)}/{PITY_PULL_THRESHOLD})
+          </span>
+        ) : (
+          <span className="text-gray-600 text-xs">-</span>
+        ),
     },
     {
       key: "banner",

@@ -83,6 +83,33 @@ export function selectPitySinceLastEpic(pulls: PullRecord[]): number {
   return count;
 }
 
+/** Number of consecutive non-epic 10x pulls before the pity system guarantees an epic. */
+export const PITY_PULL_THRESHOLD = 15;
+
+/**
+ * Returns a Map of pull ID → dry-streak position (1-indexed)
+ * for every non-epic pull that is part of a dry streak.
+ * E.g. the 4th consecutive non-epic pull maps to 4.
+ */
+export function selectDryStreakByPullId(
+  pulls: PullRecord[]
+): Map<string, number> {
+  const sorted = sortPullsChronological(pulls);
+  const counters = new Map<string, number>();
+  let dryStreak = 0;
+
+  for (const p of sorted) {
+    if (p.epicModules.length > 0) {
+      dryStreak = 0;
+    } else {
+      dryStreak++;
+      counters.set(p.id, dryStreak);
+    }
+  }
+
+  return counters;
+}
+
 /**
  * Returns a Set of pull IDs that are "pity" pulls — an epic pull
  * where the previous 14+ pulls had zero epics.
@@ -94,7 +121,7 @@ export function selectPityPullIds(pulls: PullRecord[]): Set<string> {
 
   for (const p of sorted) {
     if (p.epicModules.length > 0) {
-      if (dryStreak >= 14) pityIds.add(p.id);
+      if (dryStreak >= PITY_PULL_THRESHOLD - 1) pityIds.add(p.id);
       dryStreak = 0;
     } else {
       dryStreak++;

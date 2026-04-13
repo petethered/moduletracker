@@ -1,5 +1,5 @@
 import { useStore } from "../../store";
-import { sortPullsNewest, selectPityPullIds } from "../../store/selectors";
+import { sortPullsNewest, selectPityPullIds, selectDryStreakByPullId, PITY_PULL_THRESHOLD } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { Badge } from "../../components/ui/Badge";
 import { RARITY_COLORS } from "../../config/rarityColors";
@@ -8,6 +8,7 @@ export function RecentPullsList() {
   const pulls = useStore((s) => s.pulls);
   const openEditPullModal = useStore((s) => s.openEditPullModal);
   const pityIds = selectPityPullIds(pulls);
+  const pityCounters = selectDryStreakByPullId(pulls);
   const sorted = sortPullsNewest(pulls).slice(0, 5);
 
   if (sorted.length === 0) {
@@ -34,14 +35,18 @@ export function RecentPullsList() {
               {pull.epicModules.length}E
             </Badge>
           )}
-          {pull.epicModules.length > 0 && (
+          {pull.epicModules.length > 0 ? (
             <span className="text-[var(--color-rarity-epic)] text-xs truncate">
               {pull.epicModules
                 .map((id) => MODULE_BY_ID[id]?.name || id)
                 .join(", ")}
               {pityIds.has(pull.id) && <span className="text-red-400 ml-1">PITY :(</span>}
             </span>
-          )}
+          ) : pityCounters.has(pull.id) ? (
+            <span className="text-gray-500 text-xs">
+              (pity {pityCounters.get(pull.id)}/{PITY_PULL_THRESHOLD})
+            </span>
+          ) : null}
         </div>
       ))}
     </div>

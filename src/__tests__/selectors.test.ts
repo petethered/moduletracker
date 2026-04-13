@@ -8,10 +8,13 @@ import {
   selectEpicPullRate,
   selectGemsPerEpic,
   selectPitySinceLastEpic,
+  selectDryStreakByPullId,
+  selectPityPullIds,
   selectModulePullCounts,
   selectUniqueEpicsFound,
   selectPullStreaks,
   selectPredictedGemsToComplete,
+  PITY_PULL_THRESHOLD,
 } from "../store/selectors";
 
 const makePull = (overrides: Partial<PullRecord> = {}): PullRecord => ({
@@ -171,5 +174,68 @@ describe("predicted gems", () => {
     const pulls = [makePull({ epicModules: moduleIds })];
     const predicted = selectPredictedGemsToComplete(pulls, 24);
     expect(predicted).toBe(0);
+  });
+});
+
+describe("selectDryStreakByPullId", () => {
+  it("assigns incrementing streak positions for consecutive non-epic pulls", () => {
+    const pulls = [
+      makePull({ id: "p1", date: "2026-03-01", epicModules: [] }),
+      makePull({ id: "p2", date: "2026-03-02", epicModules: [] }),
+      makePull({ id: "p3", date: "2026-03-03", epicModules: [] }),
+    ];
+    const counters = selectDryStreakByPullId(pulls);
+    expect(counters.get("p1")).toBe(1);
+    expect(counters.get("p2")).toBe(2);
+    expect(counters.get("p3")).toBe(3);
+  });
+
+  it("resets streak after an epic pull", () => {
+    const pulls = [
+      makePull({ id: "p1", date: "2026-03-01", epicModules: [] }),
+      makePull({ id: "p2", date: "2026-03-02", epicModules: [] }),
+      makePull({ id: "p3", date: "2026-03-03", epicModules: ["a"] }),
+      makePull({ id: "p4", date: "2026-03-04", epicModules: [] }),
+    ];
+    const counters = selectDryStreakByPullId(pulls);
+    expect(counters.get("p1")).toBe(1);
+    expect(counters.get("p2")).toBe(2);
+    expect(counters.has("p3")).toBe(false);
+    expect(counters.get("p4")).toBe(1);
+  });
+
+  it("does not include epic pulls in the map", () => {
+    const pulls = [
+      makePull({ id: "p1", date: "2026-03-01", epicModules: ["a"] }),
+      makePull({ id: "p2", date: "2026-03-02", epicModules: ["b"] }),
+    ];
+    const counters = selectDryStreakByPullId(pulls);
+    expect(counters.size).toBe(0);
+  });
+
+  it("returns empty map for no pulls", () => {
+    const counters = selectDryStreakByPullId([]);
+    expect(counters.size).toBe(0);
+  });
+});
+
+describe("selectPityPullIds", () => {
+  it("marks epic pulls after 14+ consecutive non-epic pulls as pity", () => {
+    const pulls: PullRecord[] = [];
+    for (let i = 0; i < PITY_PULL_THRESHOLD - 1; i++) {
+      pulls.push(makePull({ id: `dry-${i}`, date: `2026-03-${String(i + 1).padStart(2, "0")}`, epicModules: [] }));
+    }
+    pulls.push(makePull({ id: "pity-epic", date: "2026-03-16", epicModules: ["a"] }));
+    const pityIds = selectPityPullIds(pulls);
+    expect(pityIds.has("pity-epic")).toBe(true);
+  });
+
+  it("does not mark epic pulls with fewer than 14 preceding non-epic pulls", () => {
+    const pulls = [
+      makePull({ id: "p1", date: "2026-03-01", epicModules: [] }),
+      makePull({ id: "p2", date: "2026-03-02", epicModules: ["a"] }),
+    ];
+    const pityIds = selectPityPullIds(pulls);
+    expect(pityIds.has("p2")).toBe(false);
   });
 });
