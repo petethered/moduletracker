@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand/vanilla";
-import type { TabId } from "../types";
+import type { BannerType, TabId } from "../types";
 
 export interface UiSlice {
   activeTab: TabId;
@@ -7,11 +7,13 @@ export interface UiSlice {
   editingPullId: string | null;
   settingsOpen: boolean;
   lastUsedDate: string | null;
+  lastUsedBannerType: BannerType | null;
   setActiveTab: (tab: TabId) => void;
   openAddPullModal: () => void;
   openEditPullModal: (pullId: string) => void;
   closePullModal: () => void;
   setLastUsedDate: (date: string) => void;
+  setLastUsedBannerType: (banner: BannerType) => void;
   toggleSettings: () => void;
   closeSettings: () => void;
 }
@@ -27,6 +29,7 @@ export const createUiSlice: StateCreator<
   editingPullId: null,
   settingsOpen: false,
   lastUsedDate: null,
+  lastUsedBannerType: null,
 
   setActiveTab: (tab) =>
     set((state) => {
@@ -54,6 +57,11 @@ export const createUiSlice: StateCreator<
   setLastUsedDate: (date) =>
     set((state) => {
       state.lastUsedDate = date;
+    }),
+
+  setLastUsedBannerType: (banner) =>
+    set((state) => {
+      state.lastUsedBannerType = banner;
     }),
 
   toggleSettings: () =>

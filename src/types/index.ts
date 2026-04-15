@@ -1,6 +1,6 @@
 export type ModuleType = "cannon" | "armor" | "generator" | "core";
 
-export type BannerType = "standard" | "featured";
+export type BannerType = "standard" | "featured" | "lucky";
 
 export type ModuleRarity =
   | "epic"
