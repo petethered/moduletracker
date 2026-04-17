@@ -7,6 +7,7 @@ import { AuthModal } from "./features/auth/AuthModal";
 import { SyncStatus } from "./features/auth/SyncStatus";
 import { SyncInitializer } from "./features/auth/SyncInitializer";
 import { isAuthenticated } from "./services/api";
+import { useRenderLog } from "./utils/renderLog";
 
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard").then(m => ({ default: m.Dashboard })));
 const History = lazy(() => import("./features/history/History").then(m => ({ default: m.History })));
@@ -25,6 +26,7 @@ function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState<string | undefined>();
   const [authInitialView, setAuthInitialView] = useState<"login" | "reset-confirm">("login");
+  useRenderLog("App", { activeTab, authModalOpen });
 
   // Check for password reset token in URL
   useEffect(() => {
@@ -49,10 +51,9 @@ function App() {
     <div className="min-h-screen bg-[var(--color-navy-900)] text-gray-200">
       {/* Header */}
       <header
-        className="flex items-center justify-between px-5 py-4 bg-[var(--color-navy-800)]/80 backdrop-blur-md"
+        className="flex items-center justify-between px-5 py-4 bg-[var(--color-navy-800)]"
         style={{
           borderBottom: "1px solid rgba(240, 192, 64, 0.08)",
-          animation: "borderGlow 8s ease-in-out infinite",
         }}
       >
         <h1 className="text-lg text-[var(--color-accent-gold)]">

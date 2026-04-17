@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULE_BY_ID, MODULES } from "../../config/modules";
+import { useRenderLog } from "../../utils/renderLog";
 
 const TYPE_COLORS: Record<string, string> = {
   cannon: "#e94560",
@@ -13,16 +15,18 @@ const EPIC_MODULE_IDS = new Set(MODULES.map((m) => m.id));
 
 export function PullHighlights() {
   const pulls = useStore((s) => s.pulls);
-  const counts = selectModulePullCounts(pulls);
+  useRenderLog("PullHighlights", { pullsLen: pulls.length });
 
-  // Only consider epic modules that exist in our module list
-  const epicEntries = Object.entries(counts).filter(([id]) =>
-    EPIC_MODULE_IDS.has(id)
-  );
+  const epicEntries = useMemo(() => {
+    const counts = selectModulePullCounts(pulls);
+    const entries = Object.entries(counts).filter(([id]) =>
+      EPIC_MODULE_IDS.has(id)
+    );
+    entries.sort((a, b) => b[1] - a[1]);
+    return entries;
+  }, [pulls]);
 
   if (epicEntries.length === 0) return null;
-
-  epicEntries.sort((a, b) => b[1] - a[1]);
 
   const [mostId, mostCount] = epicEntries[0];
   const [leastId, leastCount] = epicEntries[epicEntries.length - 1];

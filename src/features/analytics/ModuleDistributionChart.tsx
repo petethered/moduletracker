@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
+import { useRenderLog } from "../../utils/renderLog";
 
 const TYPE_COLORS: Record<string, string> = {
   cannon: "#e94560",
@@ -19,22 +21,26 @@ const TYPE_LABELS: Record<string, string> = {
 
 export function ModuleDistributionChart() {
   const pulls = useStore((s) => s.pulls);
-  const counts = selectModulePullCounts(pulls);
+  useRenderLog("ModuleDistributionChart", { pullsLen: pulls.length });
 
-  const typeCounts: Record<string, number> = { cannon: 0, armor: 0, generator: 0, core: 0 };
-  for (const m of MODULES) {
-    typeCounts[m.type] += counts[m.id] || 0;
-  }
-
-  const data = Object.entries(typeCounts)
-    .filter(([, count]) => count > 0)
-    .map(([type, count]) => ({
-      name: TYPE_LABELS[type],
-      value: count,
-      color: TYPE_COLORS[type],
-    }));
-
-  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const { data, total } = useMemo(() => {
+    const counts = selectModulePullCounts(pulls);
+    const typeCounts: Record<string, number> = { cannon: 0, armor: 0, generator: 0, core: 0 };
+    for (const m of MODULES) {
+      typeCounts[m.type] += counts[m.id] || 0;
+    }
+    const entries = Object.entries(typeCounts)
+      .filter(([, count]) => count > 0)
+      .map(([type, count]) => ({
+        name: TYPE_LABELS[type],
+        value: count,
+        color: TYPE_COLORS[type],
+      }));
+    return {
+      data: entries,
+      total: entries.reduce((sum, d) => sum + d.value, 0),
+    };
+  }, [pulls]);
 
   if (data.length === 0) return null;
 

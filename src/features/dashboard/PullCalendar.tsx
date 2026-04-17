@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useStore } from "../../store";
 import { formatDisplayDate, toDateString } from "../../utils/formatDate";
+import { useRenderLog } from "../../utils/renderLog";
 
 const DAYS_TO_SHOW = 90;
 const DAY_SIZE = 12;
@@ -48,7 +49,8 @@ const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 export function PullCalendar() {
   const pulls = useStore((s) => s.pulls);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
-  const pullsPerDay = getPullsPerDay(pulls);
+  const pullsPerDay = useMemo(() => getPullsPerDay(pulls), [pulls]);
+  useRenderLog("PullCalendar", { pullsLen: pulls.length, hoveredDate });
 
   const todayStr = useMemo(() => toDateString(new Date()), []);
 

@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
 import type { ModuleType } from "../../types";
+import { useRenderLog } from "../../utils/renderLog";
 
 const TYPE_COLORS: Record<ModuleType, string> = {
   cannon: "#e94560",
@@ -14,22 +16,24 @@ const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
 
 export function TypeBalance() {
   const pulls = useStore((s) => s.pulls);
-  const counts = selectModulePullCounts(pulls);
+  useRenderLog("TypeBalance", { pullsLen: pulls.length });
 
-  // Aggregate epic pull counts per type
-  const typeCounts: Record<ModuleType, number> = {
-    cannon: 0,
-    armor: 0,
-    generator: 0,
-    core: 0,
-  };
-
-  for (const mod of MODULES) {
-    const c = counts[mod.id] || 0;
-    typeCounts[mod.type] += c;
-  }
-
-  const total = TYPE_ORDER.reduce((sum, t) => sum + typeCounts[t], 0);
+  const { typeCounts, total } = useMemo(() => {
+    const counts = selectModulePullCounts(pulls);
+    const tCounts: Record<ModuleType, number> = {
+      cannon: 0,
+      armor: 0,
+      generator: 0,
+      core: 0,
+    };
+    for (const mod of MODULES) {
+      tCounts[mod.type] += counts[mod.id] || 0;
+    }
+    return {
+      typeCounts: tCounts,
+      total: TYPE_ORDER.reduce((sum, t) => sum + tCounts[t], 0),
+    };
+  }, [pulls]);
 
   if (total === 0) return null;
 

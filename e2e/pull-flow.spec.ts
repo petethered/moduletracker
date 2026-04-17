@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
 
+async function setCount(page: import("@playwright/test").Page, testid: string, value: string) {
+  const input = page.locator(`[data-testid='${testid}']`);
+  await input.fill(value);
+  await input.blur();
+}
+
 test.describe("Add pull flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -7,32 +13,33 @@ test.describe("Add pull flow", () => {
     await page.reload();
   });
 
-  test("adds a pull with no epics", async ({ page }) => {
+  test("adds a pull with no epics (default 7/3)", async ({ page }) => {
     await page.click("button:has-text('Add 10x Pull')");
 
-    await page.selectOption("[data-testid='common-count']", "7");
-    await page.selectOption("[data-testid='rare-count']", "3");
+    // Defaults should already sum to 10
+    await expect(page.locator("[data-testid='common-count']")).toHaveValue("7");
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("3");
 
     await page.click("button:has-text('Save Pull')");
 
-    // Modal closes
     await expect(page.getByRole("heading", { name: "Add 10x Pull" })).not.toBeVisible();
 
-    // Navigate to history to verify (history tab is a placeholder in this build)
     await page.click("[data-tab='history']");
     await expect(page.getByText("Pull History")).toBeVisible();
   });
 
-  test("adds a pull with epics", async ({ page }) => {
+  test("adds an epic via + Add Epic button (subtracts from rare)", async ({ page }) => {
     await page.click("button:has-text('Add 10x Pull')");
 
-    await page.selectOption("[data-testid='common-count']", "7");
-    await page.selectOption("[data-testid='rare-count']", "2");
+    await page.click("[data-testid='add-epic']");
 
-    // Should show 1 epic select
+    // Rare should have dropped by 1
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("2");
+
+    // Epic row 0 should be visible
     await expect(page.locator("[data-testid='epic-select-0']")).toBeVisible();
 
-    // Click to open the select, type to search, click result
+    // Pick a module
     await page.click("[data-testid='epic-select-0'] button");
     await page.fill("[data-testid='epic-select-0'] input", "Death");
     await page.locator("[data-testid='epic-select-0']").getByText("Death Penalty").click();
@@ -41,12 +48,38 @@ test.describe("Add pull flow", () => {
     await expect(page.getByRole("heading", { name: "Add 10x Pull" })).not.toBeVisible();
   });
 
-  test("validates common + rare <= 10", async ({ page }) => {
+  test("removing an epic adds back to rare", async ({ page }) => {
     await page.click("button:has-text('Add 10x Pull')");
-    await page.selectOption("[data-testid='common-count']", "7");
-    await page.selectOption("[data-testid='rare-count']", "5");
+    await page.click("[data-testid='add-epic']");
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("2");
 
-    await expect(page.getByText(/cannot exceed 10/i)).toBeVisible();
+    await page.click("[data-testid='epic-remove-0']");
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("3");
+    await expect(page.locator("[data-testid='epic-select-0']")).not.toBeVisible();
+  });
+
+  test("typing in common auto-balances rare", async ({ page }) => {
+    await page.click("button:has-text('Add 10x Pull')");
+    await setCount(page, "common-count", "5");
+
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("5");
+  });
+
+  test("manually edited rare stops auto-balance", async ({ page }) => {
+    await page.click("button:has-text('Add 10x Pull')");
+    await setCount(page, "rare-count", "4");
+    await setCount(page, "common-count", "5");
+
+    // Rare should NOT have auto-balanced (was manually set to 4)
+    await expect(page.locator("[data-testid='rare-count']")).toHaveValue("4");
+  });
+
+  test("validates sum equals 10", async ({ page }) => {
+    await page.click("button:has-text('Add 10x Pull')");
+    await setCount(page, "rare-count", "5");
+    await setCount(page, "common-count", "7");
+
+    await expect(page.getByText(/must equal 10/i)).toBeVisible();
     await expect(page.locator("button:has-text('Save Pull')")).toBeDisabled();
   });
 });
@@ -57,25 +90,18 @@ test.describe("Edit pull flow", () => {
     await page.evaluate(() => localStorage.clear());
     await page.reload();
 
-    // Add a pull first
     await page.click("button:has-text('Add 10x Pull')");
-    await page.selectOption("[data-testid='common-count']", "7");
-    await page.selectOption("[data-testid='rare-count']", "3");
     await page.click("button:has-text('Save Pull')");
 
-    // Go to history and click edit
     await page.click("[data-tab='history']");
     await page.click("[data-testid='edit-pull']");
 
-    // Should show Edit Pull modal
     await expect(page.getByRole("heading", { name: "Edit Pull" })).toBeVisible();
 
-    // Change common to 8, rare to 2
-    await page.selectOption("[data-testid='common-count']", "8");
-    await page.selectOption("[data-testid='rare-count']", "2");
+    await setCount(page, "common-count", "8");
+    await setCount(page, "rare-count", "2");
     await page.click("button:has-text('Save Pull')");
 
-    // Verify modal closed
     await expect(page.getByRole("heading", { name: "Edit Pull" })).not.toBeVisible();
   });
 });

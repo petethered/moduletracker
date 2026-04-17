@@ -1,16 +1,20 @@
+import { useMemo } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import { useStore } from "../../store";
 import { selectGemsPerEpicOverTime } from "../../store/selectors";
+import { useRenderLog } from "../../utils/renderLog";
 
 export function GemsPerEpicChart() {
   const pulls = useStore((s) => s.pulls);
-  const raw = selectGemsPerEpicOverTime(pulls);
+  const data = useMemo(() => {
+    const raw = selectGemsPerEpicOverTime(pulls);
+    return raw.map((d, i) => ({ ...d, idx: i }));
+  }, [pulls]);
+  useRenderLog("GemsPerEpicChart", { pullsLen: pulls.length, dataLen: data.length });
 
-  if (raw.length < 2) return null;
-
-  const data = raw.map((d, i) => ({ ...d, idx: i }));
+  if (data.length < 2) return null;
   const formatTick = (idx: number) => {
     const d = data[idx];
     if (!d) return "";

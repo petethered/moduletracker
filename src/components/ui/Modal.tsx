@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useRenderLog } from "../../utils/renderLog";
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  useRenderLog("Modal", { isOpen, title });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -25,13 +27,13 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-in"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
       <div
-        className="bg-[var(--color-navy-700)]/95 backdrop-blur-md rounded-2xl border border-[var(--color-navy-500)]/50 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up"
+        className="bg-[var(--color-navy-700)] rounded-2xl border border-[var(--color-navy-500)]/50 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up"
         style={{
           boxShadow:
             "0 0 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)",

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useRenderLog } from "../../utils/renderLog";
 
 interface Option {
   value: string;
@@ -22,6 +23,7 @@ export function SearchSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  useRenderLog("SearchSelect", { value, isOpen });
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

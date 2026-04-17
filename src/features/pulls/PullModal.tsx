@@ -1,6 +1,7 @@
 import { Modal } from "../../components/ui/Modal";
 import { PullForm } from "./PullForm";
 import { useStore } from "../../store";
+import { useRenderLog } from "../../utils/renderLog";
 
 export function PullModal() {
   const isOpen = useStore((s) => s.isAddPullModalOpen);
@@ -10,6 +11,7 @@ export function PullModal() {
   const updatePull = useStore((s) => s.updatePull);
   const deletePull = useStore((s) => s.deletePull);
   const pulls = useStore((s) => s.pulls);
+  useRenderLog("PullModal", { isOpen, editingPullId });
 
   const editingPull = editingPullId
     ? pulls.find((p) => p.id === editingPullId)

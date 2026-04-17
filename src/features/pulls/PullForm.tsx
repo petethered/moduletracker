@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DateInput } from "../../components/ui/DateInput";
-import { NumberSelect } from "../../components/ui/NumberSelect";
 import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
 import { MODULES } from "../../config/modules";
-import { validatePullForm } from "./validation";
+import { validatePullForm, clampPullCount } from "./validation";
 import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
 import { getLocalDateString } from "../../utils/formatDate";
+import { useRenderLog, logEvent } from "../../utils/renderLog";
 
 interface PullFormProps {
   initialData?: PullRecord;
@@ -16,11 +16,26 @@ interface PullFormProps {
   onDelete?: () => void;
 }
 
+interface EpicRow {
+  rowId: string;
+  moduleId: string;
+}
+
 const moduleOptions = MODULES.map((m) => ({
   value: m.id,
   label: m.name,
   group: m.type.charAt(0).toUpperCase() + m.type.slice(1),
 }));
+
+const inputClass =
+  "w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)]";
+
+function createRowId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `r-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullFormProps) {
   const bannerDefault = useStore((s) => s.bannerDefault);
@@ -28,6 +43,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   const setLastUsedBannerType = useStore((s) => s.setLastUsedBannerType);
   const lastUsedDate = useStore((s) => s.lastUsedDate);
   const setLastUsedDate = useStore((s) => s.setLastUsedDate);
+
   const [date, setDate] = useState(
     initialData?.date || lastUsedDate || getLocalDateString()
   );
@@ -39,30 +55,65 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   );
   const [rareCount, setRareCount] = useState(initialData?.rareCount ?? 3);
   const [rareManuallySet, setRareManuallySet] = useState(!!initialData);
-  const [epicModules, setEpicModules] = useState<string[]>(
-    initialData?.epicModules || []
+  const [epics, setEpics] = useState<EpicRow[]>(() =>
+    (initialData?.epicModules || []).map((moduleId) => ({
+      rowId: createRowId(),
+      moduleId,
+    }))
   );
 
-  const epicCount = 10 - commonCount - rareCount;
-  const errors = validatePullForm(commonCount, rareCount);
+  const epicCount = epics.length;
+  const errors = validatePullForm(commonCount, rareCount, epicCount);
+  const allEpicsSelected = epics.every((r) => r.moduleId !== "");
+  const canAddEpic =
+    epicCount < 10 && (rareCount > 0 || commonCount > 0) && errors.length === 0;
 
-  // Keep epicModules array in sync with epicCount
-  useEffect(() => {
-    if (epicCount < 0) return;
-    setEpicModules((prev) => {
-      if (epicCount === 0) return [];
-      if (prev.length > epicCount) return prev.slice(0, epicCount);
-      if (prev.length < epicCount) {
-        return [...prev, ...Array(epicCount - prev.length).fill("")];
-      }
-      return prev;
-    });
-  }, [epicCount]);
+  useRenderLog("PullForm", {
+    commonCount,
+    rareCount,
+    epicCount,
+    rareManuallySet,
+    errorsLen: errors.length,
+  });
 
-  const allEpicsSelected =
-    epicCount <= 0 || epicModules.every((m) => m !== "");
+  function handleCommonChange(val: number) {
+    logEvent("PullForm.handleCommonChange", { from: commonCount, to: val });
+    setCommonCount(val);
+    if (!rareManuallySet) {
+      setRareCount(Math.max(0, 10 - val - epicCount));
+    }
+  }
 
-  const handleSubmit = () => {
+  function handleRareChange(val: number) {
+    logEvent("PullForm.handleRareChange", { from: rareCount, to: val });
+    setRareCount(val);
+    setRareManuallySet(true);
+  }
+
+  function handleAddEpic() {
+    if (epicCount >= 10) return;
+    if (rareCount === 0 && commonCount === 0) return;
+    logEvent("PullForm.handleAddEpic", { epicCount, rareCount, commonCount });
+    setEpics([...epics, { rowId: createRowId(), moduleId: "" }]);
+    if (rareCount > 0) {
+      setRareCount(rareCount - 1);
+    } else {
+      setCommonCount(commonCount - 1);
+    }
+  }
+
+  function handleRemoveEpic(rowId: string) {
+    logEvent("PullForm.handleRemoveEpic", { rowId, epicCount });
+    setEpics(epics.filter((r) => r.rowId !== rowId));
+    setRareCount(rareCount + 1);
+  }
+
+  function handleEpicChange(rowId: string, moduleId: string) {
+    logEvent("PullForm.handleEpicChange", { rowId, moduleId });
+    setEpics(epics.map((r) => (r.rowId === rowId ? { ...r, moduleId } : r)));
+  }
+
+  function handleSubmit() {
     if (errors.length > 0 || !allEpicsSelected) return;
     setLastUsedDate(date);
     setLastUsedBannerType(bannerType);
@@ -70,11 +121,11 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       date,
       commonCount,
       rareCount,
-      epicModules: epicModules.filter((m) => m !== ""),
+      epicModules: epics.map((r) => r.moduleId),
       gemsSpent: 200,
       bannerType,
     });
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -87,7 +138,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         <select
           value={bannerType}
           onChange={(e) => setBannerType(e.target.value as BannerType)}
-          className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200"
+          className={inputClass}
         >
           <option value="standard">Standard</option>
           <option value="featured">Featured</option>
@@ -96,30 +147,38 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <NumberSelect
-          label="Common"
-          value={commonCount}
-          onChange={(val) => {
-            setCommonCount(val);
-            if (!rareManuallySet) {
-              setRareCount(Math.max(0, 10 - val));
-            }
-          }}
-          min={0}
-          max={10}
-          data-testid="common-count"
-        />
-        <NumberSelect
-          label="Rare"
-          value={rareCount}
-          onChange={(val) => {
-            setRareCount(val);
-            setRareManuallySet(true);
-          }}
-          min={0}
-          max={10}
-          data-testid="rare-count"
-        />
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+            Common
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={10}
+            step={1}
+            inputMode="numeric"
+            value={commonCount}
+            onChange={(e) => handleCommonChange(clampPullCount(e.target.value))}
+            data-testid="common-count"
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+            Rare
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={10}
+            step={1}
+            inputMode="numeric"
+            value={rareCount}
+            onChange={(e) => handleRareChange(clampPullCount(e.target.value))}
+            data-testid="rare-count"
+            className={inputClass}
+          />
+        </div>
       </div>
 
       {errors.length > 0 && (
@@ -130,33 +189,53 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         </div>
       )}
 
-      {epicCount > 0 && errors.length === 0 && (
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[var(--color-rarity-epic)] mb-2">
-            Epic Modules ({epicCount})
-          </label>
-          <div className="space-y-2">
-            {epicModules.map((moduleId, i) => (
-              <div key={i} data-testid={`epic-select-${i}`}>
-                <SearchSelect
-                  options={moduleOptions}
-                  value={moduleId}
-                  onChange={(val) => {
-                    const updated = [...epicModules];
-                    updated[i] = val;
-                    setEpicModules(updated);
-                  }}
-                  placeholder={`Select epic module ${i + 1}...`}
-                />
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-[var(--color-rarity-epic)] mb-2">
+          Epic Modules ({epicCount})
+        </label>
+        {epics.length > 0 && (
+          <div className="space-y-2 mb-2">
+            {epics.map((row, i) => (
+              <div
+                key={row.rowId}
+                data-testid={`epic-select-${i}`}
+                className="flex gap-2 items-start"
+              >
+                <div className="flex-1">
+                  <SearchSelect
+                    options={moduleOptions}
+                    value={row.moduleId}
+                    onChange={(val) => handleEpicChange(row.rowId, val)}
+                    placeholder={`Select epic module ${i + 1}...`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveEpic(row.rowId)}
+                  aria-label="Remove epic"
+                  data-testid={`epic-remove-${i}`}
+                  className="px-3 py-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-[var(--color-navy-700)] border border-transparent hover:border-[var(--color-navy-500)] transition-colors"
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+        <button
+          type="button"
+          onClick={handleAddEpic}
+          disabled={!canAddEpic}
+          data-testid="add-epic"
+          className="text-sm px-3 py-2 rounded-lg border border-dashed border-[var(--color-navy-500)] text-[var(--color-rarity-epic)] hover:border-[var(--color-rarity-epic)] hover:bg-[var(--color-navy-800)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          + Add Epic
+        </button>
+      </div>
 
       <div className="bg-[var(--color-navy-800)] rounded-lg p-3 text-sm">
         <p className="text-gray-400">
-          Summary: {commonCount} common, {rareCount} rare, {Math.max(epicCount, 0)} epic — 200 gems
+          Summary: {commonCount} common, {rareCount} rare, {epicCount} epic — 200 gems
         </p>
       </div>
 

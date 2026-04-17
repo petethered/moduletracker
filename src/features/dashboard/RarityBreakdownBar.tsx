@@ -1,20 +1,25 @@
+import { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
 import { selectRarityPercentages, selectRarityCounts } from "../../store/selectors";
 import { RARITY_COLORS } from "../../config/rarityColors";
+import { useRenderLog } from "../../utils/renderLog";
 
 export function RarityBreakdownBar() {
   const pulls = useStore((s) => s.pulls);
-  const pcts = selectRarityPercentages(pulls);
-  const counts = selectRarityCounts(pulls);
+  useRenderLog("RarityBreakdownBar", { pullsLen: pulls.length });
+
+  const data = useMemo(() => {
+    const pcts = selectRarityPercentages(pulls);
+    const counts = selectRarityCounts(pulls);
+    return [
+      { name: "Common", value: counts.common, color: RARITY_COLORS.common, pct: pcts.common },
+      { name: "Rare", value: counts.rare, color: RARITY_COLORS.rare, pct: pcts.rare },
+      { name: "Epic", value: counts.epic, color: RARITY_COLORS.epic, pct: pcts.epic },
+    ].filter((d) => d.value > 0);
+  }, [pulls]);
 
   if (pulls.length === 0) return null;
-
-  const data = [
-    { name: "Common", value: counts.common, color: RARITY_COLORS.common, pct: pcts.common },
-    { name: "Rare", value: counts.rare, color: RARITY_COLORS.rare, pct: pcts.rare },
-    { name: "Epic", value: counts.epic, color: RARITY_COLORS.epic, pct: pcts.epic },
-  ].filter((d) => d.value > 0);
 
   return (
     <div className="flex items-center gap-4">
