@@ -88,6 +88,9 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
     logEvent("PullForm.handleRareChange", { from: rareCount, to: val });
     setRareCount(val);
     setRareManuallySet(true);
+    if (val + commonCount + epicCount > 10) {
+      setCommonCount(Math.max(0, 10 - val - epicCount));
+    }
   }
 
   function handleAddEpic() {
@@ -159,6 +162,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
             inputMode="numeric"
             value={commonCount}
             onChange={(e) => handleCommonChange(clampPullCount(e.target.value))}
+            onFocus={(e) => e.target.select()}
             data-testid="common-count"
             className={inputClass}
           />
@@ -175,6 +179,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
             inputMode="numeric"
             value={rareCount}
             onChange={(e) => handleRareChange(clampPullCount(e.target.value))}
+            onFocus={(e) => e.target.select()}
             data-testid="rare-count"
             className={inputClass}
           />

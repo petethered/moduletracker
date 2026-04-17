@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRenderLog } from "../../utils/renderLog";
 
@@ -10,7 +10,6 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
   useRenderLog("Modal", { isOpen, title });
 
   useEffect(() => {
@@ -25,13 +24,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return createPortal(
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-in"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-in">
       <div
         className="bg-[var(--color-navy-700)] rounded-2xl border border-[var(--color-navy-500)]/50 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up"
         style={{
