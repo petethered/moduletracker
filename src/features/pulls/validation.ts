@@ -12,10 +12,3 @@ export function validatePullForm(
     errors.push("Common + Rare + Epics must equal 10");
   return errors;
 }
-
-export function clampPullCount(raw: string): number {
-  if (raw === "") return 0;
-  const n = Number(raw);
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(10, Math.trunc(n)));
-}

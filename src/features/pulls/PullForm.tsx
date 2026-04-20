@@ -3,7 +3,7 @@ import { DateInput } from "../../components/ui/DateInput";
 import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
 import { MODULES } from "../../config/modules";
-import { validatePullForm, clampPullCount } from "./validation";
+import { validatePullForm } from "./validation";
 import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
 import { getLocalDateString } from "../../utils/formatDate";
@@ -27,7 +27,7 @@ const moduleOptions = MODULES.map((m) => ({
   group: m.type.charAt(0).toUpperCase() + m.type.slice(1),
 }));
 
-const inputClass =
+const selectClass =
   "w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)]";
 
 function createRowId(): string {
@@ -35,6 +35,56 @@ function createRowId(): string {
     return crypto.randomUUID();
   }
   return `r-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+interface CountButtonRowProps {
+  label: string;
+  value: number;
+  max: number;
+  onSelect: (n: number) => void;
+  testIdPrefix: string;
+}
+
+function CountButtonRow({ label, value, max, onSelect, testIdPrefix }: CountButtonRowProps) {
+  return (
+    <div>
+      <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+        {label}
+      </label>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="grid grid-cols-3 md:grid-cols-11 gap-1"
+      >
+        {Array.from({ length: 11 }, (_, n) => {
+          const disabled = n > max;
+          const selected = n === value;
+          return (
+            <button
+              key={n}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              aria-pressed={selected}
+              onClick={() => onSelect(n)}
+              disabled={disabled}
+              data-testid={`${testIdPrefix}-${n}`}
+              className={
+                "py-2 text-sm rounded-lg border transition-colors " +
+                (selected
+                  ? "bg-[var(--color-accent-gold)] text-[var(--color-navy-900)] border-[var(--color-accent-gold)] font-semibold"
+                  : disabled
+                  ? "bg-[var(--color-navy-800)] text-gray-600 border-[var(--color-navy-700)] cursor-not-allowed"
+                  : "bg-[var(--color-navy-800)] text-gray-300 border-[var(--color-navy-500)] hover:border-[var(--color-accent-gold)]")
+              }
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullFormProps) {
@@ -54,7 +104,6 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
     initialData?.commonCount ?? 7
   );
   const [rareCount, setRareCount] = useState(initialData?.rareCount ?? 3);
-  const [rareManuallySet, setRareManuallySet] = useState(!!initialData);
   const [epics, setEpics] = useState<EpicRow[]>(() =>
     (initialData?.epicModules || []).map((moduleId) => ({
       rowId: createRowId(),
@@ -63,34 +112,28 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   );
 
   const epicCount = epics.length;
+  const maxCount = Math.max(0, 10 - epicCount);
   const errors = validatePullForm(commonCount, rareCount, epicCount);
   const allEpicsSelected = epics.every((r) => r.moduleId !== "");
-  const canAddEpic =
-    epicCount < 10 && (rareCount > 0 || commonCount > 0) && errors.length === 0;
+  const canAddEpic = epicCount < 10 && (rareCount > 0 || commonCount > 0);
 
   useRenderLog("PullForm", {
     commonCount,
     rareCount,
     epicCount,
-    rareManuallySet,
     errorsLen: errors.length,
   });
 
-  function handleCommonChange(val: number) {
-    logEvent("PullForm.handleCommonChange", { from: commonCount, to: val });
+  function handleCommonSelect(val: number) {
+    logEvent("PullForm.handleCommonSelect", { from: commonCount, to: val });
     setCommonCount(val);
-    if (!rareManuallySet) {
-      setRareCount(Math.max(0, 10 - val - epicCount));
-    }
+    setRareCount(Math.max(0, 10 - val - epicCount));
   }
 
-  function handleRareChange(val: number) {
-    logEvent("PullForm.handleRareChange", { from: rareCount, to: val });
+  function handleRareSelect(val: number) {
+    logEvent("PullForm.handleRareSelect", { from: rareCount, to: val });
     setRareCount(val);
-    setRareManuallySet(true);
-    if (val + commonCount + epicCount > 10) {
-      setCommonCount(Math.max(0, 10 - val - epicCount));
-    }
+    setCommonCount(Math.max(0, 10 - val - epicCount));
   }
 
   function handleAddEpic() {
@@ -141,7 +184,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         <select
           value={bannerType}
           onChange={(e) => setBannerType(e.target.value as BannerType)}
-          className={inputClass}
+          className={selectClass}
         >
           <option value="standard">Standard</option>
           <option value="featured">Featured</option>
@@ -149,50 +192,20 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
-            Common
-          </label>
-          <input
-            type="number"
-            min={0}
-            max={10}
-            step={1}
-            inputMode="numeric"
-            value={commonCount}
-            onChange={(e) => handleCommonChange(clampPullCount(e.target.value))}
-            onFocus={(e) => e.target.select()}
-            data-testid="common-count"
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
-            Rare
-          </label>
-          <input
-            type="number"
-            min={0}
-            max={10}
-            step={1}
-            inputMode="numeric"
-            value={rareCount}
-            onChange={(e) => handleRareChange(clampPullCount(e.target.value))}
-            onFocus={(e) => e.target.select()}
-            data-testid="rare-count"
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      {errors.length > 0 && (
-        <div className="text-red-400 text-sm">
-          {errors.map((e) => (
-            <p key={e}>{e}</p>
-          ))}
-        </div>
-      )}
+      <CountButtonRow
+        label="Common"
+        value={commonCount}
+        max={maxCount}
+        onSelect={handleCommonSelect}
+        testIdPrefix="common-count"
+      />
+      <CountButtonRow
+        label="Rare"
+        value={rareCount}
+        max={maxCount}
+        onSelect={handleRareSelect}
+        testIdPrefix="rare-count"
+      />
 
       <div>
         <label className="block text-xs uppercase tracking-wider text-[var(--color-rarity-epic)] mb-2">

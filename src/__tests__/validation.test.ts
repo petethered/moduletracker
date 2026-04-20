@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validatePullForm, clampPullCount } from "../features/pulls/validation";
+import { validatePullForm } from "../features/pulls/validation";
 
 describe("validatePullForm", () => {
   it("valid: 7 common, 3 rare, 0 epics", () => {
@@ -27,31 +27,5 @@ describe("validatePullForm", () => {
   it("invalid: epic count over 10", () => {
     const errors = validatePullForm(0, 0, 11);
     expect(errors).toContain("Epic count must be 0-10");
-  });
-});
-
-describe("clampPullCount", () => {
-  it("returns 0 for empty string", () => {
-    expect(clampPullCount("")).toBe(0);
-  });
-
-  it("parses valid integers", () => {
-    expect(clampPullCount("7")).toBe(7);
-  });
-
-  it("clamps to 0 minimum", () => {
-    expect(clampPullCount("-3")).toBe(0);
-  });
-
-  it("clamps to 10 maximum", () => {
-    expect(clampPullCount("42")).toBe(10);
-  });
-
-  it("truncates decimals", () => {
-    expect(clampPullCount("7.9")).toBe(7);
-  });
-
-  it("returns 0 for non-numeric input", () => {
-    expect(clampPullCount("abc")).toBe(0);
   });
 });
