@@ -43,12 +43,16 @@ interface CountButtonRowProps {
   max: number;
   onSelect: (n: number) => void;
   testIdPrefix: string;
+  labelColor?: string;
 }
 
-function CountButtonRow({ label, value, max, onSelect, testIdPrefix }: CountButtonRowProps) {
+function CountButtonRow({ label, value, max, onSelect, testIdPrefix, labelColor }: CountButtonRowProps) {
   return (
     <div>
-      <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+      <label
+        className="block text-sm uppercase tracking-wider mb-1"
+        style={{ color: labelColor ?? "#9ca3af" }}
+      >
         {label}
       </label>
       <div
@@ -110,6 +114,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       moduleId,
     }))
   );
+  const [autoOpenRowId, setAutoOpenRowId] = useState<string | null>(null);
 
   const epicCount = epics.length;
   const maxCount = Math.max(0, 10 - epicCount);
@@ -140,7 +145,9 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
     if (epicCount >= 10) return;
     if (rareCount === 0 && commonCount === 0) return;
     logEvent("PullForm.handleAddEpic", { epicCount, rareCount, commonCount });
-    setEpics([...epics, { rowId: createRowId(), moduleId: "" }]);
+    const newRowId = createRowId();
+    setEpics([...epics, { rowId: newRowId, moduleId: "" }]);
+    setAutoOpenRowId(newRowId);
     if (rareCount > 0) {
       setRareCount(rareCount - 1);
     } else {
@@ -192,27 +199,21 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         </select>
       </div>
 
-      <CountButtonRow
-        label="Common"
-        value={commonCount}
-        max={maxCount}
-        onSelect={handleCommonSelect}
-        testIdPrefix="common-count"
-      />
-      <CountButtonRow
-        label="Rare"
-        value={rareCount}
-        max={maxCount}
-        onSelect={handleRareSelect}
-        testIdPrefix="rare-count"
-      />
-
       <div>
         <label className="block text-xs uppercase tracking-wider text-[var(--color-rarity-epic)] mb-2">
           Epic Modules ({epicCount})
         </label>
+        <button
+          type="button"
+          onClick={handleAddEpic}
+          disabled={!canAddEpic}
+          data-testid="add-epic"
+          className="text-sm px-3 py-2 rounded-lg border border-dashed border-[var(--color-navy-500)] text-[var(--color-rarity-epic)] hover:border-[var(--color-rarity-epic)] hover:bg-[var(--color-navy-800)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          + Add Epic
+        </button>
         {epics.length > 0 && (
-          <div className="space-y-2 mb-2">
+          <div className="space-y-2 mt-2">
             {epics.map((row, i) => (
               <div
                 key={row.rowId}
@@ -225,6 +226,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
                     value={row.moduleId}
                     onChange={(val) => handleEpicChange(row.rowId, val)}
                     placeholder={`Select epic module ${i + 1}...`}
+                    defaultOpen={row.rowId === autoOpenRowId}
                   />
                 </div>
                 <button
@@ -240,16 +242,23 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
             ))}
           </div>
         )}
-        <button
-          type="button"
-          onClick={handleAddEpic}
-          disabled={!canAddEpic}
-          data-testid="add-epic"
-          className="text-sm px-3 py-2 rounded-lg border border-dashed border-[var(--color-navy-500)] text-[var(--color-rarity-epic)] hover:border-[var(--color-rarity-epic)] hover:bg-[var(--color-navy-800)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          + Add Epic
-        </button>
       </div>
+
+      <CountButtonRow
+        label="Rare"
+        value={rareCount}
+        max={maxCount}
+        onSelect={handleRareSelect}
+        testIdPrefix="rare-count"
+        labelColor="#70d6ef"
+      />
+      <CountButtonRow
+        label="Common"
+        value={commonCount}
+        max={maxCount}
+        onSelect={handleCommonSelect}
+        testIdPrefix="common-count"
+      />
 
       <div className="bg-[var(--color-navy-800)] rounded-lg p-3 text-sm">
         <p className="text-gray-400">

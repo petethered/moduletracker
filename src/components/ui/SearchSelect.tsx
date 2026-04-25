@@ -12,6 +12,7 @@ interface SearchSelectProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  defaultOpen?: boolean;
 }
 
 export function SearchSelect({
@@ -19,8 +20,9 @@ export function SearchSelect({
   value,
   onChange,
   placeholder = "Search...",
+  defaultOpen = false,
 }: SearchSelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
   useRenderLog("SearchSelect", { value, isOpen });
