@@ -1,3 +1,58 @@
+/**
+ * App.tsx — top-level application shell.
+ *
+ * Role:
+ *   - Composes the entire single-page app: header (logo, sync status, add-pull
+ *     button, settings cog), tab bar, the active tab's content, footer, and
+ *     the modal layer (pull entry, settings, auth, storage choice).
+ *   - Owns no domain data — all of that lives in the Zustand store. Owns only
+ *     small bits of UI-local state (auth modal open, password-reset token).
+ *
+ * User flows it supports:
+ *   - Tab navigation (dashboard / history / modules / analytics) via TabBar.
+ *     Logo click also routes to dashboard as a "home" affordance.
+ *   - Add 10x Pull button -> openAddPullModal() -> lazy-loaded PullModal.
+ *   - Settings cog -> toggleSettings() -> lazy-loaded SettingsPanel.
+ *   - First-run storage choice (local vs cloud) via StorageChoiceModal.
+ *   - Auth modal: opens automatically when cloud storage is chosen but the
+ *     user is not authenticated, or when a /?reset=<token> URL is detected
+ *     for password reset confirmation.
+ *
+ * --- Top-level wiring map ---
+ *   <div root>
+ *     <header>           static branding, SyncStatus, add-pull, settings cog
+ *     <TabBar>           routes between feature panels via store.activeTab
+ *     <Suspense><main>   lazy-loaded active tab content
+ *     <footer>           build date (vite-injected __BUILD_DATE__) + GitHub
+ *     <Suspense>         PullModal + SettingsPanel (lazy)
+ *     <SyncInitializer>  cloud sync bootstrap (no UI)
+ *     <StorageChoiceModal> first-run prompt
+ *     <AuthModal>        login / reset confirm
+ *
+ * --- Routing model (intentionally simple) ---
+ *   - There is NO react-router. "Routing" is a single string: store.activeTab
+ *     ("dashboard" | "history" | "modules" | "analytics"). The main element
+ *     is keyed by activeTab so React fully unmounts/remounts on tab change,
+ *     which (a) restarts the fade-in animation and (b) discards transient
+ *     per-tab state cheaply. Don't replace this with a Router unless you
+ *     actually need URL-addressable tabs.
+ *   - The /?reset=<token> URL is the ONE place the URL is read. The token
+ *     is consumed once on mount and the URL is cleaned up via
+ *     history.replaceState so a refresh doesn't re-trigger the reset flow.
+ *
+ * --- Lazy loading ---
+ *   - Every feature panel and the heavy modals are React.lazy() so the
+ *     initial bundle stays small. Suspense fallbacks are intentionally
+ *     minimal (a "Loading..." string, or null for modals). If you add a
+ *     new tab, follow this pattern.
+ *
+ * --- Providers ---
+ *   - None at this level. The Zustand store is module-scoped (see
+ *     ./store/index.ts), so any descendant can call useStore directly.
+ *     Tailwind theme tokens come from index.css CSS variables, not a
+ *     ThemeProvider. If you ever introduce a Router or i18n provider,
+ *     wrap the outermost <div> here.
+ */
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useStore } from "./store";
 import { TabBar } from "./components/ui/TabBar";
@@ -9,6 +64,9 @@ import { SyncInitializer } from "./features/auth/SyncInitializer";
 import { isAuthenticated } from "./services/api";
 import { useRenderLog } from "./utils/renderLog";
 
+// Lazy boundaries for code-splitting. Each .then(...) shim turns a named
+// export into the default export shape that React.lazy expects. Keep the
+// pattern uniform so it's grep-able and reorderable.
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard").then(m => ({ default: m.Dashboard })));
 const History = lazy(() => import("./features/history/History").then(m => ({ default: m.History })));
 const Modules = lazy(() => import("./features/modules/Modules").then(m => ({ default: m.Modules })));
@@ -17,18 +75,28 @@ const PullModal = lazy(() => import("./features/pulls/PullModal").then(m => ({ d
 const SettingsPanel = lazy(() => import("./features/settings/SettingsPanel").then(m => ({ default: m.SettingsPanel })));
 
 function App() {
+  // Store-driven UI bits — granular selectors so App only re-renders when
+  // these specific fields change, not on every store mutation.
   const activeTab = useStore((s) => s.activeTab);
   const setActiveTab = useStore((s) => s.setActiveTab);
   const openAddPullModal = useStore((s) => s.openAddPullModal);
   const toggleSettings = useStore((s) => s.toggleSettings);
   const storageChoice = useStore((s) => s.storageChoice);
   const user = useStore((s) => s.user);
+
+  // Auth modal is local UI state, not store state, because it's only opened
+  // by App-owned triggers (URL reset token, cloud-without-auth detection).
+  // Promoting this to the store would require yet another slice for one bool.
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState<string | undefined>();
   const [authInitialView, setAuthInitialView] = useState<"login" | "reset-confirm">("login");
   useRenderLog("App", { activeTab, authModalOpen });
 
-  // Check for password reset token in URL
+  // Password-reset URL handler. Runs ONCE on mount.
+  // Flow: user clicks the reset link in their email -> lands on /?reset=TOKEN
+  //       -> we extract the token, switch AuthModal to its reset-confirm view,
+  //       open it, and scrub the token out of the URL via replaceState so a
+  //       page refresh won't reopen the modal or expose the token in history.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("reset");
@@ -40,7 +108,13 @@ function App() {
     }
   }, []);
 
-  // Show auth modal when cloud is chosen but not authenticated
+  // Cloud-storage gating effect. If the user picked "cloud" in
+  // StorageChoiceModal but no user is loaded AND the API has no stored
+  // session, we force the AuthModal open. isAuthenticated() reads the
+  // persisted token from services/api so a returning user with a valid
+  // token won't see this prompt. Re-runs whenever storageChoice or user
+  // changes (e.g. after a successful login user becomes truthy and the
+  // condition no longer fires).
   useEffect(() => {
     if (storageChoice === "cloud" && !user && !isAuthenticated()) {
       setAuthModalOpen(true);
@@ -87,12 +161,19 @@ function App() {
         </div>
       </header>
 
-      {/* Tabs */}
+      {/* Tabs — TabBar is purely presentational; activeTab string drives routing. */}
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Tab Content */}
+      {/*
+        Tab Content. The key={activeTab} on <main> forces React to fully
+        unmount the previous tab and remount the new one — this is what
+        retriggers the animate-fade-in animation each switch and discards
+        any transient per-tab UI state. If you remove the key, both
+        behaviours go away.
+      */}
       <Suspense fallback={<div className="p-4 md:p-6 max-w-7xl mx-auto text-gray-500">Loading...</div>}>
         <main className="p-4 md:p-6 max-w-7xl mx-auto animate-fade-in" key={activeTab}>
+          {/* Plain string-equality routing. Add new tabs here AND in TabBar's tab list. */}
           {activeTab === "dashboard" && <Dashboard />}
           {activeTab === "history" && <History />}
           {activeTab === "modules" && <Modules />}
@@ -100,7 +181,13 @@ function App() {
         </main>
       </Suspense>
 
-      {/* Footer */}
+      {/*
+        Footer. __BUILD_DATE__ is injected at build time by Vite's `define`
+        config (see vite.config.ts). It is a global string literal, NOT a
+        runtime value — `npm run build` automatically captures the current
+        timestamp, so there's nothing to update manually. If TypeScript
+        complains about the symbol, check src/vite-env.d.ts for its declare.
+      */}
       <footer className="flex items-center justify-center gap-3 px-5 py-4 text-xs text-gray-600 border-t border-[var(--color-navy-700)]">
         <span>&copy; {new Date().getFullYear()} ModuleTracker.com</span>
         <span>Build: {__BUILD_DATE__}</span>
@@ -117,13 +204,25 @@ function App() {
         </a>
       </footer>
 
-      {/* Pull Modal */}
+      {/*
+        Modal layer. Both modals are lazy-loaded; `fallback={null}` is
+        intentional because they are invisible until opened by store state,
+        so showing a loading state would just flash a placeholder.
+      */}
       <Suspense fallback={null}>
         <PullModal />
         <SettingsPanel />
       </Suspense>
 
-      {/* Auth */}
+      {/*
+        Auth layer.
+        - SyncInitializer is a render-null component that triggers cloud
+          sync bootstrap on mount; mounting order matters (it must be
+          inside the React tree so it can read store state).
+        - StorageChoiceModal renders only on first run.
+        - AuthModal is App-controlled (see useEffects above) rather than
+          store-controlled because the open conditions are App-specific.
+      */}
       <SyncInitializer />
       <StorageChoiceModal />
       <AuthModal

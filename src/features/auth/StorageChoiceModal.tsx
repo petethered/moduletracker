@@ -1,11 +1,44 @@
+/**
+ * StorageChoiceModal — first-run gate that asks the user how they want to store data.
+ *
+ * Role in the broader feature:
+ *   The very first thing a new visitor sees. Until `storageChoice` is non-null, the rest
+ *   of the app is visually blocked by this overlay. Picking "local" disables sync and
+ *   never prompts again. Picking "cloud" eventually flows the user into AuthModal
+ *   (login/register) — that handoff is wired up by whichever component owns the cloud
+ *   onboarding step (typically the parent that watches storageChoice === "cloud" + !user).
+ *
+ * User flow supported:
+ *   first-launch → see this modal → click Local OR Cloud → modal disappears (returns null
+ *   because storageChoice is now set). The choice is persisted via the settings slice
+ *   so this never re-shows on subsequent visits.
+ *
+ * Key state interactions:
+ *   - Reads `storageChoice` (null | "local" | "cloud") from the store.
+ *   - Writes via `setStorageChoice` exactly once per user. The store handles
+ *     persistence to localStorage.
+ *
+ * Gotchas:
+ *   - `storageChoice !== null` is the show/hide gate — do not change to truthy check
+ *     because empty-string would slip through and we want the modal to remain visible
+ *     until an explicit choice is made.
+ *   - This modal is intentionally NOT dismissible (no close button, no backdrop click
+ *     handler). The user MUST pick one option to proceed.
+ */
 import { useStore } from "../../store";
 
 export function StorageChoiceModal() {
+  // Tri-state: null = no choice yet (show modal); "local"/"cloud" = chosen (hide).
   const storageChoice = useStore((s) => s.storageChoice);
   const setStorageChoice = useStore((s) => s.setStorageChoice);
 
+  // Once a choice is made (even "local"), this component renders nothing.
+  // The store persists the choice so we don't re-prompt.
   if (storageChoice !== null) return null;
 
+  // Custom overlay (not the shared <Modal/>) because:
+  //   1. It must be non-dismissible — no close button, no escape key.
+  //   2. The visual treatment differs (welcome framing, larger card, custom shadow).
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in">
       <div
@@ -26,6 +59,8 @@ export function StorageChoiceModal() {
             How would you like to store your data?
           </p>
 
+          {/* Local option — most users land here. No further onboarding required;
+              the settings slice flips to "local" and the store ceases to call sync APIs. */}
           <button
             onClick={() => setStorageChoice("local")}
             className="w-full p-4 rounded-xl border border-[var(--color-navy-500)] bg-[var(--color-navy-800)] hover:border-[var(--color-accent-gold)]/30 transition-all duration-200 text-left group"
@@ -44,6 +79,10 @@ export function StorageChoiceModal() {
             </p>
           </button>
 
+          {/* Cloud option — clicking flips storageChoice to "cloud" but does NOT yet
+              authenticate. The parent that observes (storageChoice === "cloud" && !user)
+              is responsible for opening AuthModal as the next step. Doing the auth-modal
+              hand-off elsewhere keeps this component focused on a single decision. */}
           <button
             onClick={() => setStorageChoice("cloud")}
             className="w-full p-4 rounded-xl border border-[var(--color-navy-500)] bg-[var(--color-navy-800)] hover:border-[var(--color-accent-gold)]/30 transition-all duration-200 text-left group"
