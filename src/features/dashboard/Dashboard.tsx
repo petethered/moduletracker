@@ -16,11 +16,12 @@
  *
  * Layout intent (top-to-bottom):
  *   1. Page title.
- *   2. StatCardGrid       — six headline KPIs (total pulls, gems, epic rate, etc.).
- *   3. Two-column row     — RecentPullsList + RarityBreakdownBar (donut chart).
- *   4. ModuleCollectionGrid — every module as a tile, color-coded by rarity.
- *   5. Two-column row     — MergeProgressSummary + PullHighlights.
- *   6. Two-column row     — TypeBalance + PullCalendar (90-day heatmap).
+ *   2. StatCardGrid          — six headline KPIs (total pulls, gems, epic rate, etc.).
+ *   3. Two-column row        — RecentPullsList + RarityBreakdownBar (donut chart).
+ *   4. BannerStatsBreakdown  — per-banner stat card (self-hides if <2 banners used).
+ *   5. ModuleCollectionGrid  — every module as a tile, color-coded by rarity.
+ *   6. Two-column row        — MergeProgressSummary + PullHighlights.
+ *   7. Two-column row        — TypeBalance + PullCalendar (90-day heatmap).
  *
  * Why this ordering: KPIs first (most-glanceable), then activity context, then
  * the dense collection grid, then derived analytical views. Each two-column
@@ -32,6 +33,7 @@
 import { StatCardGrid } from "./StatCardGrid";
 import { RecentPullsList } from "./RecentPullsList";
 import { RarityBreakdownBar } from "./RarityBreakdownBar";
+import { BannerStatsBreakdown } from "./BannerStatsBreakdown";
 import { ModuleCollectionGrid } from "./ModuleCollectionGrid";
 import { MergeProgressSummary } from "./MergeProgressSummary";
 import { PullHighlights } from "./PullHighlights";
@@ -80,6 +82,10 @@ export function Dashboard() {
           <RarityBreakdownBar />
         </div>
       </div>
+      {/* Per-banner stats — self-gates to render only when the user has logged
+          pulls on ≥2 distinct banner types. Sits directly above Collection so
+          the two cards visually pair (matching outer shell styling). */}
+      <BannerStatsBreakdown />
       {/* Full-width collection grid — every module the user has tracked. */}
       <ModuleCollectionGrid />
       {/* Progress / superlatives row. */}

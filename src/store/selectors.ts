@@ -40,7 +40,7 @@
  *   bootstrap so prediction selectors don't return 0 with empty history.
  */
 
-import type { PullRecord } from "../types";
+import type { BannerType, PullRecord } from "../types";
 
 /**
  * Sort pulls chronologically (oldest first).
@@ -145,6 +145,76 @@ export function selectRarityPercentages(pulls: PullRecord[]) {
     rare: (counts.rare / counts.total) * 100,
     epic: (counts.epic / counts.total) * 100,
   };
+}
+
+/**
+ * Per-banner stats bucket. Each field mirrors a whole-history selector but
+ * scoped to a single BannerType. Returned as the value type of
+ * {@link selectStatsByBanner}.
+ */
+export interface BannerStats {
+  /** Number of 10x pull records made on this banner. */
+  totalPulls: number;
+  /** Sum of gemsSpent across this banner's pulls. */
+  gemsSpent: number;
+  /** Raw count of epic-tier drops on this banner (Σ epicModules.length). */
+  epicsFound: number;
+  /**
+   * Observed epic drop rate on this banner as a percentage (0..100).
+   * Computed against the 10-per-pull invariant: epics / (totalPulls * 10) * 100.
+   * Guarded so an empty bucket returns 0 instead of NaN.
+   */
+  epicRate: number;
+}
+
+/**
+ * Aggregate per-banner stats: total pulls, gems spent, epics found, and epic
+ * rate, keyed by BannerType.
+ *
+ * RETURN SHAPE: Partial<Record<BannerType, BannerStats>> — only banners with
+ * at least one pull appear as keys. Callers should use
+ * `Object.keys(result).length` to check "how many banners were used" (e.g.
+ * for the dashboard's "≥2 banners" gate).
+ *
+ * IMPLEMENTATION:
+ *   Single pass over `pulls`; bucket counts into a sparse record. After the
+ *   pass, compute epicRate per bucket using the same 10-per-pull invariant
+ *   as `selectEpicPullRate`, with a zero-guard so empty buckets return 0.
+ *
+ * USED BY: src/features/dashboard/BannerStatsBreakdown.tsx — the dashboard
+ * card that only renders when ≥2 banner types appear in the history.
+ *
+ * GOTCHA: This selector does NOT use selectEpicPullRate per bucket because
+ * that would require building per-banner pull subarrays and a second pass.
+ * The math is identical (epic% out of total drops) — keep this in sync if
+ * the rarity-counts definition ever changes.
+ */
+export function selectStatsByBanner(
+  pulls: PullRecord[]
+): Partial<Record<BannerType, BannerStats>> {
+  const result: Partial<Record<BannerType, BannerStats>> = {};
+  for (const p of pulls) {
+    // Lazily create the bucket on first encounter — keeps absent banners out
+    // of the result so callers can rely on key count = "banners used".
+    let bucket = result[p.bannerType];
+    if (!bucket) {
+      bucket = { totalPulls: 0, gemsSpent: 0, epicsFound: 0, epicRate: 0 };
+      result[p.bannerType] = bucket;
+    }
+    bucket.totalPulls += 1;
+    bucket.gemsSpent += p.gemsSpent;
+    bucket.epicsFound += p.epicModules.length;
+  }
+  // Second pass: derive epicRate now that totals are settled. Done after the
+  // bucketing loop so we don't recompute the rate on every increment.
+  for (const key of Object.keys(result) as BannerType[]) {
+    const b = result[key]!;
+    // Zero-guard mirrors selectEpicPullRate — an unused / no-modules bucket
+    // would otherwise be 0/0 = NaN and bleed into the UI as "NaN%".
+    const totalDrops = b.totalPulls * 10;
+    b.epicRate = totalDrops > 0 ? (b.epicsFound / totalDrops) * 100 : 0;
+  }
+  return result;
 }
 
 /**

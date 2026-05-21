@@ -14,6 +14,7 @@ import {
   selectUniqueEpicsFound,
   selectPullStreaks,
   selectPredictedGemsToComplete,
+  selectStatsByBanner,
   PITY_PULL_THRESHOLD,
 } from "../store/selectors";
 
@@ -216,6 +217,95 @@ describe("selectDryStreakByPullId", () => {
   it("returns empty map for no pulls", () => {
     const counters = selectDryStreakByPullId([]);
     expect(counters.size).toBe(0);
+  });
+});
+
+describe("selectStatsByBanner", () => {
+  it("returns empty object for no pulls", () => {
+    expect(selectStatsByBanner([])).toEqual({});
+  });
+
+  it("returns a single key when all pulls share one banner", () => {
+    const pulls = [
+      makePull({ bannerType: "standard", epicModules: ["a"], gemsSpent: 200 }),
+      makePull({ bannerType: "standard", epicModules: [], gemsSpent: 200 }),
+    ];
+    const stats = selectStatsByBanner(pulls);
+    expect(Object.keys(stats)).toEqual(["standard"]);
+    expect(stats.standard).toEqual({
+      totalPulls: 2,
+      gemsSpent: 400,
+      epicsFound: 1,
+      // 1 epic out of 2 * 10 = 20 modules => 5%
+      epicRate: 5,
+    });
+  });
+
+  it("buckets stats per banner across multiple banners", () => {
+    const pulls = [
+      makePull({ bannerType: "standard", epicModules: ["a"], gemsSpent: 200 }),
+      makePull({ bannerType: "featured", epicModules: ["b", "c"], gemsSpent: 300 }),
+      makePull({ bannerType: "featured", epicModules: [], gemsSpent: 300 }),
+      makePull({ bannerType: "lucky", epicModules: ["d"], gemsSpent: 100 }),
+    ];
+    const stats = selectStatsByBanner(pulls);
+    expect(stats.standard).toEqual({
+      totalPulls: 1,
+      gemsSpent: 200,
+      epicsFound: 1,
+      epicRate: 10,
+    });
+    expect(stats.featured).toEqual({
+      totalPulls: 2,
+      gemsSpent: 600,
+      epicsFound: 2,
+      epicRate: 10,
+    });
+    expect(stats.lucky).toEqual({
+      totalPulls: 1,
+      gemsSpent: 100,
+      epicsFound: 1,
+      epicRate: 10,
+    });
+  });
+
+  it("epicRate is 0 (not NaN) for a banner with zero epics", () => {
+    const pulls = [
+      makePull({ bannerType: "lucky", epicModules: [], gemsSpent: 100 }),
+    ];
+    const stats = selectStatsByBanner(pulls);
+    expect(stats.lucky?.epicRate).toBe(0);
+  });
+
+  it("omits banners with no pulls", () => {
+    const pulls = [makePull({ bannerType: "standard" })];
+    const stats = selectStatsByBanner(pulls);
+    expect(stats.featured).toBeUndefined();
+    expect(stats.lucky).toBeUndefined();
+  });
+
+  it("per-banner totals sum to whole-history totals", () => {
+    const pulls = [
+      makePull({ bannerType: "standard", epicModules: ["a"], gemsSpent: 200 }),
+      makePull({ bannerType: "featured", epicModules: ["b", "c"], gemsSpent: 300 }),
+      makePull({ bannerType: "lucky", epicModules: ["d"], gemsSpent: 100 }),
+    ];
+    const stats = selectStatsByBanner(pulls);
+    const sumPulls =
+      (stats.standard?.totalPulls ?? 0) +
+      (stats.featured?.totalPulls ?? 0) +
+      (stats.lucky?.totalPulls ?? 0);
+    const sumGems =
+      (stats.standard?.gemsSpent ?? 0) +
+      (stats.featured?.gemsSpent ?? 0) +
+      (stats.lucky?.gemsSpent ?? 0);
+    const sumEpics =
+      (stats.standard?.epicsFound ?? 0) +
+      (stats.featured?.epicsFound ?? 0) +
+      (stats.lucky?.epicsFound ?? 0);
+    expect(sumPulls).toBe(selectTotalPulls(pulls));
+    expect(sumGems).toBe(selectTotalGems(pulls));
+    expect(sumEpics).toBe(selectRarityCounts(pulls).epic);
   });
 });
 
