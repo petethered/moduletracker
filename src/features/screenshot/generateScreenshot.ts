@@ -46,7 +46,7 @@
  */
 import { getModuleRarityColor } from "../../config/rarityColors";
 import type { ScreenshotData } from "./screenshotData";
-import { drawStatsPanel } from "./drawStatsPanel";
+import { drawStatsPanel, computeStatsPanelHeight } from "./drawStatsPanel";
 import {
   NAVY_900,
   NAVY_800,
@@ -71,13 +71,20 @@ import {
 } from "./canvasConstants";
 
 /**
- * Compute the total logical canvas height needed to fit:
+ * Compute the total logical canvas height needed to fit BOTH the table and
+ * the stats panel — whichever is taller drives the canvas height.
+ *
+ * Table side:
  *   top padding + title block + column header + (one band per section) +
  *   (one row per module across all sections) + bottom padding
  *
- * IMPORTANT: this only sizes the LEFT (table) side. The stats panel on the right is
- * shorter than the table in typical use, so the table's height drives total canvas
- * height. If the panel ever grows beyond the table, swap to Math.max(panelHeight, this).
+ * Panel side:
+ *   PADDING + HEADER_HEIGHT (the panel starts below the title block) +
+ *   computeStatsPanelHeight(data) + PADDING (matching bottom inset)
+ *
+ * When the user has logged pulls on ≥2 banners the panel grows by the
+ * "By Banner" subsection, which can exceed the table height. Math.max
+ * guarantees the panel never clips off the bottom of the canvas.
  */
 function computeCanvasHeight(data: ScreenshotData): number {
   const moduleRows = data.sections.reduce(
@@ -85,14 +92,16 @@ function computeCanvasHeight(data: ScreenshotData): number {
     0,
   );
   const sectionHeaders = data.sections.length;
-  return (
+  const tableHeight =
     PADDING +
     HEADER_HEIGHT +
     COL_HEADER_HEIGHT +
     sectionHeaders * SECTION_HEADER_HEIGHT +
     moduleRows * ROW_HEIGHT +
-    PADDING
-  );
+    PADDING;
+  const panelHeight =
+    PADDING + HEADER_HEIGHT + computeStatsPanelHeight(data) + PADDING;
+  return Math.max(tableHeight, panelHeight);
 }
 
 export async function generateScreenshotImage(

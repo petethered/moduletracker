@@ -25,7 +25,7 @@
  *   - We rely on selectors (single source of truth) rather than re-deriving from pulls
  *     so any rule change (e.g. how rarity is counted) propagates here automatically.
  */
-import type { PullRecord, ModuleProgress, ModuleRarity } from "../../types";
+import type { BannerType, PullRecord, ModuleProgress, ModuleRarity } from "../../types";
 import { MODULES_BY_TYPE } from "../../config/modules";
 import {
   selectRarityCounts,
@@ -35,6 +35,8 @@ import {
   selectGemsPerEpic,
   selectModulePullCounts,
   selectLastPullDateForModule,
+  selectStatsByBanner,
+  type BannerStats,
 } from "../../store/selectors";
 import { formatDisplayDate, getLocalDateString } from "../../utils/formatDate";
 
@@ -77,6 +79,16 @@ export interface ScreenshotStats {
 export interface ScreenshotData {
   sections: ScreenshotTypeSection[];
   stats: ScreenshotStats;
+  /**
+   * Per-banner stat buckets (pulls / gems / epics / observed epic rate),
+   * keyed by BannerType. Only banners with at least one pull appear as keys.
+   *
+   * Used by drawStatsPanel to render the "By Banner" subsection — and only
+   * rendered when at least 2 banners are present, so single-banner users see
+   * the existing summary panel unchanged. The renderer mirrors the
+   * BannerStatsBreakdown card on the live dashboard.
+   */
+  byBanner: Partial<Record<BannerType, BannerStats>>;
   generatedAt: string;   // Pre-formatted display date for the header
 }
 
@@ -154,6 +166,10 @@ export function buildScreenshotData(
       gemsSpent: selectTotalGems(pulls),
       gemsPerEpic: selectGemsPerEpic(pulls),
     },
+    // Per-banner buckets via the shared selector. Empty pulls -> {}; single
+    // banner -> one key; multi banner -> the canvas renderer will surface the
+    // "By Banner" subsection. The gating decision lives in drawStatsPanel.
+    byBanner: selectStatsByBanner(pulls),
     // Pre-format here so the renderer doesn't need any locale logic. Uses today's
     // local date — represents when the screenshot was generated.
     generatedAt: formatDisplayDate(getLocalDateString()),

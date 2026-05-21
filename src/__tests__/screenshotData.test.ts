@@ -139,4 +139,31 @@ describe("buildScreenshotData", () => {
     expect(data.generatedAt).toBeTruthy();
     expect(typeof data.generatedAt).toBe("string");
   });
+
+  it("byBanner is empty with no pulls", () => {
+    const data = buildScreenshotData([], {});
+    expect(data.byBanner).toEqual({});
+  });
+
+  it("byBanner buckets pulls by banner type", () => {
+    const pulls = [
+      makePull({ bannerType: "standard", epicModules: ["shrink-ray"], gemsSpent: 200 }),
+      makePull({ bannerType: "featured", epicModules: ["death-penalty"], gemsSpent: 300 }),
+      makePull({ bannerType: "featured", epicModules: [], gemsSpent: 300 }),
+    ];
+    const data = buildScreenshotData(pulls, {});
+    expect(data.byBanner.standard).toEqual({
+      totalPulls: 1,
+      gemsSpent: 200,
+      epicsFound: 1,
+      epicRate: 10,
+    });
+    expect(data.byBanner.featured).toEqual({
+      totalPulls: 2,
+      gemsSpent: 600,
+      epicsFound: 1,
+      epicRate: 5,
+    });
+    expect(data.byBanner.lucky).toBeUndefined();
+  });
 });
