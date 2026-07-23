@@ -15,6 +15,7 @@ import {
   selectPullStreaks,
   selectPredictedGemsToComplete,
   selectStatsByBanner,
+  selectPullsSinceLastDrawnForModule,
   PITY_PULL_THRESHOLD,
 } from "../store/selectors";
 
@@ -327,5 +328,51 @@ describe("selectPityPullIds", () => {
     ];
     const pityIds = selectPityPullIds(pulls);
     expect(pityIds.has("p2")).toBe(false);
+  });
+});
+
+describe("selectPullsSinceLastDrawnForModule", () => {
+  it("returns 0 for empty pulls array", () => {
+    expect(selectPullsSinceLastDrawnForModule([], "death-penalty")).toBe(0);
+  });
+
+  it("returns total lifetime draws when module never drawn", () => {
+    // 3 batches logged, module never appeared -> drought counter = 3 * 10.
+    const pulls = [
+      makePull({ date: "2026-03-01", epicModules: ["a"] }),
+      makePull({ date: "2026-03-02", epicModules: [] }),
+      makePull({ date: "2026-03-03", epicModules: ["b"] }),
+    ];
+    expect(selectPullsSinceLastDrawnForModule(pulls, "never-drawn")).toBe(30);
+  });
+
+  it("returns 0 when module drawn in the newest batch", () => {
+    const pulls = [
+      makePull({ date: "2026-03-01", epicModules: ["target"] }),
+      makePull({ date: "2026-03-05", epicModules: ["target", "other"] }),
+    ];
+    expect(selectPullsSinceLastDrawnForModule(pulls, "target")).toBe(0);
+  });
+
+  it("returns K * 10 when module drawn K batches ago", () => {
+    // Newest-first order: 03-04, 03-03, 03-02 (target), 03-01.
+    // 2 batches are strictly newer than the target's batch -> 20.
+    const pulls = [
+      makePull({ date: "2026-03-01", epicModules: [] }),
+      makePull({ date: "2026-03-02", epicModules: ["target"] }),
+      makePull({ date: "2026-03-03", epicModules: ["other"] }),
+      makePull({ date: "2026-03-04", epicModules: [] }),
+    ];
+    expect(selectPullsSinceLastDrawnForModule(pulls, "target")).toBe(20);
+  });
+
+  it("breaks same-date ties by insertion order (later insertion = newer)", () => {
+    // Both batches share a date. The SECOND array entry is treated as newer,
+    // so the target (in the first entry) has 1 newer batch -> 10.
+    const pulls = [
+      makePull({ date: "2026-03-05", epicModules: ["target"] }),
+      makePull({ date: "2026-03-05", epicModules: ["other"] }),
+    ];
+    expect(selectPullsSinceLastDrawnForModule(pulls, "target")).toBe(10);
   });
 });

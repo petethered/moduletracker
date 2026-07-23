@@ -388,6 +388,47 @@ export function selectLastPullDateForModule(
 }
 
 /**
+ * Number of INDIVIDUAL module draws since `moduleId` last dropped at epic.
+ *
+ * Units: individual draws, not batches. Each PullRecord is one 10x batch
+ * (invariant: commonCount + rareCount + epicModules.length === 10), so the
+ * result is always a multiple of 10. Intra-batch draw order is not tracked,
+ * which is WHY the batch containing the module contributes 0 partial draws —
+ * we count only batches strictly newer than it.
+ *
+ * Semantics (see specs/2026-07-23-pulls-since-column-design.md):
+ *   - Drawn in the newest batch -> 0.
+ *   - Never drawn -> pulls.length * 10 (total lifetime draws — a drought
+ *     counter from day one for unowned modules; deliberately NOT null/"-",
+ *     unlike selectLastPullDateForModule).
+ *   - Empty pulls -> 0 (falls out of the never-drawn rule).
+ *   - Counts ALL banners, matching selectLastPullDateForModule. Do not add
+ *     banner filtering here without also changing that selector.
+ *
+ * Ordering is delegated to sortPullsNewest (date desc, same-date ties broken
+ * by insertion index) — the same ordering selectLastPullDateForModule uses,
+ * so the two columns can never disagree about which batch was "last".
+ *
+ * Perf note: re-sorts per call, same as selectLastPullDateForModule which is
+ * called alongside it per table row. O(n log n) per row is accepted at
+ * realistic data sizes (hundreds of batches); if that ever hurts, the fix is
+ * a combined one-pass {lastDate, pullsSince} selector (considered and
+ * rejected in the spec as premature).
+ */
+export function selectPullsSinceLastDrawnForModule(
+  pulls: PullRecord[],
+  moduleId: string
+): number {
+  const sorted = sortPullsNewest(pulls);
+  for (let i = 0; i < sorted.length; i++) {
+    // i batches are strictly newer than sorted[i]; 10 draws per batch.
+    if (sorted[i].epicModules.includes(moduleId)) return i * 10;
+  }
+  // Never drawn: every logged draw counts toward the drought.
+  return pulls.length * 10;
+}
+
+/**
  * Per-module share of all epic drops, as a percentage.
  *
  * Numerator: this module's count (0 if never pulled).
