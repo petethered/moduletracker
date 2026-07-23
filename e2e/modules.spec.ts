@@ -13,6 +13,15 @@ test.describe("Module collection", () => {
     await expect(page.getByText("Dimension Core")).toBeVisible();
   });
 
+  test("shows Pulls Since column header", async ({ page }) => {
+    await page.goto("/");
+    await page.click("[data-tab='modules']");
+    // One table per module type -> 4 matching headers; assert the first.
+    await expect(
+      page.getByRole("columnheader", { name: "Pulls Since" }).first()
+    ).toBeVisible();
+  });
+
   test("updates module rarity via modal", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());

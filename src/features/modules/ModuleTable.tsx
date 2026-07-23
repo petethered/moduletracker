@@ -15,18 +15,23 @@
  *     persists the new rarity into moduleProgress (localStorage-backed).
  *
  * --- Column ordering decisions (intentional) ---
- *   1. Module       — name. 35% width, the widest; this is what users scan.
- *   2. Count        — total copies pulled. 12%, narrow numeric.
+ *   1. Module       — name. 30% width, the widest; this is what users scan.
+ *   2. Count        — total copies pulled. 10%, narrow numeric.
  *   3. % of Epics   — share of all epic drops that landed on this module.
- *                     15%; helps surface "lucky" or "cursed" modules.
- *   4. Last Pulled  — friendly date. 20%; useful for dry-streak intuition.
+ *                     14%; helps surface "lucky" or "cursed" modules.
+ *   4. Last Pulled  — friendly date. 18%; useful for dry-streak intuition.
+ *   5. Pulls Since  — individual draws since last drawn (batches-after ×10).
+ *                     12%; quantifies the dry streak Last Pulled only hints
+ *                     at. Never-drawn modules show TOTAL lifetime draws (a
+ *                     drought counter from day one), NOT "-" — deliberate,
+ *                     see specs/2026-07-23-pulls-since-column-design.md.
  *  (Hidden) Progress— a graphical progress bar toward 5-star (18 copies).
  *                     Currently commented out but the colgroup col and
  *                     header slot are LEFT IN PLACE so re-enabling it is
  *                     a one-block uncomment, not a re-layout. Do NOT
  *                     delete the placeholder col/header — it preserves
  *                     the planned restoration.
- *   5. Rarity       — manually-asserted current rarity tier. 18%;
+ *   6. Rarity       — manually-asserted current rarity tier. 16%;
  *                     rightmost because it's the only editable cell and
  *                     thumbs land there naturally on mobile.
  *
@@ -57,6 +62,7 @@ import {
   selectModulePullCounts,
   selectModuleEpicPercentage,
   selectLastPullDateForModule,
+  selectPullsSinceLastDrawnForModule,
 } from "../../store/selectors";
 import { MODULES_BY_TYPE, MODULE_BY_ID } from "../../config/modules";
 import {
@@ -67,6 +73,7 @@ import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import type { ModuleType } from "../../types";
 import { formatDisplayDate } from "../../utils/formatDate";
+import { formatInteger } from "../../utils/formatNumber";
 
 // Section render order — Cannon -> Armor -> Generator -> Core mirrors the
 // in-game ordering and the player's mental model (offense before defense
@@ -119,15 +126,16 @@ export function ModuleTable() {
               */}
               <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
                 <colgroup>
-                  <col style={{ width: "35%" }} /> {/* Module name */}
-                  <col style={{ width: "12%" }} /> {/* Count */}
-                  <col style={{ width: "15%" }} /> {/* % of Epics */}
-                  <col style={{ width: "20%" }} /> {/* Last Pulled */}
+                  <col style={{ width: "30%" }} /> {/* Module name */}
+                  <col style={{ width: "10%" }} /> {/* Count */}
+                  <col style={{ width: "14%" }} /> {/* % of Epics */}
+                  <col style={{ width: "18%" }} /> {/* Last Pulled */}
+                  <col style={{ width: "12%" }} /> {/* Pulls Since */}
                   {/* Progress column hidden - kept for future use.
                       Do NOT remove this <col>: keeping it preserves the
                       planned column slot so the eventual restoration is
                       a one-block edit, not a re-layout. */}
-                  <col style={{ width: "18%" }} /> {/* Rarity */}
+                  <col style={{ width: "16%" }} /> {/* Rarity */}
                 </colgroup>
                 <thead>
                   <tr className="border-b border-[var(--color-navy-500)]">
@@ -135,6 +143,7 @@ export function ModuleTable() {
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Count</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">% of Epics</th>
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Last Pulled</th>
+                    <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Pulls Since</th>
                     {/* Progress header hidden - kept for future use (see colgroup note). */}
                     <th className="px-3 py-2 text-left text-xs text-gray-400 uppercase">Rarity</th>
                   </tr>
@@ -153,6 +162,11 @@ export function ModuleTable() {
                     // showing "0.0%" for never-pulled modules (clutter).
                     const pct = selectModuleEpicPercentage(pulls, mod.id);
                     const lastPulled = selectLastPullDateForModule(pulls, mod.id);
+                    // Individual draws since this module last dropped
+                    // (batches-after × 10). Never-drawn modules get total
+                    // lifetime draws, so this is ALWAYS a number — no "-"
+                    // branch, unlike lastPulled. See selector docblock.
+                    const pullsSince = selectPullsSinceLastDrawnForModule(pulls, mod.id);
                     const progress = moduleProgress[mod.id];
                     const rarity = progress?.currentRarity;
 
@@ -163,6 +177,10 @@ export function ModuleTable() {
                         {/* "-" instead of "0.0%" when never pulled — keeps the column visually quiet. */}
                         <td className="px-3 py-2">{count > 0 ? `${pct.toFixed(1)}%` : "-"}</td>
                         <td className="px-3 py-2 text-gray-400">{lastPulled ? formatDisplayDate(lastPulled) : "-"}</td>
+                        {/* Always numeric (never "-"): never-drawn shows total
+                            lifetime draws by design. Locale-aware grouping via
+                            formatInteger (localization convention). */}
+                        <td className="px-3 py-2 text-gray-400">{formatInteger(pullsSince)}</td>
                         {/* Progress cell hidden - kept for future use.
                             Reactivation plan: uncomment this block, also
                             uncomment the matching <col> + <th> above, and
