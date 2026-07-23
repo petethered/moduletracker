@@ -1,4 +1,7 @@
-import { test, expect } from "@playwright/test";
+// Import from shared fixtures (NOT @playwright/test): the extended `test` pre-seeds
+// the persisted `storageChoice` via addInitScript so the first-run
+// StorageChoiceModal overlay never renders and blocks clicks. See e2e/fixtures.ts.
+import { test, expect } from "./fixtures";
 import path from "path";
 import fs from "fs";
 
@@ -10,8 +13,11 @@ test.describe("Import/Export", () => {
 
     // Add a pull
     await page.click("button:has-text('Add 10x Pull')");
-    await page.selectOption("[data-testid='common-count']", "7");
-    await page.selectOption("[data-testid='rare-count']", "3");
+    // Rarity counts are now a button grid (data-testid="common-count-N" /
+    // "rare-count-N" per src/features/pulls/PullForm.tsx), not <select> elements —
+    // the old selectOption("[data-testid='common-count']", ...) API is gone.
+    await page.click("[data-testid='common-count-7']");
+    await page.click("[data-testid='rare-count-3']");
     await page.click("button:has-text('Save Pull')");
 
     // Open settings

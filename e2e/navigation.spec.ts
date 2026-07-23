@@ -1,9 +1,15 @@
-import { test, expect } from "@playwright/test";
+// Import from shared fixtures (NOT @playwright/test): the extended `test` pre-seeds
+// the persisted `storageChoice` via addInitScript so the first-run
+// StorageChoiceModal overlay never renders and blocks clicks. See e2e/fixtures.ts.
+import { test, expect } from "./fixtures";
 
 test.describe("Tab navigation", () => {
   test("shows dashboard by default", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Module Tracker")).toBeVisible();
+    // Header brand is the h1 "ModuleTracker.com" button whose accessible name is
+    // its aria-label "Go to dashboard" (see src/App.tsx header). The old
+    // getByText("Module Tracker") assertion predates the brand rename.
+    await expect(page.getByRole("button", { name: "Go to dashboard" })).toBeVisible();
     await expect(page.getByRole("button", { name: /add 10x pull/i })).toBeVisible();
   });
 
@@ -20,7 +26,10 @@ test.describe("Tab navigation", () => {
     await expect(page.getByRole("heading", { name: "Analytics" })).toBeVisible();
 
     await page.click("[data-tab='dashboard']");
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    // exact:true — getByRole name matching is substring by default, so plain
+    // "Dashboard" also matches the header h1 (aria-label "Go to dashboard")
+    // and trips a strict-mode violation.
+    await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
   });
 
   test("Add 10x Pull button opens modal", async ({ page }) => {

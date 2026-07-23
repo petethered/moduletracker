@@ -1,4 +1,7 @@
-import { test, expect } from "@playwright/test";
+// Import from shared fixtures (NOT @playwright/test): the extended `test` pre-seeds
+// the persisted `storageChoice` via addInitScript so the first-run
+// StorageChoiceModal overlay never renders and blocks clicks. See e2e/fixtures.ts.
+import { test, expect } from "./fixtures";
 
 test.describe("Add pull flow", () => {
   test.beforeEach(async ({ page }) => {
@@ -43,7 +46,10 @@ test.describe("Add pull flow", () => {
     await expect(page.locator("[data-testid='rare-count-2']")).toHaveAttribute("aria-checked", "true");
     await expect(page.locator("[data-testid='epic-select-0']")).toBeVisible();
 
-    await page.click("[data-testid='epic-select-0'] button");
+    // NOTE: do NOT click the SearchSelect trigger button here. The just-added
+    // epic row mounts with its panel already open (defaultOpen — see
+    // src/features/pulls/PullForm.tsx autoOpenRowId), so clicking the trigger
+    // would TOGGLE the panel closed and the search input would never appear.
     await page.fill("[data-testid='epic-select-0'] input", "Death");
     await page.locator("[data-testid='epic-select-0']").getByText("Death Penalty").click();
 

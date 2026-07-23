@@ -1,4 +1,7 @@
-import { test, expect } from "@playwright/test";
+// Import from shared fixtures (NOT @playwright/test): the extended `test` pre-seeds
+// the persisted `storageChoice` via addInitScript so the first-run
+// StorageChoiceModal overlay never renders and blocks clicks. See e2e/fixtures.ts.
+import { test, expect } from "./fixtures";
 
 test.describe("Module collection", () => {
   test("shows all 24 modules", async ({ page }) => {
