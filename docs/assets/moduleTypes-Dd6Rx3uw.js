@@ -1,0 +1,1 @@
+var e={cannon:`#c97d6d`,armor:`#7d93b8`,generator:`#b8a06a`,core:`#9d8bb5`},t=[`cannon`,`armor`,`generator`,`core`],n={cannon:`Cannon`,armor:`Armor`,generator:`Generator`,core:`Core`};export{n,t as r,e as t};
