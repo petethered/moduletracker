@@ -17,13 +17,20 @@
  *     uppercase and NOT wide-tracked, so it reads as a heading rather than as
  *     another piece of chrome.
  *
- *   TIER 2 — FieldLabel (./FieldLabel.tsx)
- *     "Total Pulls", "Banner", "Date", column headers.
- *     Small uppercase wide-tracked gray. Annotates a value or an input.
+ *   TIER 2 — MetaLabel (./MetaLabel.tsx)
+ *     "Total Pulls", "Banner", "Date", "Epic Modules (3)", the collection
+ *     grid's type rows. Small uppercase wide-tracked. Annotates a value, an
+ *     input, or a short group.
  *
- * RULE OF THUMB: if it titles a REGION, use SectionHeading. If it labels a
- * single VALUE or INPUT, use FieldLabel. Do not invent a third tier without a
- * reason you can write down here.
+ * RULE OF THUMB: SectionHeading titles a REGION the reader navigates to.
+ * MetaLabel annotates something specific — a value, a control, or a handful of
+ * related rows. When it is genuinely borderline, ask whether a screen-reader
+ * user would want to jump to it: headings are navigation landmarks, labels are
+ * not. "Epic Modules (3)" heads a list but is a MetaLabel, because it is part
+ * of the form it sits inside rather than a destination.
+ *
+ * Two components deliberately opt out of both tiers; MetaLabel's header
+ * documents which and why. Read that before adding a third tier.
  *
  * Renders an <h3> by default because these sit under the per-tab <h2> in each
  * feature panel, keeping the document outline sane. Override via `as` when the
@@ -41,6 +48,17 @@ interface SectionHeadingProps {
    * pass "h4" rather than skipping a level.
    */
   as?: "h2" | "h3" | "h4";
+  /**
+   * Optional color override, for headings where the color itself carries
+   * meaning — e.g. PredictedGemsCard's two goal panels, where ancestral-green
+   * and legendary-gold tell the reader which rarity target each panel is about
+   * before they read a word.
+   *
+   * Use sparingly. A colored heading is a signal; if every heading is colored,
+   * none of them are. Verify any custom color clears WCAG AA (4.5:1) against
+   * the surface behind it.
+   */
+  color?: string;
   /** Extra classes, mainly for spacing overrides at the call site. */
   className?: string;
 }
@@ -48,12 +66,15 @@ interface SectionHeadingProps {
 export function SectionHeading({
   children,
   as: Tag = "h3",
+  color,
   className = "",
 }: SectionHeadingProps) {
   return (
     <Tag
-      className={`text-[13px] font-medium text-gray-200 mb-3 ${className}`}
-      style={{ fontFamily: "var(--font-body)" }}
+      className={`text-[13px] font-medium mb-3 ${
+        color ? "" : "text-gray-200"
+      } ${className}`}
+      style={{ fontFamily: "var(--font-body)", ...(color ? { color } : {}) }}
     >
       {children}
     </Tag>

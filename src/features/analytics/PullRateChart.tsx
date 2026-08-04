@@ -27,10 +27,12 @@ import {
 } from "recharts";
 import { useStore } from "../../store";
 import { selectEpicRateOverTime } from "../../store/selectors";
-import { RARITY_COLORS } from "../../config/rarityColors";
-import { ACCENT_GOLD, SIGNAL_WARNING } from "../../config/brandColors";
+import { MODULE_RARITY_COLORS } from "../../config/moduleRarities";
+import { ACCENT_GOLD, SIGNAL_WARNING } from "../../config/runtimeColors";
 import { useRenderLog } from "../../utils/renderLog";
 import { SectionHeading } from "../../components/ui/SectionHeading";
+import { CHART_GRID, CHART_TOOLTIP_STYLE } from "../../config/runtimeColors";
+import { formatPercent } from "../../utils/formatNumber";
 
 export function PullRateChart() {
   const pulls = useStore((s) => s.pulls);
@@ -60,8 +62,8 @@ export function PullRateChart() {
       </SectionHeading>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
-          {/* Faint navy grid — see GemsPerEpicChart comment about #1a1a2e choice. */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a2e" />
+          {/* Grid stroke token; see runtimeColors.ts for why it is this faint. */}
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
           <XAxis dataKey="idx" tick={{ fill: "#6b7280", fontSize: 11 }} tickFormatter={formatTick} />
           {/* Y axis: domain locked to [0, auto] so 0% always anchors the bottom. */}
           {/* "auto" upper bound lets Recharts size to the data — values above */}
@@ -69,12 +71,13 @@ export function PullRateChart() {
           {/* unit="%" appends the percent sign to tick labels automatically. */}
           <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} domain={[0, "auto"]} unit="%" />
           <Tooltip
-            contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             labelStyle={{ color: ACCENT_GOLD }} // gold accent for hovered date
             labelFormatter={(idx: unknown) => data[Number(idx)]?.date ?? ""}
-            // 3 decimal places — epic rates can be in the 1-5% range, so
-            // tenths/hundredths show meaningful run-to-run differences.
-            formatter={(value?: number | string | readonly (number | string)[]) => [`${Number(value).toFixed(3)}%`, "Epic Rate"]}
+            // 2 decimals, matching the epic-rate convention in formatNumber.ts.
+            // This used to be 3, which rendered "2.500%" in the tooltip directly
+            // above a reference line labelled "Expected 2.5%".
+            formatter={(value?: number | string | readonly (number | string)[]) => [formatPercent(Number(value), 2), "Epic Rate"]}
             isAnimationActive={false}
           />
           {/* Expected drop rate reference: 2.5%. See top-of-file game-mechanic context. */}
@@ -85,7 +88,7 @@ export function PullRateChart() {
           {/* hardcoded: the hex used to be inlined here and silently drifted */}
           {/* out of sync when the rarity palette moved to the -400 band. */}
           {/* monotone curve smooths between sparse points without overshoot. */}
-          <Line type="monotone" dataKey="rate" stroke={RARITY_COLORS.epic} strokeWidth={2} dot={{ fill: RARITY_COLORS.epic, r: 3 }} name="Epic Rate %" />
+          <Line type="monotone" dataKey="rate" stroke={MODULE_RARITY_COLORS.epic} strokeWidth={2} dot={{ fill: MODULE_RARITY_COLORS.epic, r: 3 }} name="Epic Rate %" />
         </LineChart>
       </ResponsiveContainer>
     </div>

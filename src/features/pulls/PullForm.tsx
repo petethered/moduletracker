@@ -63,7 +63,7 @@ import { useId, useState } from "react";
 import { DateInput } from "../../components/ui/DateInput";
 import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
-import { FieldLabel } from "../../components/ui/FieldLabel";
+import { MetaLabel } from "../../components/ui/MetaLabel";
 import { MODULES } from "../../config/modules";
 import { validatePullForm } from "./validation";
 import { useStore } from "../../store";
@@ -150,17 +150,18 @@ function CountButtonRow({ label, value, max, onSelect, testIdPrefix, labelColor 
   return (
     <div>
       {/*
-        FieldLabel WITHOUT htmlFor, so it renders a <span> rather than a
+        MetaLabel WITHOUT htmlFor, so it renders a <span> rather than a
         <label>. That is deliberate and correct: this labels an 11-button
         radiogroup, not a single control, and a <label> pointing at nothing is
         invalid HTML. The accessible name for the group is carried by the
         `aria-label` on the radiogroup below.
       */}
-      {/* No `?? "#9ca3af"` fallback: FieldLabel's own default IS that value
-          (via text-gray-400), and passing it explicitly would force the
-          inline-style branch and re-hardcode the token FieldLabel exists to
-          centralise. Undefined color = use the default. */}
-      <FieldLabel color={labelColor}>{label}</FieldLabel>
+      {/* No fallback color: an undefined `color` lets the label use its own
+          text-gray-400 default. Passing a literal would force the inline-style
+          branch and re-hardcode a value the component exists to centralise. */}
+      <MetaLabel color={labelColor} className="mb-1">
+        {label}
+      </MetaLabel>
       <div
         role="radiogroup"
         aria-label={label}
@@ -344,7 +345,9 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       <div>
         {/* htmlFor/id pair added: the label and select were previously only
             visually adjacent, so the select had no accessible name. */}
-        <FieldLabel htmlFor={bannerSelectId}>Banner</FieldLabel>
+        <MetaLabel htmlFor={bannerSelectId} className="mb-1">
+          Banner
+        </MetaLabel>
         <select
           id={bannerSelectId}
           value={bannerType}
@@ -367,12 +370,12 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
             rather than one control. Epic purple is load-bearing here (it ties
             the section to the rarity it represents) and clears AA at 7.32:1
             on this surface. */}
-        <FieldLabel
+        <MetaLabel
           color="var(--color-rarity-epic)"
           className="mb-2"
         >
           Epic Modules ({epicCount})
-        </FieldLabel>
+        </MetaLabel>
         <button
           type="button"
           onClick={handleAddEpic}

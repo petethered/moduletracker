@@ -37,13 +37,19 @@ import {
   MODULE_TYPE_ORDER,
 } from "../../config/moduleTypes";
 import { useRenderLog } from "../../utils/renderLog";
+import { TEXT_MUTED } from "../../config/runtimeColors";
+import { formatPercent } from "../../utils/formatNumber";
 
 // Type-accent palette and display order now come from
 // src/config/moduleTypes.ts. The old local copies (here, in
 // PullHighlights, in ModuleCollectionGrid, and in ModuleDistributionChart)
 // were four identical hex literals kept in sync by comment alone.
 //
-// Local aliases keep the rest of this file's JSX unchanged and readable.
+// Aliased for brevity: 6 use sites between them in this file, so the shorter
+// names materially improve the JSX. Files with only one or two use sites (
+// ModuleTable, ModuleDistributionChart, ModuleCollectionGrid) reference the
+// MODULE_TYPE_* names directly instead — a local alias there would just hide
+// the dependency from anyone grepping for the shared palette.
 const TYPE_COLORS = MODULE_TYPE_COLORS;
 const TYPE_ORDER: readonly ModuleType[] = MODULE_TYPE_ORDER;
 
@@ -92,7 +98,7 @@ export function TypeBalance() {
         Type Balance
         {/* Subtitle clarifies that this is *epic* pulls only — common/rare
             pulls aren't tracked per-module so they can't be type-bucketed. */}
-        <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 400, marginLeft: 8 }}>
+        <span style={{ fontSize: 11, color: TEXT_MUTED, fontWeight: 400, marginLeft: 8 }}>
           epic pulls by type
         </span>
       </div>
@@ -120,7 +126,7 @@ export function TypeBalance() {
               key={type}
               // Native tooltip — fine here because the legend already shows
               // exact counts; the tooltip is for users who hover the bar.
-              title={`${type}: ${typeCounts[type]} (${pct.toFixed(1)}%)`}
+              title={`${type}: ${typeCounts[type]} (${formatPercent(pct)})`}
               style={{
                 width: `${pct}%`,
                 backgroundColor: TYPE_COLORS[type],
@@ -179,8 +185,8 @@ export function TypeBalance() {
                 >
                   {type}
                 </span>
-                <span style={{ fontSize: 11, color: "#9ca3af", marginLeft: 6 }}>
-                  {count} ({pct.toFixed(1)}%)
+                <span style={{ fontSize: 11, color: TEXT_MUTED, marginLeft: 6 }}>
+                  {count} ({formatPercent(pct)})
                 </span>
               </div>
             </div>

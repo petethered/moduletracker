@@ -16,6 +16,8 @@
  * in source order, which is appropriate for screen readers.
  */
 
+import { MetaLabel } from "./MetaLabel";
+
 /**
  * Props for {@link StatCard}.
  */
@@ -32,7 +34,7 @@ interface StatCardProps {
   subtitle?: string;
   /**
    * Accent color for the label and the corner bracket lines. Defaults to the
-   * gold theme accent. Pass a rarity color (see `src/config/rarityColors.ts`)
+   * gold theme accent. Pass a rarity color (see `src/config/moduleRarities.ts`)
    * to thematically tag the stat (e.g. legendary=gold, mythic=red).
    */
   color?: string;
@@ -62,14 +64,11 @@ export function StatCard({
         className="absolute top-0 left-0 w-[1px] h-8"
         style={{ backgroundColor: color, opacity: 0.4 }}
       />
-      <div
-        // `tracking-[0.15em]` (extra wide letter-spacing) is a deliberate
-        // tradeoff — the label reads as a "category tag" rather than copy.
-        className="text-[10px] uppercase tracking-[0.15em] mb-2 font-medium"
-        style={{ color, fontFamily: "var(--font-body)" }}
-      >
+      {/* The wide letter-spacing lives in MetaLabel and is deliberate there:
+          it makes the label read as a "category tag" rather than as copy. */}
+      <MetaLabel color={color} className="mb-2">
         {label}
-      </div>
+      </MetaLabel>
       <div
         // Mono font for numbers so digits align across stacked cards (helps
         // visual scanning when a row of cards shows comparable values).

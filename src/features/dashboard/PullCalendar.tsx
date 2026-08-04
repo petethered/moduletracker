@@ -40,6 +40,7 @@ import { useMemo, useState } from "react";
 import { useStore } from "../../store";
 import { formatDisplayDate, toDateString } from "../../utils/formatDate";
 import { useRenderLog } from "../../utils/renderLog";
+import { TEXT_MUTED } from "../../config/runtimeColors";
 
 // 90-day window matches the GitHub contributions look but is short enough to
 // fit without horizontal scroll on most desktops. Tune here if the design
@@ -253,7 +254,7 @@ export function PullCalendar() {
                 left: colIndex * COL_STEP,
                 fontSize: 10,
                 fontWeight: 500,
-                color: "#9ca3af",
+                color: TEXT_MUTED,
                 whiteSpace: "nowrap",
                 letterSpacing: "0.02em",
               }}

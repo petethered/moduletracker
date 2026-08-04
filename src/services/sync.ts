@@ -63,7 +63,7 @@
 
 import { apiFetch } from "./api";
 import type { PullRecord, ModuleProgress, BannerType } from "../types";
-import { MODULE_RARITY_ORDER } from "../config/rarityColors";
+import { MODULE_RARITY_ORDER } from "../config/moduleRarities";
 
 /**
  * UI-facing sync status.

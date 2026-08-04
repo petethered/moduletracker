@@ -13,7 +13,7 @@
  * The Tower has 4 module slots on the player's tower: Cannon, Armor, Generator,
  * and Core. Each slot can equip exactly one module. Players acquire copies of
  * modules through gacha pulls; copies of the same module fuse to raise its
- * rarity (see src/config/rarityColors.ts for the rarity ladder).
+ * rarity (see src/config/moduleRarities.ts for the rarity ladder).
  *
  * GOTCHAS / INVARIANTS:
  *   - `id` MUST be a stable kebab-case slug. It is persisted in localStorage as
@@ -222,6 +222,14 @@ export const MODULES: ModuleDefinition[] = [
  * IF YOU ADD A NEW `type`: you MUST add a new key here AND update the
  *   ModuleDefinition['type'] union in src/types/index.ts. Forgetting either
  *   will silently drop modules from grids.
+ */
+/**
+ * NOTE: the DISPLAY metadata for these type keys — render order, colors and
+ * labels — lives in ./moduleTypes.ts, not here. This file owns the roster
+ * (which modules exist); that file owns how types are presented.
+ *
+ * INVARIANT: the key order below must match MODULE_TYPE_ORDER in that file, or
+ * the collection grid and the distribution chart will list types differently.
  */
 export const MODULES_BY_TYPE = {
   cannon: MODULES.filter((m) => m.type === "cannon"),

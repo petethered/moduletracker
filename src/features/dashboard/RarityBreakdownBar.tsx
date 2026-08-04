@@ -29,8 +29,10 @@ import { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
 import { selectRarityPercentages, selectRarityCounts } from "../../store/selectors";
-import { RARITY_COLORS } from "../../config/rarityColors";
+import { MODULE_RARITY_COLORS } from "../../config/moduleRarities";
 import { useRenderLog } from "../../utils/renderLog";
+import { CHART_TOOLTIP_STYLE } from "../../config/runtimeColors";
+import { formatPercent } from "../../utils/formatNumber";
 
 export function RarityBreakdownBar() {
   const pulls = useStore((s) => s.pulls);
@@ -46,9 +48,9 @@ export function RarityBreakdownBar() {
     const pcts = selectRarityPercentages(pulls);
     const counts = selectRarityCounts(pulls);
     return [
-      { name: "Common", value: counts.common, color: RARITY_COLORS.common, pct: pcts.common },
-      { name: "Rare", value: counts.rare, color: RARITY_COLORS.rare, pct: pcts.rare },
-      { name: "Epic", value: counts.epic, color: RARITY_COLORS.epic, pct: pcts.epic },
+      { name: "Common", value: counts.common, color: MODULE_RARITY_COLORS.common, pct: pcts.common },
+      { name: "Rare", value: counts.rare, color: MODULE_RARITY_COLORS.rare, pct: pcts.rare },
+      { name: "Epic", value: counts.epic, color: MODULE_RARITY_COLORS.epic, pct: pcts.epic },
     ].filter((d) => d.value > 0);
   }, [pulls]);
 
@@ -80,8 +82,7 @@ export function RarityBreakdownBar() {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: "#16213e",
-              border: "1px solid #0f3460",
+              ...CHART_TOOLTIP_STYLE,
               borderRadius: 8,
             }}
             // Custom formatter so the tooltip shows "12.3% (45) Epic" instead
@@ -90,7 +91,7 @@ export function RarityBreakdownBar() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(value: any, name: any) => {
               const entry = data.find((d: any) => d.name === name);
-              return [`${entry?.pct.toFixed(1)}% (${value})`, name];
+              return [`${formatPercent(entry?.pct ?? 0)} (${value})`, name];
             }}
           />
         </PieChart>
@@ -106,7 +107,7 @@ export function RarityBreakdownBar() {
               style={{ backgroundColor: d.color }}
             />
             <span className="text-gray-300">{d.name}</span>
-            <span className="text-gray-400">{d.pct.toFixed(1)}%</span>
+            <span className="text-gray-400">{formatPercent(d.pct)}</span>
             <span className="text-gray-400">({d.value})</span>
           </div>
         ))}

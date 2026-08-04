@@ -25,9 +25,11 @@ import {
 } from "recharts";
 import { useStore } from "../../store";
 import { selectGemsPerEpicOverTime } from "../../store/selectors";
-import { ACCENT_GOLD, SIGNAL_WARNING } from "../../config/brandColors";
+import { ACCENT_GOLD, SIGNAL_WARNING } from "../../config/runtimeColors";
 import { useRenderLog } from "../../utils/renderLog";
 import { SectionHeading } from "../../components/ui/SectionHeading";
+import { CHART_GRID, CHART_TOOLTIP_STYLE } from "../../config/runtimeColors";
+import { formatInteger } from "../../utils/formatNumber";
 
 export function GemsPerEpicChart() {
   const pulls = useStore((s) => s.pulls);
@@ -59,9 +61,9 @@ export function GemsPerEpicChart() {
       </SectionHeading>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
-          {/* Dark grid (#1a1a2e) — near-invisible against the navy theme but */}
+          {/* Grid stroke token; see runtimeColors.ts for why it is this faint. */}
           {/* still gives the eye a reference for tick alignment. */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a2e" />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
           {/* Use idx (integer) as dataKey, format to date string. See comment above. */}
           <XAxis dataKey="idx" tick={{ fill: "#6b7280", fontSize: 11 }} tickFormatter={formatTick} />
           {/* Y axis: no explicit domain — Recharts auto-fits. Auto-fit is correct */}
@@ -69,12 +71,16 @@ export function GemsPerEpicChart() {
           {/* the player's data straddles it, which is the interesting case. */}
           <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} />
           <Tooltip
-            contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             labelStyle={{ color: ACCENT_GOLD }} // gold accent for hovered date label
             // Tooltip header shows the real ISO date even though XAxis shows M/D.
             labelFormatter={(idx: unknown) => data[Number(idx)]?.date ?? ""}
-            // 3 decimal places: gems/epic values are 4-5 digits; trim noise.
-            formatter={(value?: number | string | readonly (number | string)[]) => [Number(Number(value).toFixed(3)), "Gems/Epic"]}
+            // Gems/epic is a 4-5 digit count, so it gets the same integer
+            // treatment as every other gem figure. Previously this returned a
+            // NUMBER from toFixed(3), which Recharts stringified without
+            // grouping separators: "8333.333" where the rest of the app said
+            // "8,333".
+            formatter={(value?: number | string | readonly (number | string)[]) => [formatInteger(Math.round(Number(value))), "Gems/Epic"]}
             isAnimationActive={false} // animation causes tooltip flicker on dense data
           />
           {/* Expected-value reference line at 8000 gems/epic. Red dashed = "warning */}

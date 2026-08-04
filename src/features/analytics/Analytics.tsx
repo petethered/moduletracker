@@ -52,9 +52,19 @@ export function Analytics() {
     <div className="space-y-8">
       <h2 className="text-lg text-[var(--color-accent-gold)]/80" style={{ fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em" }}>Analytics</h2>
 
-      {/* Key Stats — pity (where am I in the dry-streak window) + predicted gems (cost to goal). */}
-      {/* Two-column on md+ because both are compact summary cards of equal visual weight. */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/*
+        Key Stats — pity (where am I in the dry-streak window) + predicted gems
+        (cost to goal).
+
+        `items-start` matters here and is not decorative. These two are NOT of
+        equal visual weight, despite what this comment used to claim:
+        PredictedGemsCard stacks a stat card plus two goal panels, while
+        PityTracker is a single compact card. CSS Grid's default
+        `align-items: stretch` therefore inflated PityTracker to roughly three
+        times its natural height, leaving a large empty well below its progress
+        bar. `items-start` lets each card size to its own content.
+      */}
+      <div className="grid md:grid-cols-2 gap-6 items-start">
         <PityTracker />
         <PredictedGemsCard />
       </div>

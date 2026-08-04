@@ -29,6 +29,7 @@ import { selectModulePullCounts } from "../../store/selectors";
 import { MODULE_BY_ID, MODULES } from "../../config/modules";
 import { MODULE_TYPE_COLORS } from "../../config/moduleTypes";
 import { useRenderLog } from "../../utils/renderLog";
+import { TEXT_MUTED } from "../../config/runtimeColors";
 
 // Precomputed once at module load. Used to filter out any orphaned ids in
 // pull counts (modules removed from config, typos in imports, etc.).
@@ -133,7 +134,7 @@ function HighlightRow({ label, module, count, color }: HighlightRowProps) {
         <div
           style={{
             fontSize: 11,
-            color: "#9ca3af",
+            color: TEXT_MUTED,
             textTransform: "uppercase",
             letterSpacing: "0.06em",
             marginBottom: 2,

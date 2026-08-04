@@ -69,19 +69,17 @@ import { MODULE_TYPE_ORDER } from "../../config/moduleTypes";
 import {
   MODULE_RARITY_ORDER,
   getModuleRarityColor,
-} from "../../config/rarityColors";
+} from "../../config/moduleRarities";
 import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import type { ModuleType } from "../../types";
 import { formatDisplayDate } from "../../utils/formatDate";
 import { formatInteger } from "../../utils/formatNumber";
+import { formatPercent } from "../../utils/formatNumber";
 
 // Section render order — Cannon -> Armor -> Generator -> Core mirrors the
 // in-game ordering and the player's mental model (offense before defense
 // before utility before ultimate). Reorder only if the game does.
-// Type ordering now comes from config/moduleTypes.ts — the same tuple was
-// separately declared here, in TypeBalance and in ModuleCollectionGrid.
-const TYPE_ORDER: readonly ModuleType[] = MODULE_TYPE_ORDER;
 
 // NOTE: these labels deliberately do NOT use MODULE_TYPE_LABELS from
 // config/moduleTypes.ts. That export is the plain title-case name ("Cannon")
@@ -119,7 +117,7 @@ export function ModuleTable() {
   return (
     <>
       <div className="space-y-6">
-        {TYPE_ORDER.map((type) => (
+        {MODULE_TYPE_ORDER.map((type) => (
           <div key={type}>
             <h3 className="text-sm font-medium text-[var(--color-accent-gold)] uppercase tracking-wider mb-2">
               {TYPE_LABELS[type]}
@@ -182,7 +180,7 @@ export function ModuleTable() {
                         <td className="px-3 py-2 font-medium">{mod.name}</td>
                         <td className="px-3 py-2">{count}</td>
                         {/* "-" instead of "0.0%" when never pulled — keeps the column visually quiet. */}
-                        <td className="px-3 py-2">{count > 0 ? `${pct.toFixed(1)}%` : "-"}</td>
+                        <td className="px-3 py-2">{count > 0 ? formatPercent(pct) : "-"}</td>
                         <td className="px-3 py-2 text-gray-400">{lastPulled ? formatDisplayDate(lastPulled) : "-"}</td>
                         {/* Always numeric (never "-"): never-drawn shows total
                             lifetime draws by design. Locale-aware grouping via
@@ -191,11 +189,11 @@ export function ModuleTable() {
                         {/* Progress cell hidden - kept for future use.
                             Reactivation plan: uncomment this block, also
                             uncomment the matching <col> + <th> above, and
-                            re-import COPIES_FOR_5_STAR / getRarityForCopies.
+                            re-import COPIES_FOR_5_STAR / getModuleRarityForCopies.
                             The bar visualises copies-toward-5-star (18 max).
                         <td className="px-3 py-2">
                           {count > 0 ? (() => {
-                            const achievable = getRarityForCopies(count);
+                            const achievable = getModuleRarityForCopies(count);
                             const color = achievable ? getModuleRarityColor(achievable) : "var(--color-rarity-epic)";
                             return (
                               <div>

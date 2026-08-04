@@ -29,7 +29,7 @@
  *   - Star levels (1*-5*) are all green/ancestral. They're treated as a
  *     single color band visually, but distinct entries in MODULE_RARITY_ORDER
  *     because they're meaningfully different progression states.
- *   - `common` and `rare` colors exist in RARITY_COLORS but no entry in
+ *   - `common` and `rare` colors exist in MODULE_RARITY_COLORS but no entry in
  *     MODULE_RARITY_ORDER currently uses them — modules in The Tower start
  *     at `epic`. The colors are kept for potential future use (e.g. items
  *     other than modules, or pre-epic shards if that ever ships).
@@ -75,9 +75,9 @@ import type { ModuleRarity } from "../types";
  * Frozen with `as const` so consumers can derive a literal type from the keys.
  *
  * IF YOU ADD A NEW TIER: also extend `ModuleRarity` in src/types/index.ts and
- *   update MODULE_RARITY_ORDER plus RARITY_COPY_THRESHOLDS below.
+ *   update MODULE_RARITY_ORDER plus MODULE_RARITY_COPY_THRESHOLDS below.
  */
-export const RARITY_COLORS = {
+export const MODULE_RARITY_COLORS = {
   common: "#e4e4e7",
   rare: "#60a5fa",
   epic: "#c084fc",
@@ -91,7 +91,7 @@ export const RARITY_COLORS = {
  * NOTE: This is NOT the same as `ModuleRarity` from types/index.ts — that one
  * also includes `epic+`, `mythic+`, and the star levels `1*` through `5*`.
  */
-export type RarityTier = keyof typeof RARITY_COLORS;
+export type ModuleRarityTier = keyof typeof MODULE_RARITY_COLORS;
 
 /**
  * Canonical ascending order of every module-rarity progression state.
@@ -103,12 +103,12 @@ export type RarityTier = keyof typeof RARITY_COLORS;
  *   epic -> epic+ -> legendary -> legendary+ -> mythic -> mythic+ ->
  *   ancestral -> 1* -> 2* -> 3* -> 4* -> 5*
  *
- * INVARIANT: This order MUST match RARITY_COPY_THRESHOLDS below (same
- *   sequence). `getRarityForCopies` walks RARITY_COPY_THRESHOLDS in order
+ * INVARIANT: This order MUST match MODULE_RARITY_COPY_THRESHOLDS below (same
+ *   sequence). `getModuleRarityForCopies` walks MODULE_RARITY_COPY_THRESHOLDS in order
  *   and assumes monotonically-increasing thresholds.
  *
  * NOTE: Modules in The Tower do not drop below `epic` — `common` and `rare`
- *   colors exist in RARITY_COLORS but no module rarity uses them today.
+ *   colors exist in MODULE_RARITY_COLORS but no module rarity uses them today.
  */
 export const MODULE_RARITY_ORDER: ModuleRarity[] = [
   "epic",
@@ -133,7 +133,7 @@ export const MODULE_RARITY_ORDER: ModuleRarity[] = [
  *   requires 4 total copies — not 4 more after legendary.
  *
  * SHAPE: ordered array (NOT a map) because:
- *   1. Order matters — `getRarityForCopies` iterates and picks the highest
+ *   1. Order matters — `getModuleRarityForCopies` iterates and picks the highest
  *      threshold the copy count satisfies.
  *   2. Multiple rarities can share the same copy count (e.g. `epic+` and
  *      `legendary` both at 2 — the later entry wins, which is the intended
@@ -149,7 +149,7 @@ export const MODULE_RARITY_ORDER: ModuleRarity[] = [
  *   copies needed at higher tiers). Don't tweak unless the game itself
  *   changes — these aren't UI knobs.
  */
-export const RARITY_COPY_THRESHOLDS: { rarity: ModuleRarity; copies: number }[] = [
+export const MODULE_RARITY_COPY_THRESHOLDS: { rarity: ModuleRarity; copies: number }[] = [
   { rarity: "epic", copies: 1 },
   { rarity: "epic+", copies: 2 },
   { rarity: "legendary", copies: 2 },
@@ -178,15 +178,15 @@ export const RARITY_COPY_THRESHOLDS: { rarity: ModuleRarity; copies: number }[] 
  *   - Very large counts plateau at `'5*'` — the loop simply never finds a
  *     higher threshold. There is no over-cap or wrap-around behavior.
  *
- * IMPLEMENTATION DETAIL: Walks RARITY_COPY_THRESHOLDS top-down and keeps
+ * IMPLEMENTATION DETAIL: Walks MODULE_RARITY_COPY_THRESHOLDS top-down and keeps
  *   the last (highest) tier whose threshold is satisfied. Relies on the
- *   ordering invariant of RARITY_COPY_THRESHOLDS — if you reorder that
+ *   ordering invariant of MODULE_RARITY_COPY_THRESHOLDS — if you reorder that
  *   table, this function breaks silently.
  */
-export function getRarityForCopies(copies: number): ModuleRarity | null {
+export function getModuleRarityForCopies(copies: number): ModuleRarity | null {
   if (copies < 1) return null;
   let best: ModuleRarity = "epic";
-  for (const t of RARITY_COPY_THRESHOLDS) {
+  for (const t of MODULE_RARITY_COPY_THRESHOLDS) {
     if (copies >= t.copies) best = t.rarity;
   }
   return best;
@@ -197,12 +197,12 @@ export function getRarityForCopies(copies: number): ModuleRarity | null {
  * display hex color.
  *
  * MAPPING RULES:
- *   - `epic`, `epic+`           -> RARITY_COLORS.epic     (purple)
- *   - `legendary`, `legendary+` -> RARITY_COLORS.legendary (gold)
- *   - `mythic`, `mythic+`       -> RARITY_COLORS.mythic   (red)
- *   - `ancestral`               -> RARITY_COLORS.ancestral (green)
- *   - any `*`-suffixed star tier (`1*`-`5*`) -> RARITY_COLORS.ancestral (green)
- *   - fallthrough               -> RARITY_COLORS.common   (white)
+ *   - `epic`, `epic+`           -> MODULE_RARITY_COLORS.epic     (purple)
+ *   - `legendary`, `legendary+` -> MODULE_RARITY_COLORS.legendary (gold)
+ *   - `mythic`, `mythic+`       -> MODULE_RARITY_COLORS.mythic   (red)
+ *   - `ancestral`               -> MODULE_RARITY_COLORS.ancestral (green)
+ *   - any `*`-suffixed star tier (`1*`-`5*`) -> MODULE_RARITY_COLORS.ancestral (green)
+ *   - fallthrough               -> MODULE_RARITY_COLORS.common   (white)
  *
  * RATIONALE: star tiers are a sub-progression INSIDE the ancestral band, so
  *   they share the green color. The `+` plus-tiers are half-steps inside
@@ -215,10 +215,10 @@ export function getRarityForCopies(copies: number): ModuleRarity | null {
  *   before the `endsWith('*')` check or it may be misclassified.
  */
 export function getModuleRarityColor(rarity: ModuleRarity): string {
-  if (rarity.startsWith("epic")) return RARITY_COLORS.epic;
-  if (rarity.startsWith("legendary")) return RARITY_COLORS.legendary;
-  if (rarity.startsWith("mythic")) return RARITY_COLORS.mythic;
+  if (rarity.startsWith("epic")) return MODULE_RARITY_COLORS.epic;
+  if (rarity.startsWith("legendary")) return MODULE_RARITY_COLORS.legendary;
+  if (rarity.startsWith("mythic")) return MODULE_RARITY_COLORS.mythic;
   if (rarity === "ancestral" || rarity.endsWith("*"))
-    return RARITY_COLORS.ancestral;
-  return RARITY_COLORS.common;
+    return MODULE_RARITY_COLORS.ancestral;
+  return MODULE_RARITY_COLORS.common;
 }

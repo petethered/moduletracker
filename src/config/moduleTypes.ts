@@ -46,7 +46,7 @@
  * `--color-type-*` CSS variable set — every consumer passes these into a JS
  * API (Recharts `fill`, inline `style`), so a parallel CSS declaration would
  * be a second source of truth that nothing reads and that could silently
- * drift. Contrast with RARITY_COLORS, which genuinely needs both because
+ * drift. Contrast with MODULE_RARITY_COLORS, which genuinely needs both because
  * rarity is styled via Tailwind classes AND drawn to <canvas>.
  *
  * IF YOU ADD A MODULE TYPE: extend `ModuleType` in src/types/index.ts, add the
@@ -61,7 +61,7 @@ import type { ModuleType } from "../types";
  *
  * Annotated `Record<ModuleType, string>` so a missing or extra key is a
  * compile error rather than a runtime `undefined`. Deliberately NOT `as const`
- * (unlike RARITY_COLORS in rarityColors.ts): nothing needs the literal value
+ * (unlike MODULE_RARITY_COLORS in moduleRarities.ts): nothing needs the literal value
  * types here, the values are consumed as plain color strings. Do not "restore"
  * an `as const` — it conflicts with the Record annotation.
  */

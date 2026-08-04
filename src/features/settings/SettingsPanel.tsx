@@ -58,6 +58,7 @@ import { parseBulkImport } from "./parseBulkImport";
 import { getLocalDateString } from "../../utils/formatDate";
 import { ScreenshotButton } from "../screenshot/ScreenshotButton";
 import { AccountSettings } from "./AccountSettings";
+import { formatInteger } from "../../utils/formatNumber";
 
 export function SettingsPanel() {
   // Store subscriptions — a wide cross-section because this component touches
@@ -312,7 +313,10 @@ export function SettingsPanel() {
             )}
             {bulkResult && bulkResult.count > 0 && (
               <div className="mt-2 text-xs">
-                <p className="text-green-400">Imported {bulkResult.count} pulls.</p>
+                <p className="text-green-400">
+                  Imported {formatInteger(bulkResult.count)}{" "}
+                  {bulkResult.count === 1 ? "pull" : "pulls"}.
+                </p>
                 {bulkResult.correctedNames.length > 0 && (
                   <div className="mt-1">
                     <p className="text-yellow-400">Corrected names:</p>

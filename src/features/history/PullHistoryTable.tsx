@@ -64,9 +64,10 @@ import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useStore } from "../../store";
 import { sortPullsNewest, selectPityPullIds, selectDryStreakByPullId, PITY_PULL_THRESHOLD } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
-import { RARITY_COLORS } from "../../config/rarityColors";
+import { MODULE_RARITY_COLORS } from "../../config/moduleRarities";
 import type { PullRecord } from "../../types";
 import { formatDisplayDate } from "../../utils/formatDate";
+import { formatInteger } from "../../utils/formatNumber";
 
 export function PullHistoryTable() {
   const pulls = useStore((s) => s.pulls);
@@ -100,14 +101,14 @@ export function PullHistoryTable() {
       // Common count — leftmost rarity column (matches rarity ascending).
       key: "common",
       header: "Common",
-      render: (p) => <Badge color={RARITY_COLORS.common}>{p.commonCount}</Badge>,
+      render: (p) => <Badge color={MODULE_RARITY_COLORS.common}>{p.commonCount}</Badge>,
       sortable: true,
       sortValue: (p) => p.commonCount,
     },
     {
       key: "rare",
       header: "Rare",
-      render: (p) => <Badge color={RARITY_COLORS.rare}>{p.rareCount}</Badge>,
+      render: (p) => <Badge color={MODULE_RARITY_COLORS.rare}>{p.rareCount}</Badge>,
       sortable: true,
       sortValue: (p) => p.rareCount,
     },
@@ -120,7 +121,7 @@ export function PullHistoryTable() {
       header: "Epic",
       render: (p) =>
         p.epicModules.length > 0 ? (
-          <Badge color={RARITY_COLORS.epic}>{p.epicModules.length}</Badge>
+          <Badge color={MODULE_RARITY_COLORS.epic}>{p.epicModules.length}</Badge>
         ) : (
           <span className="text-gray-400">0</span>
         ),
@@ -171,7 +172,7 @@ export function PullHistoryTable() {
       // without a schema change.
       key: "gems",
       header: "Gems",
-      render: (p) => p.gemsSpent.toLocaleString(),
+      render: (p) => formatInteger(p.gemsSpent),
     },
     {
       // Action column — empty header to keep visual weight low. Both

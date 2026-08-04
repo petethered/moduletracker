@@ -38,6 +38,8 @@ import {
   selectPredictedGemsForMerge,
 } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
+import { formatInteger } from "../../utils/formatNumber";
+import { SectionHeading } from "../../components/ui/SectionHeading";
 
 export function PredictedGemsCard() {
   const pulls = useStore((s) => s.pulls);
@@ -58,7 +60,7 @@ export function PredictedGemsCard() {
       {/* have been pulled yet to avoid "0 gems/epic" looking like a real value. */}
       <StatCard
         label="Gems/Epic"
-        value={gemsPerEpic > 0 ? gemsPerEpic.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "-"}
+        value={gemsPerEpic > 0 ? formatInteger(Math.round(gemsPerEpic)) : "-"}
         subtitle="Average gems per epic pull"
         color="var(--color-rarity-legendary)"
       />
@@ -66,9 +68,9 @@ export function PredictedGemsCard() {
       {/* === Tier 1: All Ancestral (8 copies each) === */}
       {/* Ancestral is the top rarity in The Tower; green color matches that tier. */}
       <div className="bg-[var(--color-navy-600)] rounded-xl p-4">
-        <h4 className="text-xs uppercase tracking-wider text-[var(--color-rarity-ancestral)] font-medium mb-3">
+        <SectionHeading as="h4" color="var(--color-rarity-ancestral)">
           All Ancestral (8 copies each)
-        </h4>
+        </SectionHeading>
         <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 bg-[var(--color-navy-800)] rounded-full h-3 overflow-hidden">
             {/* Progress bar width = (copies pulled / copies needed). Caps at 100% */}
@@ -91,7 +93,7 @@ export function PredictedGemsCard() {
           {/* it's the actionable number ("how much do I still need to spend?"). */}
           {/* "Done!" replaces the cost when all modules are at the target tier. */}
           <span className="text-[var(--color-accent-crimson)]">
-            {gemsForAncestral > 0 ? `~${gemsForAncestral.toLocaleString()} gems` : "Done!"}
+            {gemsForAncestral > 0 ? `~${formatInteger(gemsForAncestral)} gems` : "Done!"}
           </span>
         </div>
       </div>
@@ -100,9 +102,9 @@ export function PredictedGemsCard() {
       {/* 5-Star is a separate progression axis (max stars per module). */}
       {/* Gold color = legendary tier semantics (max-star feel). */}
       <div className="bg-[var(--color-navy-600)] rounded-xl p-4">
-        <h4 className="text-xs uppercase tracking-wider text-[var(--color-rarity-legendary)] font-medium mb-3">
+        <SectionHeading as="h4" color="var(--color-rarity-legendary)">
           All 5-Star (18 copies each)
-        </h4>
+        </SectionHeading>
         <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 bg-[var(--color-navy-800)] rounded-full h-3 overflow-hidden">
             <div
@@ -118,7 +120,7 @@ export function PredictedGemsCard() {
           {/* "/24" same caveat as above re: MODULES.length. */}
           <span className="text-gray-400">{progress.modulesAt5Star}/24 modules at 5*</span>
           <span className="text-[var(--color-accent-crimson)]">
-            {gemsFor5Star > 0 ? `~${gemsFor5Star.toLocaleString()} gems` : "Done!"}
+            {gemsFor5Star > 0 ? `~${formatInteger(gemsFor5Star)} gems` : "Done!"}
           </span>
         </div>
       </div>

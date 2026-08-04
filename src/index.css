@@ -83,7 +83,7 @@
   /* -------------------------------------------------------------------------
      RARITY COLORS — CANONICAL VALUES
      -------------------------------------------------------------------------
-     THESE MUST STAY IN SYNC WITH `RARITY_COLORS` in src/config/rarityColors.ts.
+     THESE MUST STAY IN SYNC WITH `MODULE_RARITY_COLORS` in src/config/moduleRarities.ts.
 
      There are two rendering paths for rarity color and they cannot share a
      single source at runtime:
@@ -104,7 +104,7 @@
      on a dark theme. This is a deliberate, tiny deviation from CLAUDE.md's
      "common=white" shorthand — revert this one hex if you disagree.
 
-     IF YOU CHANGE ANY VALUE HERE, change it in rarityColors.ts too. There is
+     IF YOU CHANGE ANY VALUE HERE, change it in moduleRarities.ts too. There is
      a unit test (src/__tests__/config.test.ts) guarding the key set but not
      the values, because the canvas renderer is the only other consumer.
   ------------------------------------------------------------------------- */
@@ -121,8 +121,15 @@
      that nothing reads. See that file for why the type palette is muted while
      the rarity palette above is vivid. */
 
+  /* Muted secondary text. Mirrored by TEXT_MUTED in
+     src/config/runtimeColors.ts for the few places that set `color` through an
+     inline style object rather than a Tailwind class. Visually equivalent to
+     `text-gray-400` but not byte-identical: Tailwind v4's palette is oklch, so
+     its gray-400 computes to #99a1af. Both clear AA on every navy surface. */
+  --color-text-muted: #9ca3af;
+
   /* Chart benchmark / warning red. Mirrored by SIGNAL_WARNING in
-     src/config/brandColors.ts because Recharts needs a literal. Deliberately
+     src/config/runtimeColors.ts because Recharts needs a literal. Deliberately
      not a rarity color: it marks "expected value" reference lines. */
   --color-signal-warning: #ef4444;
 

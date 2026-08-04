@@ -35,6 +35,8 @@
 import { useStore } from "../../store";
 import { selectStatsByBanner, type BannerStats } from "../../store/selectors";
 import type { BannerType } from "../../types";
+import { formatInteger, formatPercent } from "../../utils/formatNumber";
+import { MetaLabel } from "../../components/ui/MetaLabel";
 
 /**
  * Iteration order for banner panels. Fixed so the layout doesn't shuffle as
@@ -126,22 +128,18 @@ function BannerPanel({
         border: `1px solid color-mix(in srgb, ${accent} 40%, transparent)`,
       }}
     >
-      {/* Banner label — uppercase with wide tracking matches the
-          SectionLabel pattern used elsewhere in the dashboard. */}
-      <div
-        className="text-[10px] font-semibold uppercase tracking-[0.15em] mb-2"
-        style={{ color: accent, fontFamily: "var(--font-body)" }}
-      >
+      <MetaLabel color={accent} className="mb-2">
         {banner}
-      </div>
+      </MetaLabel>
       <div className="space-y-1">
-        <StatRow label="Pulls" value={stats.totalPulls.toLocaleString()} />
-        {/* gemsSpent uses toLocaleString to match StatCardGrid's "Gems Spent". */}
-        <StatRow label="Gems" value={stats.gemsSpent.toLocaleString()} />
-        <StatRow label="Epics" value={stats.epicsFound.toLocaleString()} />
-        {/* epicRate uses .toFixed(2) + '%' to match StatCardGrid's "Epic Rate"
-            — both surface "observed epic %" so they should format identically. */}
-        <StatRow label="Rate" value={`${stats.epicRate.toFixed(2)}%`} />
+        <StatRow label="Pulls" value={formatInteger(stats.totalPulls)} />
+        <StatRow label="Gems" value={formatInteger(stats.gemsSpent)} />
+        <StatRow label="Epics" value={formatInteger(stats.epicsFound)} />
+        {/* 2 decimals, not the formatPercent default of 1: this and
+            StatCardGrid's "Epic Rate" both surface observed epic %, so they
+            must format identically. See the precision convention in
+            utils/formatNumber.ts. */}
+        <StatRow label="Rate" value={formatPercent(stats.epicRate, 2)} />
       </div>
     </div>
   );
@@ -155,12 +153,7 @@ function BannerPanel({
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-baseline">
-      <span
-        className="text-[10px] uppercase tracking-wider text-gray-400"
-        style={{ fontFamily: "var(--font-body)" }}
-      >
-        {label}
-      </span>
+      <MetaLabel>{label}</MetaLabel>
       <span
         className="text-sm text-white"
         style={{ fontFamily: "var(--font-mono)" }}

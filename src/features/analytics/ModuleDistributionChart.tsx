@@ -32,6 +32,8 @@ import {
 import type { ModuleType } from "../../types";
 import { useRenderLog } from "../../utils/renderLog";
 import { SectionHeading } from "../../components/ui/SectionHeading";
+import { CHART_TOOLTIP_STYLE } from "../../config/runtimeColors";
+import { formatPercent } from "../../utils/formatNumber";
 
 // Palette and labels come from src/config/moduleTypes.ts — see that file for
 // why the type palette is muted. Imported as TS constants rather than the
@@ -110,16 +112,14 @@ export function ModuleDistributionChart() {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#16213e",
-                border: "1px solid #0f3460",
-                borderRadius: 8,
+                ...CHART_TOOLTIP_STYLE,
               }}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               // Tooltip shows raw count + percentage. `value` is always number here
               // (pie slice values), but Recharts' types are loose so we use any.
               formatter={(value: any, name: any) => {
-                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
-                return [`${value} (${pct}%)`, name];
+                const pct = total > 0 ? (value / total) * 100 : 0;
+                return [`${value} (${formatPercent(pct)})`, name];
               }}
             />
           </PieChart>
@@ -136,7 +136,7 @@ export function ModuleDistributionChart() {
               <span className="text-gray-300 w-20">{d.name}</span>
               <span className="text-white font-medium">{d.value}</span>
               <span className="text-gray-400">
-                ({total > 0 ? ((d.value / total) * 100).toFixed(1) : "0"}%)
+                ({formatPercent(total > 0 ? (d.value / total) * 100 : 0)})
               </span>
             </div>
           ))}

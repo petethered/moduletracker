@@ -29,6 +29,7 @@
 
 import { StatCard } from "../../components/ui/StatCard";
 import { useStore } from "../../store";
+import { formatInteger, formatPercent } from "../../utils/formatNumber";
 import {
   selectTotalPulls,
   selectTotalGems,
@@ -59,7 +60,7 @@ export function StatCardGrid() {
       {/* Gems use a crimson accent — it's "money spent", a costly stat. */}
       <StatCard
         label="Gems Spent"
-        value={totalGems.toLocaleString()}
+        value={formatInteger(totalGems)}
         color="var(--color-accent-crimson)"
       />
       {/* Epic Rate is shown to 2 decimals because it usually hovers near 2.5%
@@ -67,7 +68,7 @@ export function StatCardGrid() {
           the user to the expected baseline. */}
       <StatCard
         label="Epic Rate"
-        value={`${epicRate.toFixed(2)}%`}
+        value={formatPercent(epicRate, 2)}
         subtitle="Expected: 2.5%"
         color="var(--color-rarity-epic)"
       />

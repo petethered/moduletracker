@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { MODULES } from "../config/modules";
-import { RARITY_COLORS, MODULE_RARITY_ORDER } from "../config/rarityColors";
+import { MODULE_RARITY_COLORS, MODULE_RARITY_ORDER } from "../config/moduleRarities";
 
 describe("Module config", () => {
   it("has exactly 24 modules", () => {
@@ -29,7 +29,7 @@ describe("Module config", () => {
 
 describe("Rarity colors", () => {
   it("has all 6 rarity tiers", () => {
-    expect(Object.keys(RARITY_COLORS)).toEqual(
+    expect(Object.keys(MODULE_RARITY_COLORS)).toEqual(
       expect.arrayContaining([
         "common",
         "rare",

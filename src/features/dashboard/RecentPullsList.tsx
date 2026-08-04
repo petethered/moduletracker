@@ -35,7 +35,8 @@ import { useStore } from "../../store";
 import { sortPullsNewest, selectPityPullIds, selectDryStreakByPullId, PITY_PULL_THRESHOLD } from "../../store/selectors";
 import { MODULE_BY_ID } from "../../config/modules";
 import { Badge } from "../../components/ui/Badge";
-import { RARITY_COLORS } from "../../config/rarityColors";
+import { MODULE_RARITY_COLORS } from "../../config/moduleRarities";
+import { formatDisplayDate } from "../../utils/formatDate";
 
 export function RecentPullsList() {
   const pulls = useStore((s) => s.pulls);
@@ -68,15 +69,21 @@ export function RecentPullsList() {
           onClick={() => openEditPullModal(pull.id)}
           className="flex items-center gap-3 bg-[var(--color-navy-600)] rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-[var(--color-navy-500)] transition-colors"
         >
-          {/* Date column — fixed width (w-24) so badges align across rows. */}
-          <span className="text-gray-400 w-24 shrink-0">{pull.date}</span>
+          {/* Date column — fixed width (w-24) so badges align across rows.
+              Routed through formatDisplayDate like PullHistoryTable and
+              ModuleTable; this used to render the raw YYYY-MM-DD storage
+              string, so one pull displayed two different ways depending on
+              which tab you were looking at. */}
+          <span className="text-gray-400 w-24 shrink-0">
+            {formatDisplayDate(pull.date)}
+          </span>
           {/* Rarity tally badges. Common/Rare are always rendered (even if 0)
               so the row layout stays consistent. Epic is only shown when
               there are epics — adds emphasis when present. */}
-          <Badge color={RARITY_COLORS.common}>{pull.commonCount}C</Badge>
-          <Badge color={RARITY_COLORS.rare}>{pull.rareCount}R</Badge>
+          <Badge color={MODULE_RARITY_COLORS.common}>{pull.commonCount}C</Badge>
+          <Badge color={MODULE_RARITY_COLORS.rare}>{pull.rareCount}R</Badge>
           {pull.epicModules.length > 0 && (
-            <Badge color={RARITY_COLORS.epic}>
+            <Badge color={MODULE_RARITY_COLORS.epic}>
               {pull.epicModules.length}E
             </Badge>
           )}

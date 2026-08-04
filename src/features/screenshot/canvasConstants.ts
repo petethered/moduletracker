@@ -31,13 +31,13 @@
  *     of the viewer's theme. This file is a PINNED SNAPSHOT of the palette, not a
  *     live mirror of it: if the app's colors change, updating these is a judgement
  *     call about how the exported image should look, NOT an automatic obligation.
- *     Do not "consolidate" this file into src/config/brandColors.ts — that file
+ *     Do not "consolidate" this file into src/config/runtimeColors.ts — that file
  *     exists for live-UI values and says so.
  */
 
 // Navy palette, snapshotted from index.css so the screenshot LOOKS like the app.
 // Intentionally a copy, not a live reference — see the header. These have drifted
-// from the live palette before (WHITE here is #e5e7eb while RARITY_COLORS.common is
+// from the live palette before (WHITE here is #e5e7eb while MODULE_RARITY_COLORS.common is
 // #e4e4e7); that is tolerable for an exported image and is not a bug to chase.
 export const NAVY_900 = "#06060f"; // Page background
 export const NAVY_800 = "#0c0c1d"; // Section headers / panel fill / alternating rows

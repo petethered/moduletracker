@@ -44,9 +44,10 @@
  *     circle outline) so the panel doesn't look broken on a fresh account.
  *   - Slice angles start at -π/2 (12 o'clock) for the conventional "first slice on top".
  */
-import { RARITY_COLORS } from "../../config/rarityColors";
+import { MODULE_RARITY_COLORS } from "../../config/moduleRarities";
 import type { BannerType } from "../../types";
 import type { ScreenshotData } from "./screenshotData";
+import { formatInteger, formatPercent } from "../../utils/formatNumber";
 import {
   NAVY_800,
   NAVY_700,
@@ -71,8 +72,8 @@ import {
  */
 const BANNER_ACCENT: Record<BannerType, string> = {
   standard: GOLD,
-  featured: RARITY_COLORS.epic,
-  lucky: RARITY_COLORS.ancestral,
+  featured: MODULE_RARITY_COLORS.epic,
+  lucky: MODULE_RARITY_COLORS.ancestral,
 };
 
 /**
@@ -244,7 +245,10 @@ export function drawStatsPanel(
   // Specialized row for Common/Rare/Epic. Differs from drawStatRow in two ways:
   //   1. Label color reflects rarity (visual mirror of the in-app history view).
   //   2. Value formats both count and percentage on one line, e.g. "1,234  (25.5%)".
-  // toLocaleString() ensures locale-appropriate thousands separators.
+  // Shared formatters, same as the live UI: number formatting is a locale
+  // concern and the exported PNG should match what the user sees on screen.
+  // (This is the opposite of the COLOR constants in canvasConstants.ts, which
+  // are a deliberately pinned snapshot — see that file's header.)
   const drawRarityRow = (
     label: string,
     count: number,
@@ -257,7 +261,7 @@ export function drawStatsPanel(
     ctx.fillStyle = WHITE;
     ctx.textAlign = "right";
     ctx.fillText(
-      `${count.toLocaleString()}  (${pct.toFixed(1)}%)`,
+      `${formatInteger(count)}  (${formatPercent(pct)})`,
       x + panelWidth - 16,
       py,
     );
@@ -272,12 +276,12 @@ export function drawStatsPanel(
   py += 28;
 
   // Gems Spent
-  drawStatRow("Gems Spent", data.stats.gemsSpent.toLocaleString());
+  drawStatRow("Gems Spent", formatInteger(data.stats.gemsSpent));
 
   drawDivider();
 
   // Total Pulls
-  drawStatRow("Total Pulls", data.stats.totalPulls.toLocaleString());
+  drawStatRow("Total Pulls", formatInteger(data.stats.totalPulls));
 
   drawDivider();
 
@@ -286,19 +290,19 @@ export function drawStatsPanel(
     "Common",
     data.stats.commonCount,
     data.stats.commonPct,
-    RARITY_COLORS.common,
+    MODULE_RARITY_COLORS.common,
   );
   drawRarityRow(
     "Rare",
     data.stats.rareCount,
     data.stats.rarePct,
-    RARITY_COLORS.rare,
+    MODULE_RARITY_COLORS.rare,
   );
   drawRarityRow(
     "Epic",
     data.stats.epicCount,
     data.stats.epicPct,
-    RARITY_COLORS.epic,
+    MODULE_RARITY_COLORS.epic,
   );
 
   drawDivider();
@@ -315,9 +319,9 @@ export function drawStatsPanel(
     // Build slice list in display order (common→rare→epic) so the visual ordering
     // matches the rarity rows above.
     const slices = [
-      { pct: data.stats.commonCount / total, color: RARITY_COLORS.common },
-      { pct: data.stats.rareCount / total, color: RARITY_COLORS.rare },
-      { pct: data.stats.epicCount / total, color: RARITY_COLORS.epic },
+      { pct: data.stats.commonCount / total, color: MODULE_RARITY_COLORS.common },
+      { pct: data.stats.rareCount / total, color: MODULE_RARITY_COLORS.rare },
+      { pct: data.stats.epicCount / total, color: MODULE_RARITY_COLORS.epic },
     ];
     // Start at -π/2 = 12 o'clock so the first slice begins at the top, mirroring the
     // typical pie chart convention.
@@ -353,7 +357,7 @@ export function drawStatsPanel(
   drawStatRow(
     "Gems/Epic",
     data.stats.gemsPerEpic > 0
-      ? Math.round(data.stats.gemsPerEpic).toLocaleString()
+      ? formatInteger(Math.round(data.stats.gemsPerEpic))
       : "-",
     GOLD,
   );
@@ -415,10 +419,10 @@ export function drawStatsPanel(
 
     // Match the live dashboard's value formatting exactly so screenshots and
     // on-screen view stay in sync.
-    drawBannerRow("Pulls", stats.totalPulls.toLocaleString());
-    drawBannerRow("Gems", stats.gemsSpent.toLocaleString());
-    drawBannerRow("Epics", stats.epicsFound.toLocaleString());
-    drawBannerRow("Rate", `${stats.epicRate.toFixed(2)}%`);
+    drawBannerRow("Pulls", formatInteger(stats.totalPulls));
+    drawBannerRow("Gems", formatInteger(stats.gemsSpent));
+    drawBannerRow("Epics", formatInteger(stats.epicsFound));
+    drawBannerRow("Rate", formatPercent(stats.epicRate, 2));
 
     // Spacer between banner blocks — keeps them visually distinct without
     // needing a divider line.

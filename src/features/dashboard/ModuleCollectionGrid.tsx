@@ -29,7 +29,9 @@
 import { useStore } from "../../store";
 import { MODULES, MODULES_BY_TYPE } from "../../config/modules";
 import { selectModulePullCounts } from "../../store/selectors";
-import { getModuleRarityColor } from "../../config/rarityColors";
+import { getModuleRarityColor } from "../../config/moduleRarities";
+import { TEXT_MUTED } from "../../config/runtimeColors";
+import { MetaLabel } from "../../components/ui/MetaLabel";
 import {
   MODULE_TYPE_COLORS,
   MODULE_TYPE_ORDER,
@@ -68,14 +70,10 @@ export function ModuleCollectionGrid() {
           const modules = MODULES_BY_TYPE[type];
           return (
             <div key={type}>
-              {/* Type heading — color-coded so the row is identifiable even
-                  without reading the label. */}
-              <div
-                className="text-[10px] uppercase tracking-wider font-semibold mb-1"
-                style={{ color: typeColor }}
-              >
+              {/* Color-coded so the row is identifiable without reading it. */}
+              <MetaLabel color={typeColor} className="mb-1">
                 {type}
-              </div>
+              </MetaLabel>
               {/* Responsive tile grid: 2 cols on phones, 3 on tablets, 6 on
                   desktop. Tile sizing kept tight (px-1.5 py-1.5) so the whole
                   collection fits on one screen at desktop widths. */}
@@ -99,7 +97,7 @@ export function ModuleCollectionGrid() {
                   //   - Found    -> tinted background + colored border + colored text
                   //   - Not found -> muted gray with a dim navy background
                   // The `+ "33"` / `+ "88"` are alpha hex suffixes (~20% / ~53%).
-                  const displayColor = found ? rarityColor : "#9ca3af";
+                  const displayColor = found ? rarityColor : TEXT_MUTED;
                   const bgColor = found
                     ? rarityColor + "33"
                     : "var(--color-navy-700)";

@@ -44,9 +44,10 @@
  *     ourselves so 2d context is guaranteed available; null only occurs in headless
  *     environments we don't support for screenshot generation.
  */
-import { getModuleRarityColor } from "../../config/rarityColors";
+import { getModuleRarityColor } from "../../config/moduleRarities";
 import type { ScreenshotData } from "./screenshotData";
 import { drawStatsPanel, computeStatsPanelHeight } from "./drawStatsPanel";
+import { formatPercent } from "../../utils/formatNumber";
 import {
   NAVY_900,
   NAVY_800,
@@ -205,7 +206,7 @@ export async function generateScreenshotImage(
     // sections don't look broken.
     ctx.textAlign = "center";
     ctx.fillText(
-      section.pctOfPulls > 0 ? `${section.pctOfPulls.toFixed(1)}%` : "-",
+      section.pctOfPulls > 0 ? formatPercent(section.pctOfPulls) : "-",
       PADDING + COL_PCT + 30,
       y + 21,
     );
@@ -259,7 +260,7 @@ export async function generateScreenshotImage(
       ctx.fillStyle = mod.pctOfPulls > 0 ? WHITE : DARK_GRAY;
       ctx.textAlign = "center";
       ctx.fillText(
-        mod.pctOfPulls > 0 ? `${mod.pctOfPulls.toFixed(1)}%` : "-",
+        mod.pctOfPulls > 0 ? formatPercent(mod.pctOfPulls) : "-",
         PADDING + COL_PCT + 30,
         rowY,
       );

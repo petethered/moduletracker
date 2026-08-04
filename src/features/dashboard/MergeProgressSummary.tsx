@@ -30,6 +30,8 @@
 import { useStore } from "../../store";
 import { MODULES } from "../../config/modules";
 import { selectMergeProgress } from "../../store/selectors";
+import { TEXT_MUTED } from "../../config/runtimeColors";
+import { formatInteger } from "../../utils/formatNumber";
 
 interface ProgressBarProps {
   label: string;
@@ -63,8 +65,8 @@ function ProgressBar({ label, value, max, color, modulesAt, totalModules }: Prog
         }}
       >
         <span style={{ fontSize: 13, fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: 12, color: "#9ca3af" }}>
-          {value.toLocaleString()} / {max.toLocaleString()} copies
+        <span style={{ fontSize: 12, color: TEXT_MUTED }}>
+          {formatInteger(value)} / {formatInteger(max)} copies
         </span>
       </div>
       {/* Progress track. The fill is a single absolutely-sized div whose width
@@ -94,7 +96,7 @@ function ProgressBar({ label, value, max, color, modulesAt, totalModules }: Prog
       <div
         style={{
           fontSize: 11,
-          color: "#9ca3af",
+          color: TEXT_MUTED,
           marginTop: 4,
         }}
       >

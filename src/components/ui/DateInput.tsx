@@ -16,7 +16,7 @@
  */
 
 import { useId } from "react";
-import { FieldLabel } from "./FieldLabel";
+import { MetaLabel } from "./MetaLabel";
 
 /**
  * Props for {@link DateInput}.
@@ -47,9 +47,13 @@ export function DateInput({ value, onChange, label }: DateInputProps) {
 
   return (
     <div>
-      {/* FieldLabel is the shared value/input label tier — see
+      {/* MetaLabel is the shared value/input label tier — see
           components/ui/SectionHeading.tsx for why the two tiers exist. */}
-      {label && <FieldLabel htmlFor={inputId}>{label}</FieldLabel>}
+      {label && (
+        <MetaLabel htmlFor={inputId} className="mb-1">
+          {label}
+        </MetaLabel>
+      )}
       <input
         id={inputId}
         type="date"

@@ -1,36 +1,49 @@
 /**
- * FieldLabel — the small uppercase label that annotates a single value or
- * form input.
+ * MetaLabel — the small uppercase label that annotates a value, an input, or a
+ * short group.
  *
  * This is TIER 2 of the two-tier label system. Read the header of
  * ./SectionHeading.tsx first — it explains why the tiers exist and which one
- * to reach for. Short version: SectionHeading titles a REGION, FieldLabel
- * labels a VALUE or an INPUT.
+ * to reach for. Short version: SectionHeading titles a REGION, MetaLabel
+ * annotates a VALUE, an INPUT, or a small group.
  *
  * The treatment it replaces was copy-pasted across the app with drift in
  * tracking (`tracking-wider` vs `tracking-[0.15em]` vs `tracking-[0.2em]`) and
  * size (10px vs 12px), so the "system" was really several similar-looking
  * one-offs.
  *
- * MIGRATION IS PARTIAL. Adopted so far: DateInput, PullForm (3 labels). Still
- * hand-rolling the classes and worth converting when you next touch them:
- *   StatCard.tsx, Table.tsx (column headers), BannerStatsBreakdown.tsx,
- *   ModuleCollectionGrid.tsx (type headings), ModuleTable.tsx,
- *   PredictedGemsCard.tsx
- * Do not read this component's existence as "the system is enforced".
+ * NAMING: it is `MetaLabel`, not `FieldLabel`, because most call sites are not
+ * form fields. Only the ones passing `htmlFor` label a real control; the rest
+ * annotate read-only values (StatCard) or head a short group (PullForm's "Epic
+ * Modules", the collection grid's type rows).
  *
- * NAMING CAVEAT: "Field" oversells it. Only some call sites label a real form
- * control (those pass `htmlFor`); others annotate a read-only value or head a
- * short group. Treat the name as "small annotating label", not "form field
- * label only".
+ * --- TWO DELIBERATE NON-ADOPTERS ---
+ * Both hand-roll a similar treatment on purpose. Do not "finish the migration"
+ * by converting them without reading this:
+ *
+ *   1. Table.tsx column headers. A `<th>` is a different box context: this
+ *      component renders `display: block`, and sortable headers nest their
+ *      text inside an inline-flex `<button>` alongside a sort arrow. Forcing
+ *      MetaLabel in would need a variant prop that only Table uses.
+ *   2. ModuleTable.tsx type-section dividers ("Cannon (Attack)"). Those are
+ *      gold uppercase band headings that separate sections of a long table —
+ *      a third thing, structurally between a heading and a label. Converting
+ *      them to either tier loses the visual separation that makes the table
+ *      scannable.
  *
  * Renders a <label> when `htmlFor` is supplied (correct for form controls,
  * gives click-to-focus and a programmatic association) and a <span>
  * otherwise (correct for annotating a read-only value, where a <label> with
  * no control is invalid).
+ *
+ * SPACING IS NOT BAKED IN. There is no default margin: call sites pass their
+ * own (`mb-1`, `mb-2`, or none). An earlier version hardcoded `mb-1`, which a
+ * call site could not reliably override — appending `mb-2` via className loses
+ * to `mb-1` or wins depending on stylesheet order, not on the order you wrote
+ * them. Explicit margin at the call site is the only predictable option.
  */
 
-interface FieldLabelProps {
+interface MetaLabelProps {
   children: React.ReactNode;
   /**
    * Id of the control this labels. When present the component renders a real
@@ -51,19 +64,19 @@ interface FieldLabelProps {
    * text, not large text.
    */
   color?: string;
-  /** Extra classes, mainly for spacing overrides at the call site. */
+  /** Extra classes. Pass the call site's own margin here. */
   className?: string;
 }
 
-export function FieldLabel({
+export function MetaLabel({
   children,
   htmlFor,
   color,
   className = "",
-}: FieldLabelProps) {
+}: MetaLabelProps) {
   // text-gray-400 (not 500/600) is the floor that clears 4.5:1 against every
   // navy surface in the app. Do not darken this.
-  const classes = `block text-[11px] uppercase tracking-[0.15em] font-medium mb-1 ${
+  const classes = `block text-[11px] uppercase tracking-[0.15em] font-medium ${
     color ? "" : "text-gray-400"
   } ${className}`;
 

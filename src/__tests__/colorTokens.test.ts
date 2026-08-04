@@ -10,7 +10,7 @@
  *                  `var()` does not resolve. Both need literal strings.
  *
  * That duplication already drifted once and shipped: index.css held the
- * Tailwind -400 shades while rarityColors.ts held the -500 shades, so "epic"
+ * Tailwind -400 shades while moduleRarities.ts held the -500 shades, so "epic"
  * rendered as #c084fc on a StatCard and #a855f7 on a collection tile, on the
  * same dashboard. The only thing guarding it was a comment, and comments do
  * not fail builds.
@@ -22,9 +22,10 @@
  *
  * SCOPE — read before adding cases:
  * Only tokens that are genuinely declared in BOTH places belong here.
- *   - MODULE_TYPE_COLORS (config/moduleTypes.ts) has NO CSS counterpart on
- *     purpose: every consumer passes it into a JS API, so a parallel CSS
- *     declaration would be an unread second source of truth.
+ *   - MODULE_TYPE_COLORS (config/moduleTypes.ts) and the CHART_* values in
+ *     config/runtimeColors.ts have NO CSS counterpart on purpose: every
+ *     consumer passes them into a JS API, so a parallel CSS declaration would
+ *     be an unread second source of truth.
  *   - canvasConstants.ts also duplicates navy + gold, but that is a PINNED
  *     SNAPSHOT for the exported PNG and is deliberately allowed to drift.
  *     Do not add assertions for it.
@@ -33,8 +34,12 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { RARITY_COLORS } from "../config/rarityColors";
-import { ACCENT_GOLD, SIGNAL_WARNING } from "../config/brandColors";
+import { MODULE_RARITY_COLORS } from "../config/moduleRarities";
+import {
+  ACCENT_GOLD,
+  SIGNAL_WARNING,
+  TEXT_MUTED,
+} from "../config/runtimeColors";
 
 // Read from disk rather than importing the stylesheet.
 //
@@ -68,7 +73,7 @@ function cssVar(name: string): string | undefined {
 describe("color token sync contract (src/index.css <-> src/config)", () => {
   // Single %s on purpose: it.each spreads the whole tuple into the title, so a
   // second %s would render the hex where the reader expects the variable name.
-  it.each(Object.entries(RARITY_COLORS))(
+  it.each(Object.entries(MODULE_RARITY_COLORS))(
     "rarity '%s' matches its --color-rarity-* variable",
     (tier, hex) => {
       expect(cssVar(`color-rarity-${tier}`)).toBe(hex.toLowerCase());
@@ -81,6 +86,10 @@ describe("color token sync contract (src/index.css <-> src/config)", () => {
 
   it("SIGNAL_WARNING matches --color-signal-warning", () => {
     expect(cssVar("color-signal-warning")).toBe(SIGNAL_WARNING.toLowerCase());
+  });
+
+  it("TEXT_MUTED matches --color-text-muted", () => {
+    expect(cssVar("color-text-muted")).toBe(TEXT_MUTED.toLowerCase());
   });
 
   it("finds no --color-type-* variables (type palette is TS-only by design)", () => {

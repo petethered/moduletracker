@@ -3,7 +3,7 @@
  *
  * Where it's used: history rows, module cards, pull entries, anywhere a rarity
  * label needs a colored chip. The color is driven by the caller (see
- * `src/config/rarityColors.ts` for the canonical rarity palette) rather than a
+ * `src/config/moduleRarities.ts` for the canonical rarity palette) rather than a
  * hard-coded variant map — that's intentional so we can encode arbitrary
  * non-rarity tags (e.g. event labels) without expanding a variant union.
  *
