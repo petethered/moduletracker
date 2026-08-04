@@ -1,0 +1,1 @@
+import{r as e}from"./renderLog-D1ytFGMk.js";var t=e();function n({children:e,htmlFor:n,color:r,className:i=``}){let a=`block text-[11px] uppercase tracking-[0.15em] font-medium ${r?``:`text-gray-400`} ${i}`,o=r?{color:r}:void 0;return n?(0,t.jsx)(`label`,{htmlFor:n,className:a,style:o,children:e}):(0,t.jsx)(`span`,{className:a,style:o,children:e})}export{n as t};
