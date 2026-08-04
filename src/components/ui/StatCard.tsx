@@ -80,7 +80,7 @@ export function StatCard({
       </div>
       {subtitle && (
         <div
-          className="text-[10px] text-gray-500 mt-1.5"
+          className="text-[10px] text-gray-400 mt-1.5"
           style={{ fontFamily: "var(--font-body)" }}
         >
           {subtitle}

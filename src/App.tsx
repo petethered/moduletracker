@@ -150,7 +150,7 @@ function App() {
           <Button onClick={openAddPullModal}><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>
           <button
             onClick={toggleSettings}
-            className="text-gray-500 hover:text-[var(--color-accent-gold)] text-lg transition-colors duration-200"
+            className="text-gray-400 hover:text-[var(--color-accent-gold)] text-lg transition-colors duration-200"
             aria-label="Settings"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -171,7 +171,7 @@ function App() {
         any transient per-tab UI state. If you remove the key, both
         behaviours go away.
       */}
-      <Suspense fallback={<div className="p-4 md:p-6 max-w-7xl mx-auto text-gray-500">Loading...</div>}>
+      <Suspense fallback={<div className="p-4 md:p-6 max-w-7xl mx-auto text-gray-400">Loading...</div>}>
         <main className="p-4 md:p-6 max-w-7xl mx-auto animate-fade-in" key={activeTab}>
           {/* Plain string-equality routing. Add new tabs here AND in TabBar's tab list. */}
           {activeTab === "dashboard" && <Dashboard />}
@@ -188,14 +188,14 @@ function App() {
         timestamp, so there's nothing to update manually. If TypeScript
         complains about the symbol, check src/vite-env.d.ts for its declare.
       */}
-      <footer className="flex items-center justify-center gap-3 px-5 py-4 text-xs text-gray-600 border-t border-[var(--color-navy-700)]">
+      <footer className="flex items-center justify-center gap-3 px-5 py-4 text-xs text-gray-400 border-t border-[var(--color-navy-700)]">
         <span>&copy; {new Date().getFullYear()} ModuleTracker.com</span>
         <span>Build: {__BUILD_DATE__}</span>
         <a
           href="https://github.com/petethered/moduletracker"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-[var(--color-accent-gold)] transition-colors duration-200"
+          className="text-gray-400 hover:text-[var(--color-accent-gold)] transition-colors duration-200"
           aria-label="GitHub"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

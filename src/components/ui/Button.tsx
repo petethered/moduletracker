@@ -42,8 +42,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // (`--color-navy-*`, `--color-accent-*`) come from the global theme — keep
 // these in sync if the palette ever expands.
 const variantClasses: Record<ButtonVariant, string> = {
+  // The gradient START is --color-accent-crimson-deep (#d63a55), NOT the brand
+  // crimson (#e94560). White label text measures only 3.83:1 against the brand
+  // crimson, which fails WCAG AA for 14px copy; the deep variant measures
+  // 4.57:1 and is visually indistinguishable at button scale. The gradient END
+  // (#c23152) was already fine at 5.45:1.
+  //
+  // Do NOT "restore" the brand crimson here. Use it for glows and decorative
+  // accents, where nothing is layered on top of it.
   primary:
-    "bg-gradient-to-r from-[var(--color-accent-crimson)] to-[#c23152] text-white hover:brightness-110 shadow-[0_0_16px_rgba(233,69,96,0.2)] hover:shadow-[0_0_24px_rgba(233,69,96,0.35)]",
+    "bg-gradient-to-r from-[var(--color-accent-crimson-deep)] to-[#c23152] text-white hover:brightness-110 shadow-[0_0_16px_rgba(233,69,96,0.2)] hover:shadow-[0_0_24px_rgba(233,69,96,0.35)]",
   secondary:
     "bg-[var(--color-navy-600)] text-gray-200 hover:bg-[var(--color-navy-500)] border border-[var(--color-navy-500)] hover:border-[var(--color-accent-gold)]/30",
   danger: "bg-red-800/80 text-white hover:bg-red-700 border border-red-700/50",

@@ -65,6 +65,7 @@ import {
   selectPullsSinceLastDrawnForModule,
 } from "../../store/selectors";
 import { MODULES_BY_TYPE, MODULE_BY_ID } from "../../config/modules";
+import { MODULE_TYPE_ORDER } from "../../config/moduleTypes";
 import {
   MODULE_RARITY_ORDER,
   getModuleRarityColor,
@@ -78,10 +79,16 @@ import { formatInteger } from "../../utils/formatNumber";
 // Section render order — Cannon -> Armor -> Generator -> Core mirrors the
 // in-game ordering and the player's mental model (offense before defense
 // before utility before ultimate). Reorder only if the game does.
-const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
+// Type ordering now comes from config/moduleTypes.ts — the same tuple was
+// separately declared here, in TypeBalance and in ModuleCollectionGrid.
+const TYPE_ORDER: readonly ModuleType[] = MODULE_TYPE_ORDER;
 
-// Display labels with parenthetical role, since not every player remembers
-// that "Generator" = utility. Keep concise — these are section headings.
+// NOTE: these labels deliberately do NOT use MODULE_TYPE_LABELS from
+// config/moduleTypes.ts. That export is the plain title-case name ("Cannon")
+// used in compact surfaces like chart legends and tooltips. This screen has
+// room for the parenthetical role, which is genuinely more useful here because
+// not every player remembers that "Generator" = utility. Two label sets for
+// two contexts is intentional; do not collapse them.
 const TYPE_LABELS: Record<ModuleType, string> = {
   cannon: "Cannon (Attack)",
   armor: "Armor (Defense)",
@@ -210,7 +217,7 @@ export function ModuleTable() {
                               </div>
                             );
                           })() : (
-                            <span className="text-gray-600">-</span>
+                            <span className="text-gray-400">-</span>
                           )}
                         </td>
                         */}
@@ -233,7 +240,7 @@ export function ModuleTable() {
                               {rarity}
                             </span>
                           ) : (
-                            <span className="text-xs text-gray-600">Click to set</span>
+                            <span className="text-xs text-gray-400">Click to set</span>
                           )}
                         </td>
                       </tr>
@@ -256,7 +263,7 @@ export function ModuleTable() {
       <Modal
         isOpen={editingModule !== null}
         onClose={() => setEditingModule(null)}
-        title={editingModuleDef ? `Set Rarity — ${editingModuleDef.name}` : "Set Rarity"}
+        title={editingModuleDef ? `Set Rarity: ${editingModuleDef.name}` : "Set Rarity"}
       >
         <div className="grid grid-cols-2 gap-2">
           {MODULE_RARITY_ORDER.map((r) => (
@@ -291,7 +298,7 @@ export function ModuleTable() {
           <div className="mt-4">
             <Button
               variant="ghost"
-              className="w-full text-gray-500"
+              className="w-full text-gray-400"
               onClick={() => {
                 if (editingModule) {
                   updateModuleRarity(editingModule, "epic");

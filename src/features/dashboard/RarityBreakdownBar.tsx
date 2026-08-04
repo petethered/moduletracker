@@ -106,8 +106,8 @@ export function RarityBreakdownBar() {
               style={{ backgroundColor: d.color }}
             />
             <span className="text-gray-300">{d.name}</span>
-            <span className="text-gray-500">{d.pct.toFixed(1)}%</span>
-            <span className="text-gray-600">({d.value})</span>
+            <span className="text-gray-400">{d.pct.toFixed(1)}%</span>
+            <span className="text-gray-400">({d.value})</span>
           </div>
         ))}
       </div>

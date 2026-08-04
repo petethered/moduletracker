@@ -43,7 +43,9 @@ export function Badge({ color, children, className = "" }: BadgeProps) {
       // Tailwind handles layout/typography; inline `style` handles the
       // color-derived trio because Tailwind can't express dynamic hex-alpha
       // values without arbitrary-value JIT churn.
-      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide ${className}`}
+      // rounded-lg, not bare `rounded`: see the corner-radius scale documented
+      // at the top of src/index.css.
+      className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold tracking-wide ${className}`}
       style={{
         color,
         // "15" hex suffix => ~8% alpha background fill (subtle tint).

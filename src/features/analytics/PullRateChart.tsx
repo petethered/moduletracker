@@ -27,7 +27,10 @@ import {
 } from "recharts";
 import { useStore } from "../../store";
 import { selectEpicRateOverTime } from "../../store/selectors";
+import { RARITY_COLORS } from "../../config/rarityColors";
+import { ACCENT_GOLD, SIGNAL_WARNING } from "../../config/brandColors";
 import { useRenderLog } from "../../utils/renderLog";
+import { SectionHeading } from "../../components/ui/SectionHeading";
 
 export function PullRateChart() {
   const pulls = useStore((s) => s.pulls);
@@ -52,9 +55,9 @@ export function PullRateChart() {
 
   return (
     <div data-testid="pull-rate-chart">
-      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">
+      <SectionHeading>
         Epic Pull Rate Over Time
-      </h3>
+      </SectionHeading>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           {/* Faint navy grid — see GemsPerEpicChart comment about #1a1a2e choice. */}
@@ -67,7 +70,7 @@ export function PullRateChart() {
           <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} domain={[0, "auto"]} unit="%" />
           <Tooltip
             contentStyle={{ backgroundColor: "#16213e", border: "1px solid #0f3460", borderRadius: 8 }}
-            labelStyle={{ color: "#ffd700" }} // gold accent for hovered date
+            labelStyle={{ color: ACCENT_GOLD }} // gold accent for hovered date
             labelFormatter={(idx: unknown) => data[Number(idx)]?.date ?? ""}
             // 3 decimal places — epic rates can be in the 1-5% range, so
             // tenths/hundredths show meaningful run-to-run differences.
@@ -76,11 +79,13 @@ export function PullRateChart() {
           />
           {/* Expected drop rate reference: 2.5%. See top-of-file game-mechanic context. */}
           {/* Red dashed = "this is the benchmark to compare against". */}
-          <ReferenceLine y={2.5} stroke="#ef4444" strokeDasharray="5 5" label={{ value: "Expected 2.5%", fill: "#ef4444", fontSize: 10 }} />
-          {/* Purple line (#a855f7) = epic rarity color. Semantic match: this */}
-          {/* chart is specifically about EPIC pull frequency. monotone curve */}
-          {/* smooths between sparse points without overshoot artifacts. */}
-          <Line type="monotone" dataKey="rate" stroke="#a855f7" strokeWidth={2} dot={{ fill: "#a855f7", r: 3 }} name="Epic Rate %" />
+          <ReferenceLine y={2.5} stroke={SIGNAL_WARNING} strokeDasharray="5 5" label={{ value: "Expected 2.5%", fill: SIGNAL_WARNING, fontSize: 10 }} />
+          {/* Purple line = the epic rarity color, because this chart is */}
+          {/* specifically about EPIC pull frequency. Imported rather than */}
+          {/* hardcoded: the hex used to be inlined here and silently drifted */}
+          {/* out of sync when the rarity palette moved to the -400 band. */}
+          {/* monotone curve smooths between sparse points without overshoot. */}
+          <Line type="monotone" dataKey="rate" stroke={RARITY_COLORS.epic} strokeWidth={2} dot={{ fill: RARITY_COLORS.epic, r: 3 }} name="Epic Rate %" />
         </LineChart>
       </ResponsiveContainer>
     </div>

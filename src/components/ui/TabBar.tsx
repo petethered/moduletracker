@@ -61,7 +61,7 @@ export function TabBar({ activeTab, onTabChange }: TabBarProps) {
           className={`relative flex-1 md:flex-none px-3 md:px-5 py-3.5 text-[10px] md:text-xs tracking-wider md:tracking-widest uppercase transition-all duration-300 ${
             activeTab === tab.id
               ? "text-[var(--color-accent-gold)]"
-              : "text-gray-500 hover:text-gray-300"
+              : "text-gray-400 hover:text-gray-200"
           }`}
           style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
         >

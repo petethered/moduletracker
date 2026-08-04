@@ -122,7 +122,7 @@ export function PullHistoryTable() {
         p.epicModules.length > 0 ? (
           <Badge color={RARITY_COLORS.epic}>{p.epicModules.length}</Badge>
         ) : (
-          <span className="text-gray-600">0</span>
+          <span className="text-gray-400">0</span>
         ),
       sortable: true,
       sortValue: (p) => p.epicModules.length,
@@ -149,11 +149,11 @@ export function PullHistoryTable() {
             {pityIds.has(p.id) && <span className="text-red-400 ml-1">PITY :(</span>}
           </span>
         ) : pityCounters.has(p.id) ? (
-          <span className="text-gray-500 text-xs">
+          <span className="text-gray-400 text-xs">
             (pity {pityCounters.get(p.id)}/{PITY_PULL_THRESHOLD})
           </span>
         ) : (
-          <span className="text-gray-600 text-xs">-</span>
+          <span className="text-gray-400 text-xs">-</span>
         ),
     },
     {

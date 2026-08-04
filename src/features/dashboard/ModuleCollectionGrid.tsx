@@ -30,21 +30,16 @@ import { useStore } from "../../store";
 import { MODULES, MODULES_BY_TYPE } from "../../config/modules";
 import { selectModulePullCounts } from "../../store/selectors";
 import { getModuleRarityColor } from "../../config/rarityColors";
+import {
+  MODULE_TYPE_COLORS,
+  MODULE_TYPE_ORDER,
+} from "../../config/moduleTypes";
 
-// Type accent colors used for both the type heading and as a *fallback* tile
-// color when a module has been found but has no recorded rarity. These are
-// intentionally distinct from the rarity palette in `rarityColors.ts` so the
-// type grouping reads even before any merges happen.
-const TYPE_COLORS: Record<string, string> = {
-  cannon: "#e94560",
-  armor: "#3b82f6",
-  generator: "#eab308",
-  core: "#a855f7",
-};
-
-// Display order for type rows. Matches the in-game "shop" / loadout ordering
-// players are used to. `as const` so TS narrows to literal string union.
-const TYPE_ORDER = ["cannon", "armor", "generator", "core"] as const;
+// This grid is the one place that renders BOTH color encodings at once: a tile
+// uses its rarity color when the player has a rarity and falls back to the
+// type color when they don't (see `displayColor` below). That is why the type
+// palette must stay visually distinct from the rarity palette — see
+// src/config/moduleTypes.ts for the full rationale.
 
 export function ModuleCollectionGrid() {
   const pulls = useStore((s) => s.pulls);
@@ -66,8 +61,8 @@ export function ModuleCollectionGrid() {
       </div>
 
       <div className="flex flex-col gap-3">
-        {TYPE_ORDER.map((type) => {
-          const typeColor = TYPE_COLORS[type];
+        {MODULE_TYPE_ORDER.map((type) => {
+          const typeColor = MODULE_TYPE_COLORS[type];
           // MODULES_BY_TYPE is precomputed in `config/modules.ts` to avoid
           // repeated filtering on every render.
           const modules = MODULES_BY_TYPE[type];
@@ -104,7 +99,7 @@ export function ModuleCollectionGrid() {
                   //   - Found    -> tinted background + colored border + colored text
                   //   - Not found -> muted gray with a dim navy background
                   // The `+ "33"` / `+ "88"` are alpha hex suffixes (~20% / ~53%).
-                  const displayColor = found ? rarityColor : "#6b7280";
+                  const displayColor = found ? rarityColor : "#9ca3af";
                   const bgColor = found
                     ? rarityColor + "33"
                     : "var(--color-navy-700)";
@@ -142,7 +137,7 @@ export function ModuleCollectionGrid() {
                           {rarity}
                         </div>
                       ) : found ? (
-                        <div className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 mt-0.5">
+                        <div className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-400 mt-0.5">
                           epic
                         </div>
                       ) : null}

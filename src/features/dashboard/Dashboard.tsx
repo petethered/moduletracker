@@ -21,11 +21,16 @@
  *   4. BannerStatsBreakdown  — per-banner stat card (self-hides if <2 banners used).
  *   5. ModuleCollectionGrid  — every module as a tile, color-coded by rarity.
  *   6. Two-column row        — MergeProgressSummary + PullHighlights.
- *   7. Two-column row        — TypeBalance + PullCalendar (90-day heatmap).
+ *   7. Asymmetric 1fr/2fr    — TypeBalance + PullCalendar (90-day heatmap).
  *
  * Why this ordering: KPIs first (most-glanceable), then activity context, then
- * the dense collection grid, then derived analytical views. Each two-column
- * row stacks on small screens via `md:grid-cols-2`.
+ * the dense collection grid, then derived analytical views. Every multi-column
+ * row collapses to a single column below `md`.
+ *
+ * Why row 7 is asymmetric and not another 50/50: see the inline comment at the
+ * row itself. Short version — the heatmap needs the width, and three identical
+ * two-column bands in a row made the lower half of the page read as one
+ * undifferentiated block.
  *
  * Selectors consumed: NONE directly. All store reads happen inside children.
  */
@@ -39,23 +44,7 @@ import { MergeProgressSummary } from "./MergeProgressSummary";
 import { PullHighlights } from "./PullHighlights";
 import { PullCalendar } from "./PullCalendar";
 import { TypeBalance } from "./TypeBalance";
-
-/**
- * SectionLabel — small uppercase eyebrow text used to head each subsection
- * inside the two-column rows. Kept local because it's only used here and its
- * styling (tracking-[0.2em], font-body) is dashboard-specific. If a second
- * consumer ever appears, promote to `components/ui/`.
- */
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <h3
-      className="text-[10px] font-medium text-gray-500 uppercase tracking-[0.2em] mb-3"
-      style={{ fontFamily: "var(--font-body)" }}
-    >
-      {children}
-    </h3>
-  );
-}
+import { SectionHeading } from "../../components/ui/SectionHeading";
 
 export function Dashboard() {
   // `space-y-8` provides the vertical rhythm between the major dashboard
@@ -74,11 +63,11 @@ export function Dashboard() {
       {/* Activity row: recency on the left, rarity distribution on the right. */}
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <SectionLabel>Recent Pulls</SectionLabel>
+          <SectionHeading>Recent Pulls</SectionHeading>
           <RecentPullsList />
         </div>
         <div>
-          <SectionLabel>Rarity Breakdown</SectionLabel>
+          <SectionHeading>Rarity Breakdown</SectionHeading>
           <RarityBreakdownBar />
         </div>
       </div>
@@ -93,10 +82,28 @@ export function Dashboard() {
         <MergeProgressSummary />
         <PullHighlights />
       </div>
-      {/* Distribution / cadence row. */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/*
+        Distribution / cadence row — ASYMMETRIC 1fr / 2fr, deliberately not
+        another 50/50 split.
+
+        Two reasons:
+        1. Content fit. PullCalendar is a 90-day heatmap laid out as ~13 ISO
+           week columns. At half width those columns get cramped and the
+           legend wraps; the extra third of the row is real estate it actually
+           uses. TypeBalance is four labelled bars and reads fine narrow.
+        2. Rhythm. This row previously sat directly below the
+           MergeProgressSummary + PullHighlights row with identical
+           `md:grid-cols-2` geometry, so the page ended on two visually
+           interchangeable bands. Varying the split gives the scroll somewhere
+           to land.
+
+        Both still collapse to a single column below `md`.
+      */}
+      <div className="grid md:grid-cols-3 gap-6">
         <TypeBalance />
-        <PullCalendar />
+        <div className="md:col-span-2">
+          <PullCalendar />
+        </div>
       </div>
     </div>
   );

@@ -279,7 +279,7 @@ export function SettingsPanel() {
 
           <div className="border-t border-[var(--color-navy-500)] pt-4">
             <h3 className="text-sm font-medium text-gray-300 mb-2">Bulk Import</h3>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-gray-400 mb-2">
               Paste tab-separated data or exported JSON
             </p>
             <textarea
@@ -302,7 +302,7 @@ export function SettingsPanel() {
             </Button>
             {bulkResult && bulkResult.errors.length > 0 && (
               <div className="mt-2 text-xs">
-                <p className="text-red-400 font-medium">Errors found — nothing imported:</p>
+                <p className="text-red-400 font-medium">Errors found. Nothing was imported:</p>
                 <ul className="text-red-400 mt-1 space-y-0.5 max-h-32 overflow-y-auto">
                   {bulkResult.errors.map((e, i) => (
                     <li key={i}>{e}</li>

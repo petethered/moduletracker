@@ -87,7 +87,7 @@ export function SyncStatus() {
         syncStatus === "syncing" ? "Syncing..." :
         syncStatus === "synced" ? "Synced" :
         syncStatus === "error" ? "Sync failed. Click to retry." :
-        syncStatus === "offline" ? "Offline — changes will sync when you reconnect" :
+        syncStatus === "offline" ? "Offline. Changes will sync when you reconnect." :
         ""
       }
     >

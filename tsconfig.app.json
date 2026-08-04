@@ -5,7 +5,14 @@
     "useDefineForClassFields": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
+    /* "node" is here for the co-located unit tests under src/__tests__, which
+       this config also typechecks (`include: ["src"]`, and `npm run build`
+       runs `tsc -b`). src/__tests__/colorTokens.test.ts reads src/index.css
+       from disk to verify the CSS-variable <-> TS-constant color contract, and
+       needs node:fs / node:path / process.
+       Application code must NOT use node APIs — they are unavailable in the
+       browser. If you see a node import outside src/__tests__, that is a bug. */
+    "types": ["vite/client", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode */

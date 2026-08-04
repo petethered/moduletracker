@@ -59,10 +59,11 @@
  *     outcome with zero epics. Saves taps when the user pulled nothing
  *     interesting.
  */
-import { useState } from "react";
+import { useId, useState } from "react";
 import { DateInput } from "../../components/ui/DateInput";
 import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
+import { FieldLabel } from "../../components/ui/FieldLabel";
 import { MODULES } from "../../config/modules";
 import { validatePullForm } from "./validation";
 import { useStore } from "../../store";
@@ -148,12 +149,18 @@ interface CountButtonRowProps {
 function CountButtonRow({ label, value, max, onSelect, testIdPrefix, labelColor }: CountButtonRowProps) {
   return (
     <div>
-      <label
-        className="block text-sm uppercase tracking-wider mb-1"
-        style={{ color: labelColor ?? "#9ca3af" }}
-      >
-        {label}
-      </label>
+      {/*
+        FieldLabel WITHOUT htmlFor, so it renders a <span> rather than a
+        <label>. That is deliberate and correct: this labels an 11-button
+        radiogroup, not a single control, and a <label> pointing at nothing is
+        invalid HTML. The accessible name for the group is carried by the
+        `aria-label` on the radiogroup below.
+      */}
+      {/* No `?? "#9ca3af"` fallback: FieldLabel's own default IS that value
+          (via text-gray-400), and passing it explicitly would force the
+          inline-style branch and re-hardcode the token FieldLabel exists to
+          centralise. Undefined color = use the default. */}
+      <FieldLabel color={labelColor}>{label}</FieldLabel>
       <div
         role="radiogroup"
         aria-label={label}
@@ -191,6 +198,10 @@ function CountButtonRow({ label, value, max, onSelect, testIdPrefix, labelColor 
 }
 
 export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullFormProps) {
+  // Stable id linking the Banner <label> to its <select>. useId rather than a
+  // literal because PullModal and the edit flow can have a PullForm mounted
+  // while another modal is open, and duplicate ids would cross-wire labels.
+  const bannerSelectId = useId();
   // --- Sticky-default plumbing ---
   // Settings slice exposes the user's chosen `bannerDefault`. The UI slice
   // remembers the LAST date/banner the user actually submitted so a player
@@ -331,10 +342,11 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       <DateInput label="Date" value={date} onChange={setDate} />
 
       <div>
-        <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
-          Banner
-        </label>
+        {/* htmlFor/id pair added: the label and select were previously only
+            visually adjacent, so the select had no accessible name. */}
+        <FieldLabel htmlFor={bannerSelectId}>Banner</FieldLabel>
         <select
+          id={bannerSelectId}
           value={bannerType}
           onChange={(e) => setBannerType(e.target.value as BannerType)}
           className={selectClass}
@@ -351,9 +363,16 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         the freshly-added row's SearchSelect auto-opens. See file header.
       */}
       <div>
-        <label className="block text-xs uppercase tracking-wider text-[var(--color-rarity-epic)] mb-2">
+        {/* Span, not <label>: this heads a variable-length list of epic rows
+            rather than one control. Epic purple is load-bearing here (it ties
+            the section to the rarity it represents) and clears AA at 7.32:1
+            on this surface. */}
+        <FieldLabel
+          color="var(--color-rarity-epic)"
+          className="mb-2"
+        >
           Epic Modules ({epicCount})
-        </label>
+        </FieldLabel>
         <button
           type="button"
           onClick={handleAddEpic}
@@ -411,7 +430,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
         onSelect={handleRareSelect}
         testIdPrefix="rare-count"
         // Rarity-blue label colour; matches the rare badge elsewhere.
-        labelColor="#70d6ef"
+        labelColor="var(--color-rarity-rare)"
       />
       <CountButtonRow
         label="Common"
@@ -424,7 +443,7 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
       {/* Live summary — also a sanity check for the user that totals to 10. */}
       <div className="bg-[var(--color-navy-800)] rounded-lg p-3 text-sm">
         <p className="text-gray-400">
-          Summary: {commonCount} common, {rareCount} rare, {epicCount} epic — 200 gems
+          Summary: {commonCount} common, {rareCount} rare, {epicCount} epic. 200 gems
         </p>
       </div>
 

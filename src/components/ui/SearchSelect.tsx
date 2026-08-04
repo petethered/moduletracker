@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useRenderLog } from "../../utils/renderLog";
 
 /**
- * SearchSelect — combobox-style dropdown with a built-in fuzzy(ish) text
+ * SearchSelect — combobox-style dropdown with a built-in substring text
  * filter. Replaces a native `<select>` when the option list is long enough to
  * benefit from search-as-you-type.
  *
@@ -19,12 +19,34 @@ import { useRenderLog } from "../../utils/renderLog";
  *     panel and clears the search.
  *
  * Controlled component: `value` and `onChange` are owned by the parent.
- * Internal state (`isOpen`, `search`) is local because it's purely UI.
+ * Internal state (`isOpen`, `search`, `activeIndex`) is local because it's
+ * purely UI.
  *
- * Accessibility caveats: this is NOT a fully ARIA-compliant combobox. If
- * keyboard nav (arrow keys, Enter to select) is needed, plan to add
- * roving-tabindex + aria-activedescendant. Today it works mouse-first plus
- * type-and-click.
+ * --- ARIA pattern: combobox + listbox popup ---
+ * This follows the WAI-ARIA "combobox with listbox popup" pattern. It used to
+ * be mouse-first only (no roles, no keyboard nav, no Escape), which made the
+ * epic-module picker in the add-pull modal unusable without a pointer.
+ *
+ *   - The SEARCH INPUT is the combobox (role="combobox"), not the trigger
+ *     button. That is what carries aria-expanded / aria-controls /
+ *     aria-activedescendant, because it is what holds DOM focus while the
+ *     popup is open.
+ *   - Options are NOT focused directly. Focus stays in the input and
+ *     `aria-activedescendant` points at the visually-highlighted option. This
+ *     is the standard approach for a searchable listbox: moving real DOM focus
+ *     onto options would break type-to-filter.
+ *   - The trigger button keeps only `aria-haspopup` + `aria-expanded`. It
+ *     deliberately does NOT get `aria-controls`: while the popup is open the
+ *     input is the combobox that owns the listbox, and having two elements
+ *     both claim ownership confuses AT. The trigger is just an open/close
+ *     affordance at that point.
+ *
+ * Keyboard contract:
+ *   ArrowDown / ArrowUp  move the active option (wraps at both ends)
+ *   Home / End           jump to first / last option
+ *   Enter                select the active option
+ *   Escape               close, clear search, return focus to the trigger
+ *   Tab                  close and let focus move on naturally
  */
 
 /**
@@ -75,9 +97,25 @@ export function SearchSelect({
   // local because no parent has ever needed to read or override them.
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [search, setSearch] = useState("");
+  // Index into `filtered` of the keyboard-highlighted option. -1 means "no
+  // active option" (fresh open, or the filter matched nothing).
+  const [activeIndex, setActiveIndex] = useState(-1);
+
   // Wrapper ref used by the click-outside effect to detect outside-of-component
   // clicks. Must wrap BOTH the trigger and the panel.
   const ref = useRef<HTMLDivElement>(null);
+  // Trigger ref so Escape can hand focus back to it.
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  // Listbox ref so we can scroll the active option into view.
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Stable id prefix for the listbox + option ids that aria-activedescendant
+  // and aria-controls point at. `useId` because several SearchSelects are
+  // mounted at once (one per epic row in PullForm) and hardcoded ids collide.
+  const baseId = useId();
+  const listboxId = `${baseId}-listbox`;
+  const optionId = (index: number) => `${baseId}-option-${index}`;
+
   useRenderLog("SearchSelect", { value, isOpen });
 
   // Click-outside handler. Listens on `mousedown` (not `click`) so the panel
@@ -90,6 +128,7 @@ export function SearchSelect({
         // Reset search so re-opening starts fresh — matches the user's mental
         // model of "the dropdown forgets what I typed when I leave it".
         setSearch("");
+        setActiveIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -104,67 +143,194 @@ export function SearchSelect({
     o.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Resolve the currently-selected label for the trigger. Falls back to
-  // `undefined` if `value` doesn't match any option (e.g. stale data) so the
-  // trigger then renders `placeholder` instead of an empty button.
   const selectedLabel = options.find((o) => o.value === value)?.label;
+
+  // Reset the highlight whenever the panel opens or the result set changes.
+  // Without this, typing a narrower query can leave activeIndex pointing past
+  // the end of `filtered` and Enter would select nothing (or the wrong row).
+  //
+  // The `isOpen` guard AND dep are both load-bearing. Previously this ran on
+  // mount and keyed only on [search, filtered.length], which produced two
+  // different behaviours for the same visible state: a panel opened via
+  // `defaultOpen` had option 0 highlighted, but one closed with an empty
+  // search and reopened had nothing highlighted (closing sets search to "",
+  // which was already "", so the deps never changed and this never re-fired).
+  // Now every open starts from the same place.
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveIndex(filtered.length > 0 ? 0 : -1);
+  }, [isOpen, search, filtered.length]);
+
+  // Keep the highlighted option visible while arrowing through a long list.
+  // `block: "nearest"` scrolls the minimum amount rather than centring, which
+  // avoids the list jumping on every keypress.
+  useEffect(() => {
+    if (!isOpen || activeIndex < 0 || !listRef.current) return;
+    const el = listRef.current.querySelector<HTMLElement>(
+      `#${CSS.escape(optionId(activeIndex))}`
+    );
+    // Optional-call the method, not just the element: jsdom does not implement
+    // scrollIntoView, and an unguarded call throws inside this passive effect,
+    // which made every test that renders an OPEN SearchSelect crash. Guarding
+    // here rather than polyfilling in test-setup keeps the component honest
+    // about depending on a non-universal DOM API.
+    el?.scrollIntoView?.({ block: "nearest" });
+    // optionId is derived from the stable baseId, so it is not a real dep.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex, isOpen]);
+
+  /** Commit an option and close the panel. Shared by click and Enter. */
+  function selectOption(optionValue: string) {
+    onChange(optionValue);
+    setIsOpen(false);
+    setSearch("");
+    setActiveIndex(-1);
+  }
+
+  /** Close without committing, returning focus to the trigger. */
+  function closeAndRestoreFocus() {
+    setIsOpen(false);
+    setSearch("");
+    setActiveIndex(-1);
+    triggerRef.current?.focus();
+  }
+
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case "ArrowDown":
+        // preventDefault stops the caret jumping to the end of the input and
+        // stops the page scrolling.
+        e.preventDefault();
+        if (filtered.length === 0) return;
+        setActiveIndex((i) => (i + 1) % filtered.length);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        if (filtered.length === 0) return;
+        // + length before % so -1 wraps to the last item rather than going
+        // negative.
+        setActiveIndex((i) => (i - 1 + filtered.length) % filtered.length);
+        break;
+      case "Home":
+        e.preventDefault();
+        if (filtered.length > 0) setActiveIndex(0);
+        break;
+      case "End":
+        e.preventDefault();
+        if (filtered.length > 0) setActiveIndex(filtered.length - 1);
+        break;
+      case "Enter":
+        // Guard the index: Enter on a zero-result search must do nothing
+        // rather than throw on filtered[-1].
+        e.preventDefault();
+        if (activeIndex >= 0 && activeIndex < filtered.length) {
+          selectOption(filtered[activeIndex].value);
+          triggerRef.current?.focus();
+        }
+        break;
+      case "Escape":
+        // stopPropagation so Escape dismisses only the dropdown, not the
+        // enclosing Modal. Without this, cancelling a module picker would
+        // throw away the whole half-filled pull form.
+        e.preventDefault();
+        e.stopPropagation();
+        closeAndRestoreFocus();
+        break;
+      case "Tab":
+        // Let focus leave naturally, but don't leave an orphaned open panel.
+        setIsOpen(false);
+        setSearch("");
+        setActiveIndex(-1);
+        break;
+    }
+  }
 
   return (
     <div ref={ref} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 hover:border-[var(--color-accent-gold)] transition-colors"
+        // aria-haspopup tells AT a listbox will appear. aria-expanded mirrors
+        // isOpen. The combobox role itself lives on the search input below,
+        // because that is what holds focus while the popup is open.
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        className="w-full text-left px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 hover:border-[var(--color-accent-gold)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-gold)]"
       >
         {selectedLabel || placeholder}
       </button>
       {isOpen && (
-        // Absolute positioning + `z-10` keeps the panel above sibling fields
-        // without escaping a parent stacking context (e.g. when this lives
-        // inside a Modal, which has its own z-50 portal layer).
         <div className="absolute z-10 mt-1 w-full bg-[var(--color-navy-700)] border border-[var(--color-navy-500)] rounded-lg shadow-xl max-h-60 overflow-y-auto">
           {/* Sticky search bar so it stays visible while the option list scrolls. */}
           <div className="p-2 sticky top-0 bg-[var(--color-navy-700)]">
             <input
               type="text"
+              role="combobox"
+              aria-expanded="true"
+              aria-controls={listboxId}
+              aria-autocomplete="list"
+              // Points at the highlighted option WITHOUT moving DOM focus, so
+              // typing keeps working. Undefined (not "") when nothing is
+              // active — an empty string is an invalid idref.
+              aria-activedescendant={
+                activeIndex >= 0 ? optionId(activeIndex) : undefined
+              }
+              aria-label={placeholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={handleInputKeyDown}
               placeholder={placeholder}
-              className="w-full px-3 py-2 rounded bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-sm focus:outline-none focus:border-[var(--color-accent-gold)]"
-              // Autofocus on open so users can start typing immediately.
+              className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 text-sm focus:outline-none focus:border-[var(--color-accent-gold)]"
               autoFocus
             />
           </div>
-          {filtered.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                // Close + reset search on pick — same rationale as the
-                // click-outside reset above.
-                setIsOpen(false);
-                setSearch("");
-              }}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-[var(--color-navy-600)] ${
-                // Highlight the currently-selected row in gold so the user can
-                // see what they had previously chosen even after typing.
-                option.value === value
-                  ? "text-[var(--color-accent-gold)]"
-                  : "text-gray-300"
-              }`}
-            >
-              {option.group && (
-                <span className="text-xs text-gray-500 mr-2">
-                  [{option.group}]
-                </span>
-              )}
-              {option.label}
-            </button>
-          ))}
+          <div ref={listRef} role="listbox" id={listboxId}>
+            {filtered.map((option, index) => (
+              <button
+                key={option.value}
+                id={optionId(index)}
+                type="button"
+                role="option"
+                aria-selected={option.value === value}
+                // tabIndex={-1} keeps options out of the tab order: they are
+                // driven by aria-activedescendant from the input, and making
+                // them real tab stops would mean tabbing through hundreds of
+                // modules to escape the dropdown.
+                tabIndex={-1}
+                // Pointer hover moves the highlight too, so mouse and keyboard
+                // agree on what Enter would select.
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => {
+                  selectOption(option.value);
+                  triggerRef.current?.focus();
+                }}
+                className={`w-full text-left px-3 py-2 text-sm ${
+                  index === activeIndex ? "bg-[var(--color-navy-600)]" : ""
+                } ${
+                  option.value === value
+                    ? "text-[var(--color-accent-gold)]"
+                    : "text-gray-300"
+                }`}
+              >
+                {option.group && (
+                  <span className="text-xs text-gray-400 mr-2">
+                    [{option.group}]
+                  </span>
+                )}
+                {option.label}
+              </button>
+            ))}
+          </div>
           {filtered.length === 0 && (
-            // Empty-state row (not a button) — no action available.
-            <div className="px-3 py-2 text-sm text-gray-500">No results</div>
+            // Sits OUTSIDE the listbox on purpose: owned children of a
+            // role="listbox" must be option/group, so a role="status" node
+            // nested inside it is invalid and AT may not expose it.
+            // role="status" itself is what announces the empty result without
+            // the user having to arrow into an empty list.
+            <div role="status" className="px-3 py-2 text-sm text-gray-400">
+              No results
+            </div>
           )}
         </div>
       )}

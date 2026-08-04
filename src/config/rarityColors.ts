@@ -40,13 +40,37 @@ import type { ModuleRarity } from "../types";
 /**
  * Hex color codes for each rarity tier name.
  *
- * GAME-CONVENTION COLORS (per CLAUDE.md):
- *   common     -> white   (#ffffff)
- *   rare       -> blue    (#3b82f6, tailwind blue-500)
- *   epic       -> purple  (#a855f7, tailwind purple-500)
- *   legendary  -> gold    (#eab308, tailwind yellow-500)
- *   mythic     -> red     (#ef4444, tailwind red-500)
- *   ancestral  -> green   (#22c55e, tailwind green-500)
+ * !! SYNC CONTRACT !!
+ * These values MUST match the `--color-rarity-*` custom properties in
+ * src/index.css. There are two rendering paths for rarity color and they
+ * cannot share one runtime source:
+ *   1. DOM      -> components read `var(--color-rarity-epic)` etc.
+ *   2. <canvas> -> src/features/screenshot/* imports THIS object, because a
+ *                  canvas 2D context cannot resolve CSS custom properties.
+ *
+ * They drifted badly before: this file held the Tailwind -500 shades while
+ * index.css held the -400 shades, so "epic" rendered as #a855f7 on a
+ * collection tile and #c084fc on a StatCard, on the same dashboard. If you
+ * change a value here, change it in index.css too.
+ *
+ * GAME-CONVENTION COLORS (per CLAUDE.md), now on the -400 band:
+ *   common     -> white   (#e4e4e7, tailwind zinc-200)
+ *   rare       -> blue    (#60a5fa, tailwind blue-400)
+ *   epic       -> purple  (#c084fc, tailwind purple-400)
+ *   legendary  -> gold    (#fbbf24, tailwind amber-400)
+ *   mythic     -> red     (#f87171, tailwind red-400)
+ *   ancestral  -> green   (#4ade80, tailwind green-400)
+ *
+ * WHY THE -400 BAND: measured against the app's near-black navy surfaces the
+ * lighter shades clear WCAG AA comfortably where the -500 shades were
+ * marginal (epic 7.32:1 vs 4.89:1; rare 7.61:1 vs 5.26:1). Rarity labels
+ * render as small as 8px in ModuleCollectionGrid, so the headroom is not
+ * decorative.
+ *
+ * WHY `common` IS NOT PURE WHITE: #ffffff on a dark theme flattens depth and
+ * reads as a blown-out highlight next to the other tiers. zinc-200 still
+ * reads as "white" to a player. Small deliberate deviation from CLAUDE.md's
+ * "common=white" shorthand.
  *
  * Frozen with `as const` so consumers can derive a literal type from the keys.
  *
@@ -54,12 +78,12 @@ import type { ModuleRarity } from "../types";
  *   update MODULE_RARITY_ORDER plus RARITY_COPY_THRESHOLDS below.
  */
 export const RARITY_COLORS = {
-  common: "#ffffff",
-  rare: "#3b82f6",
-  epic: "#a855f7",
-  legendary: "#eab308",
-  mythic: "#ef4444",
-  ancestral: "#22c55e",
+  common: "#e4e4e7",
+  rare: "#60a5fa",
+  epic: "#c084fc",
+  legendary: "#fbbf24",
+  mythic: "#f87171",
+  ancestral: "#4ade80",
 } as const;
 
 /**

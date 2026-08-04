@@ -43,7 +43,7 @@ export function Analytics() {
     return (
       <div>
         <h2 className="text-lg text-[var(--color-accent-gold)]/80 mb-6" style={{ fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em" }}>Analytics</h2>
-        <p className="text-gray-500">Add some pulls to see analytics.</p>
+        <p className="text-gray-400">Add some pulls to see analytics.</p>
       </div>
     );
   }

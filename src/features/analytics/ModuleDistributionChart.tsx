@@ -24,27 +24,18 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
+import {
+  MODULE_TYPE_COLORS,
+  MODULE_TYPE_LABELS,
+  MODULE_TYPE_ORDER,
+} from "../../config/moduleTypes";
+import type { ModuleType } from "../../types";
 import { useRenderLog } from "../../utils/renderLog";
+import { SectionHeading } from "../../components/ui/SectionHeading";
 
-// Per-type colors. Chosen for distinctness on the dark navy background AND
-// for thematic match: cannon=red (offensive/firepower), armor=blue (defense),
-// generator=yellow (energy/electric), core=purple (special/unique).
-// These do NOT match rarity colors — those are reserved for rarity displays.
-const TYPE_COLORS: Record<string, string> = {
-  cannon: "#e94560",   // crimson — offensive
-  armor: "#3b82f6",    // blue   — defensive
-  generator: "#eab308", // gold  — energy
-  core: "#a855f7",     // purple — special
-};
-
-// Human-readable labels for legend/tooltip. Kept separate from TYPE_COLORS
-// so future agents can change one without diff-touching the other.
-const TYPE_LABELS: Record<string, string> = {
-  cannon: "Cannon",
-  armor: "Armor",
-  generator: "Generator",
-  core: "Core",
-};
+// Palette and labels come from src/config/moduleTypes.ts — see that file for
+// why the type palette is muted. Imported as TS constants rather than the
+// Tailwind/CSS route because Recharts needs a literal string for `fill`.
 
 export function ModuleDistributionChart() {
   const pulls = useStore((s) => s.pulls);
@@ -57,19 +48,30 @@ export function ModuleDistributionChart() {
   // lets the chart own its bucketing strategy.
   const { data, total } = useMemo(() => {
     const counts = selectModulePullCounts(pulls);
-    const typeCounts: Record<string, number> = { cannon: 0, armor: 0, generator: 0, core: 0 };
+    const typeCounts: Record<ModuleType, number> = {
+      cannon: 0,
+      armor: 0,
+      generator: 0,
+      core: 0,
+    };
     for (const m of MODULES) {
       typeCounts[m.type] += counts[m.id] || 0;
     }
     // Filter out zero-count types so the donut isn't cluttered with
     // empty slices and the legend stays focused on what the player has.
-    const entries = Object.entries(typeCounts)
-      .filter(([, count]) => count > 0)
-      .map(([type, count]) => ({
-        name: TYPE_LABELS[type],
-        value: count,
-        color: TYPE_COLORS[type],
-      }));
+    //
+    // Iterating MODULE_TYPE_ORDER rather than Object.entries(typeCounts) keeps
+    // the key narrowed to ModuleType (Object.entries widens to string, which
+    // can't index a Record<ModuleType, ...>) and makes slice order an explicit
+    // shared decision. The resulting order is unchanged — it previously
+    // matched by accident, via the object literal's insertion order.
+    const entries = MODULE_TYPE_ORDER.filter((type) => typeCounts[type] > 0).map(
+      (type) => ({
+        name: MODULE_TYPE_LABELS[type],
+        value: typeCounts[type],
+        color: MODULE_TYPE_COLORS[type],
+      })
+    );
     return {
       data: entries,
       // Total for percentage math in tooltip + sidebar legend. Computed
@@ -83,9 +85,9 @@ export function ModuleDistributionChart() {
 
   return (
     <div data-testid="module-distribution-chart">
-      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">
+      <SectionHeading>
         Epic Pulls by Type
-      </h3>
+      </SectionHeading>
       <div className="flex items-center gap-6">
         {/* Fixed 160x160 — small donut beside its custom legend. ResponsiveContainer */}
         {/* still used for SVG sizing/aspect, even though dimensions are fixed. */}
@@ -101,7 +103,7 @@ export function ModuleDistributionChart() {
               strokeWidth={0}    // no inter-slice borders; colors are distinct enough
             >
               {/* Cell-per-entry to apply per-slice colors. Recharts default uses */}
-              {/* its own palette — we override with TYPE_COLORS for theme fit. */}
+              {/* its own palette — we override with MODULE_TYPE_COLORS for theme fit. */}
               {data.map((entry) => (
                 <Cell key={entry.name} fill={entry.color} />
               ))}
@@ -133,7 +135,7 @@ export function ModuleDistributionChart() {
               />
               <span className="text-gray-300 w-20">{d.name}</span>
               <span className="text-white font-medium">{d.value}</span>
-              <span className="text-gray-500">
+              <span className="text-gray-400">
                 ({total > 0 ? ((d.value / total) * 100).toFixed(1) : "0"}%)
               </span>
             </div>

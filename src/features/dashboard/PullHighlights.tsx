@@ -27,16 +27,8 @@ import { useMemo } from "react";
 import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULE_BY_ID, MODULES } from "../../config/modules";
+import { MODULE_TYPE_COLORS } from "../../config/moduleTypes";
 import { useRenderLog } from "../../utils/renderLog";
-
-// Same type-accent palette used across the dashboard (TypeBalance,
-// ModuleCollectionGrid). Keep these in sync if the brand palette evolves.
-const TYPE_COLORS: Record<string, string> = {
-  cannon: "#e94560",
-  armor: "#3b82f6",
-  generator: "#eab308",
-  core: "#a855f7",
-};
 
 // Precomputed once at module load. Used to filter out any orphaned ids in
 // pull counts (modules removed from config, typos in imports, etc.).
@@ -96,13 +88,13 @@ export function PullHighlights() {
           label="Most Pulled"
           module={mostModule}
           count={mostCount}
-          color={TYPE_COLORS[mostModule.type] || "#9ca3af"}
+          color={MODULE_TYPE_COLORS[mostModule.type]}
         />
         <HighlightRow
           label="Least Pulled"
           module={leastModule}
           count={leastCount}
-          color={TYPE_COLORS[leastModule.type] || "#9ca3af"}
+          color={MODULE_TYPE_COLORS[leastModule.type]}
         />
       </div>
     </div>

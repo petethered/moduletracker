@@ -15,10 +15,19 @@ import { useState } from "react";
  *     (`sortKey`, `sortDir`, `onSortChange`); don't try to read it via ref.
  *
  * Accessibility: uses native `<table>`/`<thead>`/`<tbody>`/`<th>`/`<td>` so
- * screen readers and column-by-column nav work. Sort headers are clickable
- * `<th>` elements (NOT buttons) — acceptable for a presentational table but
- * note that keyboard-only users currently can't sort. If this matters, swap
- * the sort header to a real `<button>` inside the `<th>`.
+ * screen readers and column-by-column nav work. Sortable columns render a real
+ * `<button>` INSIDE the `<th>`, which gets focus, Enter/Space activation and
+ * the right role for free; the `<th>` carries `aria-sort` to announce current
+ * state. Do not move the click handler back onto the `<th>` itself — a bare
+ * `<th>` is not focusable, which made sorting keyboard-unreachable.
+ *
+ * There is deliberately NO row-click affordance. An earlier `onRowClick` prop
+ * existed but had no caller: the one consumer (PullHistoryTable) uses explicit
+ * per-row Edit/Delete buttons instead, which is the better pattern here
+ * because a row carries two distinct actions. If you ever need a drill-down
+ * row, put a real `<button>` in the first cell rather than making the `<tr>`
+ * clickable — a `<tr>` has no activation behaviour and faking one with
+ * tabIndex/role fights the table's own semantics.
  */
 
 /**
@@ -60,12 +69,6 @@ interface TableProps<T> {
   data: T[];
   /** Returns a stable React key for each row (typically the row's id). */
   keyExtractor: (item: T) => string;
-  /**
-   * If provided, rows become clickable and the cursor turns into a pointer.
-   * Use for "drill down to detail" patterns — e.g. clicking a history row
-   * opens its edit modal.
-   */
-  onRowClick?: (item: T) => void;
   /** Shown in place of the table when `data` is empty. Default `"No data"`. */
   emptyMessage?: string;
 }
@@ -74,7 +77,6 @@ export function Table<T>({
   columns,
   data,
   keyExtractor,
-  onRowClick,
   emptyMessage = "No data",
 }: TableProps<T>) {
   // Sort state is intentionally local — see the top-of-file note about lifting
@@ -117,7 +119,7 @@ export function Table<T>({
   // message is friendlier than an empty grid.
   if (data.length === 0) {
     return (
-      <div className="text-center text-gray-600 py-16" style={{ fontFamily: "var(--font-body)" }}>
+      <div className="text-center text-gray-400 py-16" style={{ fontFamily: "var(--font-body)" }}>
         {emptyMessage}
       </div>
     );
@@ -130,40 +132,64 @@ export function Table<T>({
       <table className="w-full text-sm" style={{ fontFamily: "var(--font-body)" }}>
         <thead>
           <tr className="border-b border-[var(--color-navy-500)]/40">
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                // Only attach the click handler when the column opts in to
-                // sorting — keeps the cursor/affordance honest.
-                onClick={col.sortable ? () => handleSort(col.key) : undefined}
-                className={`px-3 py-3 text-left text-[10px] uppercase tracking-[0.15em] text-gray-500 font-medium ${
-                  col.sortable ? "cursor-pointer hover:text-gray-300 transition-colors" : ""
-                }`}
-              >
-                {col.header}
-                {sortKey === col.key && (
-                  // Up/down arrow indicates direction. Gold accent so it
-                  // pops against the muted gray header text.
-                  <span className="text-[var(--color-accent-gold)] ml-1">
-                    {sortDir === "asc" ? "↑" : "↓"}
-                  </span>
-                )}
-              </th>
-            ))}
+            {columns.map((col) => {
+              const isSorted = sortKey === col.key;
+              return (
+                <th
+                  key={col.key}
+                  // aria-sort is what actually communicates sort state to a
+                  // screen reader. The ↑/↓ glyph below is a purely visual
+                  // affordance and is hidden from the a11y tree.
+                  // Non-sortable columns get no aria-sort at all (rather than
+                  // "none", which would imply they are sortable but unsorted).
+                  aria-sort={
+                    col.sortable
+                      ? isSorted
+                        ? sortDir === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
+                      : undefined
+                  }
+                  className="px-3 py-3 text-left text-[10px] uppercase tracking-[0.15em] text-gray-400 font-medium"
+                >
+                  {col.sortable ? (
+                    // A REAL <button> inside the <th>, rather than onClick on
+                    // the <th> itself. The old version was mouse-only: a bare
+                    // th is not focusable, so sorting was unreachable by
+                    // keyboard entirely. Using a native button gets focus,
+                    // Enter/Space activation, and the correct role for free —
+                    // no manual tabIndex/onKeyDown plumbing to get wrong.
+                    <button
+                      type="button"
+                      onClick={() => handleSort(col.key)}
+                      className="inline-flex items-center gap-1 uppercase tracking-[0.15em] font-medium cursor-pointer hover:text-gray-200 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-gold)] rounded-lg"
+                    >
+                      {col.header}
+                      {isSorted && (
+                        // aria-hidden: aria-sort on the <th> already conveys
+                        // this. Announcing "up arrow" would be noise.
+                        <span
+                          aria-hidden="true"
+                          className="text-[var(--color-accent-gold)]"
+                        >
+                          {sortDir === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    col.header
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           {sortedData.map((item) => (
             <tr
               key={keyExtractor(item)}
-              // Same opt-in pattern as headers: only wire the click + hover
-              // styles when the caller actually wants row interaction.
-              onClick={onRowClick ? () => onRowClick(item) : undefined}
-              className={`border-b border-[var(--color-navy-600)]/30 transition-colors ${
-                onRowClick
-                  ? "cursor-pointer hover:bg-[var(--color-navy-600)]/40"
-                  : ""
-              }`}
+              className="border-b border-[var(--color-navy-600)]/30"
             >
               {columns.map((col) => (
                 <td key={col.key} className="px-3 py-3">

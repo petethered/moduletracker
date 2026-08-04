@@ -15,6 +15,9 @@
  * the input event — no Date parsing happens at this layer (caller decides).
  */
 
+import { useId } from "react";
+import { FieldLabel } from "./FieldLabel";
+
 /**
  * Props for {@link DateInput}.
  */
@@ -34,21 +37,33 @@ interface DateInputProps {
 }
 
 export function DateInput({ value, onChange, label }: DateInputProps) {
+  // Generated id wiring the label to the input. Previously the <label> had no
+  // `htmlFor` and the <input> had no `id`, so they were only VISUALLY
+  // associated: a screen reader announced the field as an unlabelled date
+  // input, and clicking the label didn't focus it. `useId` (not a hardcoded
+  // string) because PullForm can render more than one DateInput at a time and
+  // duplicate ids would cross-wire the labels.
+  const inputId = useId();
+
   return (
     <div>
-      {label && (
-        <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
-          {label}
-        </label>
-      )}
+      {/* FieldLabel is the shared value/input label tier — see
+          components/ui/SectionHeading.tsx for why the two tiers exist. */}
+      {label && <FieldLabel htmlFor={inputId}>{label}</FieldLabel>}
       <input
+        id={inputId}
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         // `[color-scheme:dark]` flips the native calendar icon to a light
         // variant so it stays visible against the navy background. Don't
         // remove this without verifying the picker icon in Chrome + Safari.
-        className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)] cursor-pointer [color-scheme:dark]"
+        //
+        // focus-visible ring: the field previously had `focus:outline-none`
+        // with only a border-color change as the focus signal, which is easy
+        // to miss on a dark theme. The gold outline is the app-wide focus
+        // treatment.
+        className="w-full px-3 py-2 rounded-lg bg-[var(--color-navy-800)] border border-[var(--color-navy-500)] text-gray-200 focus:outline-none focus:border-[var(--color-accent-gold)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-gold)] cursor-pointer [color-scheme:dark]"
       />
     </div>
   );

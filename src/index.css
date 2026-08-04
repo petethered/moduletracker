@@ -1,5 +1,69 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   SELF-HOSTED TYPEFACES
+   ---------------------------------------------------------------------------
+   These were previously pulled from fonts.googleapis.com via a <link> in
+   index.html. That cost two extra DNS+TLS round trips on the critical path
+   (googleapis.com for the CSS, then gstatic.com for the woff2s) and the
+   stylesheet was render-blocking, which directly hurt LCP.
+
+   All three families are VARIABLE fonts, so one file covers every weight we
+   use. Total payload is ~80KB for the entire type system. Files live in
+   public/fonts/ and Vite copies them to the site root untouched, which is why
+   the src url is an absolute /fonts/... path and not a bundler import.
+
+   `font-display: swap` keeps text visible during the swap period rather than
+   flashing invisible text. Do NOT switch these to `block`.
+
+   IF YOU ADD A WEIGHT: no new file needed, just use it. The variable ranges
+   below already cover 300-700 (display) and 100-900 (body/mono).
+   IF YOU CHANGE A FAMILY: re-download the latin-subset woff2 from Google's
+   css2 API and drop it in public/fonts/. Keep the -var.woff2 naming.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700; /* variable axis range */
+  font-display: swap;
+  src: url("/fonts/spacegrotesk-var.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 100 900; /* variable axis range */
+  font-display: swap;
+  src: url("/fonts/outfit-var.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900; /* variable axis range */
+  font-display: swap;
+  src: url("/fonts/geistmono-var.woff2") format("woff2");
+}
+
+/* ---------------------------------------------------------------------------
+   CORNER RADIUS SCALE (style rule, not a token)
+   ---------------------------------------------------------------------------
+   One rule, applied everywhere. The app previously used four radii with no
+   system (bare `rounded` on Badge, `rounded-lg` on buttons, `rounded-xl` on
+   cards, `rounded-2xl` on Modal), which reads as inconsistency rather than
+   hierarchy.
+
+     rounded-lg   (8px)  -> interactive controls: buttons, inputs, selects,
+                            badges, collection tiles
+     rounded-xl   (12px) -> containers: stat cards, tables, panels
+     rounded-2xl  (16px) -> overlays: modals only
+     rounded-full        -> meters, progress bars, pills
+
+   These are Tailwind utilities, so there is nothing to declare in :root. The
+   rule lives here because this is the file a reader opens to learn the visual
+   system. Follow it when adding any new surface.
+--------------------------------------------------------------------------- */
+
 :root {
   --color-navy-900: #06060f;
   --color-navy-800: #0c0c1d;
@@ -8,14 +72,68 @@
   --color-navy-500: #252560;
   --color-accent-gold: #f0c040;
   --color-accent-crimson: #e94560;
-  --color-rarity-common: #d4d4d8;
+
+  /* Darkened crimson used ONLY as the primary Button gradient start.
+     The brand crimson (#e94560) only reaches 3.83:1 against white label text,
+     which fails WCAG AA for 14px copy. #d63a55 measures 4.57:1 and is visually
+     indistinguishable at button scale. Do not use this for decorative accents;
+     use --color-accent-crimson for those. */
+  --color-accent-crimson-deep: #d63a55;
+
+  /* -------------------------------------------------------------------------
+     RARITY COLORS — CANONICAL VALUES
+     -------------------------------------------------------------------------
+     THESE MUST STAY IN SYNC WITH `RARITY_COLORS` in src/config/rarityColors.ts.
+
+     There are two rendering paths for rarity color and they cannot share a
+     single source at runtime:
+       1. DOM      -> reads these CSS custom properties.
+       2. <canvas> -> src/features/screenshot/* cannot read CSS vars, so it
+                      imports the TS constants instead.
+     They previously drifted: CSS held the Tailwind -400 shades while TS held
+     the -500 shades, so e.g. "epic" rendered as #c084fc on a StatCard and
+     #a855f7 on a collection tile ON THE SAME DASHBOARD.
+
+     The -400 band won because it measures materially better on this near-black
+     navy background (epic: 7.32:1 here vs 4.89:1 for -500; rare: 7.61:1 vs
+     5.26:1). Rarity text renders as small as 8px in the collection grid, so
+     the extra headroom matters.
+
+     `common` is #e4e4e7 (zinc-200) rather than pure #ffffff: it still reads as
+     "white" against navy but avoids the pure-value flatness that kills depth
+     on a dark theme. This is a deliberate, tiny deviation from CLAUDE.md's
+     "common=white" shorthand — revert this one hex if you disagree.
+
+     IF YOU CHANGE ANY VALUE HERE, change it in rarityColors.ts too. There is
+     a unit test (src/__tests__/config.test.ts) guarding the key set but not
+     the values, because the canvas renderer is the only other consumer.
+  ------------------------------------------------------------------------- */
+  --color-rarity-common: #e4e4e7;
   --color-rarity-rare: #60a5fa;
   --color-rarity-epic: #c084fc;
   --color-rarity-legendary: #fbbf24;
   --color-rarity-mythic: #f87171;
   --color-rarity-ancestral: #4ade80;
 
-  --font-display: "Cinzel", Georgia, serif;
+  /* Module TYPE colors deliberately live ONLY in src/config/moduleTypes.ts,
+     not here. Every consumer passes them into a JS API (Recharts fill, inline
+     style), so a parallel CSS declaration would be a second source of truth
+     that nothing reads. See that file for why the type palette is muted while
+     the rarity palette above is vivid. */
+
+  /* Chart benchmark / warning red. Mirrored by SIGNAL_WARNING in
+     src/config/brandColors.ts because Recharts needs a literal. Deliberately
+     not a rarity color: it marks "expected value" reference lines. */
+  --color-signal-warning: #ef4444;
+
+  /* Display face: Space Grotesk, replacing Cinzel. Cinzel is a Roman
+     inscriptional serif (classical, carved-stone), which sat at odds with the
+     sci-fi HUD language the rest of the UI speaks: L-bracket corner accents,
+     monospaced numerals, neon glow. Space Grotesk's angular terminals echo
+     those brackets and it shares design DNA with Geist Mono, so display and
+     numerals now read as one system. Revert this single line to
+     `"Cinzel", Georgia, serif` if you want the old look back. */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body: "Outfit", system-ui, sans-serif;
   --font-mono: "Geist Mono", "Fira Code", monospace;
 
@@ -134,3 +252,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .stagger-4 { animation-delay: 0.2s; }
 .stagger-5 { animation-delay: 0.25s; }
 .stagger-6 { animation-delay: 0.3s; }
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION
+   ---------------------------------------------------------------------------
+   Mandatory accessibility guardrail, and this app fires entry animations
+   constantly: <main> in App.tsx is keyed by activeTab, so EVERY tab switch
+   remounts the panel and replays animate-fade-in, and every modal open replays
+   animate-slide-up. For a user with vestibular sensitivity that is a lot of
+   unrequested movement.
+
+   The override collapses animation and transition to a ~0 duration rather than
+   `animation: none`, because `none` would strip the `both` fill-mode and leave
+   elements stuck at their `from` keyframe (opacity: 0 => invisible UI). The
+   1ms + `animation-fill-mode: forwards` combination lands them on their final
+   state instantly, which is what we want: no motion, but everything visible.
+
+   `scroll-behavior: auto` kills smooth-scroll anchoring for the same reason.
+
+   IF YOU ADD AN ANIMATION: it is covered automatically by the universal
+   selector below. You only need to touch this block if you add something that
+   moves WITHOUT using CSS animation/transition (e.g. a JS rAF loop or a
+   <canvas> effect) — those must check
+   `window.matchMedia("(prefers-reduced-motion: reduce)")` themselves.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    animation-fill-mode: forwards !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -34,6 +34,7 @@
  */
 import { useStore } from "../../store";
 import { selectPitySinceLastEpic } from "../../store/selectors";
+import { SectionHeading } from "../../components/ui/SectionHeading";
 
 export function PityTracker() {
   const pulls = useStore((s) => s.pulls);
@@ -47,7 +48,7 @@ export function PityTracker() {
 
   return (
     <div data-testid="pity-tracker" className="bg-[var(--color-navy-600)] rounded-xl p-4">
-      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Pity Counter</h3>
+      <SectionHeading>Pity Counter</SectionHeading>
       {/* Big numerator (current pity) + small denominator (max) — gives both */}
       {/* the absolute value and the "how close to guarantee" framing. */}
       <div className="text-3xl font-bold text-white mb-2">
@@ -65,7 +66,7 @@ export function PityTracker() {
           }}
         />
       </div>
-      <p className="text-xs text-gray-500 mt-2">Pulls since last epic. Guaranteed epic at 150.</p>
+      <p className="text-xs text-gray-400 mt-2">Pulls since last epic. Guaranteed epic at 150.</p>
     </div>
   );
 }

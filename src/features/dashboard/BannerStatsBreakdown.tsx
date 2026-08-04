@@ -156,7 +156,7 @@ function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-baseline">
       <span
-        className="text-[10px] uppercase tracking-wider text-gray-500"
+        className="text-[10px] uppercase tracking-wider text-gray-400"
         style={{ fontFamily: "var(--font-body)" }}
       >
         {label}

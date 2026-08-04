@@ -51,7 +51,7 @@ export function RecentPullsList() {
   // so the user has a clear next step.
   if (sorted.length === 0) {
     return (
-      <p className="text-gray-500 text-sm">
+      <p className="text-gray-400 text-sm">
         No pulls recorded yet. Click "Add 10x Pull" to get started.
       </p>
     );
@@ -98,7 +98,7 @@ export function RecentPullsList() {
               {pityIds.has(pull.id) && <span className="text-red-400 ml-1">PITY :(</span>}
             </span>
           ) : pityCounters.has(pull.id) ? (
-            <span className="text-gray-500 text-xs">
+            <span className="text-gray-400 text-xs">
               (pity {pityCounters.get(pull.id)}/{PITY_PULL_THRESHOLD})
             </span>
           ) : null}

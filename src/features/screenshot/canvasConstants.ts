@@ -26,12 +26,19 @@
  * Gotchas / image-export quirks:
  *   - The canvas is scaled by devicePixelRatio in generateScreenshot to get crisp output
  *     on retina displays. All constants here are LOGICAL px, not device px.
- *   - These values are intentionally NOT exposed via CSS vars — the screenshot must
- *     render identically regardless of the user's current theme/zoom.
+ *   - These values are intentionally NOT read from CSS vars — a canvas 2D context
+ *     cannot resolve them, and the exported PNG must render identically regardless
+ *     of the viewer's theme. This file is a PINNED SNAPSHOT of the palette, not a
+ *     live mirror of it: if the app's colors change, updating these is a judgement
+ *     call about how the exported image should look, NOT an automatic obligation.
+ *     Do not "consolidate" this file into src/config/brandColors.ts — that file
+ *     exists for live-UI values and says so.
  */
 
-// Navy palette (from index.css vars). MUST stay in sync with the live app's CSS so
-// the screenshot looks like the app rather than a mismatched mockup.
+// Navy palette, snapshotted from index.css so the screenshot LOOKS like the app.
+// Intentionally a copy, not a live reference — see the header. These have drifted
+// from the live palette before (WHITE here is #e5e7eb while RARITY_COLORS.common is
+// #e4e4e7); that is tolerable for an exported image and is not a bug to chase.
 export const NAVY_900 = "#06060f"; // Page background
 export const NAVY_800 = "#0c0c1d"; // Section headers / panel fill / alternating rows
 export const NAVY_700 = "#13132b"; // Reserved (currently unused but kept for parity)

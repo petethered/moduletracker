@@ -74,7 +74,7 @@ export function StorageChoiceModal() {
               </svg>
               <span className="text-sm font-medium text-gray-200">Local Storage Only</span>
             </div>
-            <p className="text-xs text-gray-500 ml-8">
+            <p className="text-xs text-gray-400 ml-8">
               Your data stays on this device. No account needed.
             </p>
           </button>
@@ -93,7 +93,7 @@ export function StorageChoiceModal() {
               </svg>
               <span className="text-sm font-medium text-gray-200">Cloud Storage</span>
             </div>
-            <p className="text-xs text-gray-500 ml-8">
+            <p className="text-xs text-gray-400 ml-8">
               Sync across devices. Requires a free account.
             </p>
           </button>

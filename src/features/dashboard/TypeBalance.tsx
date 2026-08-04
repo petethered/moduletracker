@@ -32,19 +32,20 @@ import { useStore } from "../../store";
 import { selectModulePullCounts } from "../../store/selectors";
 import { MODULES } from "../../config/modules";
 import type { ModuleType } from "../../types";
+import {
+  MODULE_TYPE_COLORS,
+  MODULE_TYPE_ORDER,
+} from "../../config/moduleTypes";
 import { useRenderLog } from "../../utils/renderLog";
 
-// Same type-accent palette used across the dashboard. If colors change,
-// also update PullHighlights and ModuleCollectionGrid.
-const TYPE_COLORS: Record<ModuleType, string> = {
-  cannon: "#e94560",
-  armor: "#3b82f6",
-  generator: "#eab308",
-  core: "#a855f7",
-};
-
-// Display order matches the rest of the dashboard for consistency.
-const TYPE_ORDER: ModuleType[] = ["cannon", "armor", "generator", "core"];
+// Type-accent palette and display order now come from
+// src/config/moduleTypes.ts. The old local copies (here, in
+// PullHighlights, in ModuleCollectionGrid, and in ModuleDistributionChart)
+// were four identical hex literals kept in sync by comment alone.
+//
+// Local aliases keep the rest of this file's JSX unchanged and readable.
+const TYPE_COLORS = MODULE_TYPE_COLORS;
+const TYPE_ORDER: readonly ModuleType[] = MODULE_TYPE_ORDER;
 
 export function TypeBalance() {
   const pulls = useStore((s) => s.pulls);
