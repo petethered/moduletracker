@@ -6,7 +6,7 @@
  * type, and a big count.
  *
  * Game-domain concept ("highlight"):
- *   With ~24 epic modules in the roster, RNG creates obvious favorites and
+ *   With the full epic roster in play, RNG creates obvious favorites and
  *   neglected ones. Players love seeing which module they've over-pulled
  *   (the "you got 17 of these" reveal) and feel motivated to chase the
  *   under-pulled tail. This card crystallizes both ends in one glance —

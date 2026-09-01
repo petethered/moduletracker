@@ -13,7 +13,7 @@
  *                       so the user can tell if they're hot or cold.
  *   - "Epics Found"   : raw count of epic modules pulled (NOT unique).
  *   - "Unique Epics"  : how many *distinct* epic modules the user has ever
- *                       pulled, out of the 24-module roster.
+ *                       pulled, out of the full roster (MODULES.length).
  *   - "Pity Counter"  : pulls since the last epic, max 150 before the in-game
  *                       pity guarantee triggers. Color shifts to mythic-red
  *                       past 100 to convey "we're getting close".
@@ -29,6 +29,7 @@
 
 import { StatCard } from "../../components/ui/StatCard";
 import { useStore } from "../../store";
+import { MODULES } from "../../config/modules";
 import { formatInteger, formatPercent } from "../../utils/formatNumber";
 import {
   selectTotalPulls,
@@ -77,12 +78,14 @@ export function StatCardGrid() {
         value={counts.epic}
         color="var(--color-rarity-epic)"
       />
-      {/* "/24" is the current roster size from MODULES. Hard-coded for visual
-          punch (matches the "complete the dex" feeling); update if the
-          module config grows. The legendary-gold color signals "completion". */}
+      {/* Denominator is MODULES.length, never a literal. selectUniqueEpicsFound
+          counts distinct ids in the user's PULL data and is NOT clamped to the
+          roster, so a hardcoded total renders nonsense like "25/24" the moment
+          the roster grows (this shipped once — don't reintroduce it).
+          The legendary-gold color signals "completion" / "complete the dex". */}
       <StatCard
         label="Unique Epics"
-        value={`${uniqueEpics}/24`}
+        value={`${uniqueEpics}/${MODULES.length}`}
         color="var(--color-rarity-legendary)"
       />
       {/* Pity counter conditional color:

@@ -4,7 +4,7 @@
 import { test, expect } from "./fixtures";
 
 test.describe("Module collection", () => {
-  test("shows all 24 modules", async ({ page }) => {
+  test("shows a module from each type group", async ({ page }) => {
     await page.goto("/");
     await page.click("[data-tab='modules']");
     await expect(page.getByRole("heading", { name: "Module Collection" })).toBeVisible();

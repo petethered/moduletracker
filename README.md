@@ -5,7 +5,7 @@ A web app for tracking gacha module pulls in [The Tower](https://the-tower-idle-
 ## Features
 
 - **Pull Logging** - Record 10x pulls with common/rare/epic counts and specific epic module names
-- **Module Collection** - Track all 24 epic modules across 4 types (Cannon, Armor, Generator, Core) with merge rarity progression from Epic through 5-Star
+- **Module Collection** - Track every epic module across 4 types (Cannon, Armor, Generator, Core) with merge rarity progression from Epic through 5-Star
 - **Dashboard** - At-a-glance stats, recent pulls, rarity breakdown, collection grid, merge progress, pull calendar heatmap, and type balance
 - **Analytics** - Pity tracker, predicted gems to completion, luck streaks, pull rate trends, gems-per-epic charts, and module distribution
 - **Pull History** - Full history table with sorting, editing, and deletion

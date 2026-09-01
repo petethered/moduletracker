@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { PullRecord, ModuleProgress } from "../types";
 import { buildScreenshotData } from "../features/screenshot/screenshotData";
+import { MODULES } from "../config/modules";
 
 const makePull = (overrides: Partial<PullRecord> = {}): PullRecord => ({
   id: Math.random().toString(),
@@ -14,7 +15,7 @@ const makePull = (overrides: Partial<PullRecord> = {}): PullRecord => ({
 });
 
 describe("buildScreenshotData", () => {
-  it("returns 4 sections with all 24 modules when pulls are empty", () => {
+  it("returns 4 sections covering the whole module roster when pulls are empty", () => {
     const data = buildScreenshotData([], {});
     expect(data.sections).toHaveLength(4);
     expect(data.sections.map((s) => s.label)).toEqual([
@@ -23,11 +24,11 @@ describe("buildScreenshotData", () => {
       "GENERATOR",
       "CORE",
     ]);
-    const totalModules = data.sections.reduce(
-      (sum, s) => sum + s.modules.length,
-      0,
-    );
-    expect(totalModules).toBe(24);
+    // Compare the flattened NAME SET against the roster, not just the count:
+    // a count-only check would pass if one module were duplicated and another
+    // dropped, which is exactly the regression this test exists to catch.
+    const rendered = data.sections.flatMap((s) => s.modules.map((m) => m.name));
+    expect([...rendered].sort()).toEqual(MODULES.map((m) => m.name).sort());
   });
 
   it("returns zeroed stats with empty pulls", () => {

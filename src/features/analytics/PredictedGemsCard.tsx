@@ -24,11 +24,9 @@
  *     - 8 copies of an epic   -> ancestral-grade module   (top tier — green)
  *     - 18 copies of an epic  -> all-5-star module        (max-stars across tiers)
  *   The literals 8 and 18 are passed to selectPredictedGemsForMerge.
- *   24 (modulesAtAncestral/24, modulesAt5Star/24) is the total module count;
- *   it should track MODULES.length but is hardcoded in the UI strings here.
- *
- * NOTE for future agents: If MODULES.length ever != 24, update the "/24"
- * literals below OR replace them with `{MODULES.length}` to stay in sync.
+ *   The "N modules ready"/"N modules at 5*" denominators render
+ *   {MODULES.length} directly, so they follow the roster automatically when a
+ *   module is added or removed — do NOT reintroduce a hardcoded total here.
  */
 import { StatCard } from "../../components/ui/StatCard";
 import { useStore } from "../../store";
@@ -86,9 +84,8 @@ export function PredictedGemsCard() {
           </span>
         </div>
         <div className="flex justify-between text-xs">
-          {/* "/24" is the total module count. See top-of-file note: keep in */}
-          {/* sync with MODULES.length if the module roster ever changes size. */}
-          <span className="text-gray-400">{progress.modulesAtAncestral}/24 modules ready</span>
+          {/* Denominator is the live roster size, not a literal — see top-of-file note. */}
+          <span className="text-gray-400">{progress.modulesAtAncestral}/{MODULES.length} modules ready</span>
           {/* Crimson highlight for the gem cost — visually loud because */}
           {/* it's the actionable number ("how much do I still need to spend?"). */}
           {/* "Done!" replaces the cost when all modules are at the target tier. */}
@@ -117,8 +114,8 @@ export function PredictedGemsCard() {
           </span>
         </div>
         <div className="flex justify-between text-xs">
-          {/* "/24" same caveat as above re: MODULES.length. */}
-          <span className="text-gray-400">{progress.modulesAt5Star}/24 modules at 5*</span>
+          {/* Same live-roster denominator as the Ancestral tile above. */}
+          <span className="text-gray-400">{progress.modulesAt5Star}/{MODULES.length} modules at 5*</span>
           <span className="text-[var(--color-accent-crimson)]">
             {gemsFor5Star > 0 ? `~${formatInteger(gemsFor5Star)} gems` : "Done!"}
           </span>

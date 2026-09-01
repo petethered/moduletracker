@@ -75,8 +75,13 @@ export function ModuleCollectionGrid() {
                 {type}
               </MetaLabel>
               {/* Responsive tile grid: 2 cols on phones, 3 on tablets, 6 on
-                  desktop. Tile sizing kept tight (px-1.5 py-1.5) so the whole
-                  collection fits on one screen at desktop widths. */}
+                  desktop. Tile sizing kept tight (px-1.5 py-1.5) to keep the
+                  collection compact at desktop widths.
+                  NOTE: type groups are no longer uniformly 6 wide — Armor has 7
+                  modules and deliberately wraps to a second row rather than
+                  shrinking every tile to fit. Do NOT retune the column count to
+                  the current largest group; the roster changes, and each group
+                  is rendered independently so wrapping is the graceful case. */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5">
                 {modules.map((mod) => {
                   // "Found" = the user has pulled this module at least once.

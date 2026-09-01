@@ -131,6 +131,12 @@ export const MODULES: ModuleDefinition[] = [
     type: "armor",
     uniqueAbility: "Adds orbiting Electrons dealing 15% of enemy remaining health.",
   },
+  {
+    id: "sentry-protocol",
+    name: "Sentry Protocol",
+    type: "armor",
+    uniqueAbility: "Orb speed is reduced to zero. Orbs instead fire mini orbs.",
+  },
   // Generator — utility/economy slot. Abilities here interact with bots,
   // packages, ultimate cooldowns, and cash multipliers.
   {
