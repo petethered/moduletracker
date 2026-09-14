@@ -42,6 +42,9 @@ import type { ModuleProgress, ModuleRarity } from "../types";
  *
  * Actions:
  *   updateModuleRarity    — set/overwrite a module's current rarity.
+ *   setModuleRarities     — set/overwrite several at once in ONE store update
+ *                           (Import Player Info). One persist write and one
+ *                           sync-subscriber pass instead of N.
  *   importModuleProgress  — wholesale replacement (file import / sync rehydrate).
  *   clearModuleProgress   — wipe (settings -> reset).
  */
@@ -49,6 +52,8 @@ export interface ModulesSlice {
   moduleProgress: Record<string, ModuleProgress>;
   /** Set the current rarity for a module. Creates the entry if missing; overwrites if present. */
   updateModuleRarity: (moduleId: string, rarity: ModuleRarity) => void;
+  /** Set/overwrite several module rarities in a single update. Modules not listed are untouched. */
+  setModuleRarities: (rarities: Record<string, ModuleRarity>) => void;
   /** Replace the entire progress map. Used by file import and cloud-sync rehydrate. */
   importModuleProgress: (progress: Record<string, ModuleProgress>) => void;
   /** Wipe all module progress. Triggered from settings/reset flows. */
@@ -70,6 +75,15 @@ export const createModulesSlice: StateCreator<
       // embedded moduleId stays consistent with the map key — preserves the
       // self-describing-record invariant required for clean export/sync.
       state.moduleProgress[moduleId] = { moduleId, currentRarity: rarity };
+    }),
+
+  setModuleRarities: (rarities) =>
+    set((state) => {
+      // Same whole-record rebuild as updateModuleRarity: keeps the embedded
+      // moduleId equal to the map key.
+      for (const [moduleId, rarity] of Object.entries(rarities)) {
+        state.moduleProgress[moduleId] = { moduleId, currentRarity: rarity };
+      }
     }),
 
   importModuleProgress: (progress) =>

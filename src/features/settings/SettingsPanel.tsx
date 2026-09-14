@@ -4,7 +4,9 @@
  * Role in the broader feature:
  *   The catch-all settings screen. Hosts:
  *     1. AccountSettings (cloud sync sub-panel)
- *     2. Data Management — JSON export, JSON file import, Screenshot export
+ *     2. Data Management — JSON export, JSON file import, Import Player Info
+ *        (module levels from the game's playerInfo.dat; see
+ *        ImportPlayerInfoButton), Screenshot export
  *     3. Bulk Import — paste tab-separated text OR exported JSON
  *     4. Danger Zone — Reset all data
  *
@@ -18,6 +20,9 @@
  *     expected shape, replace local pulls + (if present) moduleProgress.
  *   - Bulk Import: takes the contents of the textarea. Auto-detects whether the input
  *     is JSON (starts with { or [) or tab-separated text and routes accordingly.
+ *   - Import Player Info: reads The Tower's own save (playerInfo.dat) and RAISES module
+ *     rarities to match it. Only ever touches moduleProgress, never pulls; never lowers.
+ *     Self-contained in ImportPlayerInfoButton (+ usePlayerInfoImport, parsePlayerInfo).
  *   - Reset: clears pulls + moduleProgress after a ConfirmDialog. Destructive.
  *
  * Bulk import policy (important):
@@ -36,10 +41,13 @@
  *     would corrupt selectors and persistence.
  *   - moduleProgress is OPTIONAL — older exports didn't include it.
  *
- * Why two import paths:
+ * Why three import paths:
  *   File picker is the canonical way to round-trip exports. Bulk import textarea exists
  *   so users can paste community spreadsheets directly without intermediate save-as-file.
  *   The auto-detection (JSON vs TSV) keeps the textarea ergonomic for both audiences.
+ *   Import Player Info is a different kind of import: it MERGES game state into module
+ *   progress (raise-only) instead of replacing or appending pull history, and keeps
+ *   Settings open to show its summary. See ImportPlayerInfoButton.tsx's header.
  *
  * Gotchas:
  *   - We reset `e.target.value = ""` after file load so the SAME file can be re-selected
@@ -57,6 +65,7 @@ import { useStore } from "../../store";
 import { parseBulkImport } from "./parseBulkImport";
 import { getLocalDateString } from "../../utils/formatDate";
 import { ScreenshotButton } from "../screenshot/ScreenshotButton";
+import { ImportPlayerInfoButton } from "./ImportPlayerInfoButton";
 import { AccountSettings } from "./AccountSettings";
 import { formatInteger } from "../../utils/formatNumber";
 
@@ -272,6 +281,7 @@ export function SettingsPanel() {
             <div className="space-y-2">
               <Button variant="secondary" onClick={handleExport} className="w-full">Export Data</Button>
               <Button variant="secondary" onClick={handleImport} className="w-full">Import Data</Button>
+              <ImportPlayerInfoButton />
               <ScreenshotButton />
               <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} className="hidden" />
               {importError && <p className="text-red-400 text-sm">{importError}</p>}

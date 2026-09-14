@@ -26,8 +26,8 @@
 - Store slices: `src/store/{pullsSlice,modulesSlice,uiSlice,settingsSlice,authSlice}.ts`
 - Selectors for derived data: `src/store/selectors.ts`
 - Cloud sync services: `src/services/{api,auth,sync}.ts` (talks to the worker)
-- Shared utilities: `src/utils/` (formatDate, renderLog)
-- Module config: `src/config/modules.ts` (edit here to add/remove modules)
+- Shared utilities: `src/utils/` (formatDate, formatNumber, renderLog, nrbfReader — generic game-agnostic .NET BinaryFormatter decoder used to read The Tower's save file)
+- Module config: `src/config/modules.ts` (edit here to add/remove modules; each needs `gameIndex`, the game's own module number, used by Import Player Info)
 - Rarity colors: `src/config/rarityColors.ts`
 - Types: `src/types/index.ts`
 - Backend: `worker/` is a separate Cloudflare Worker (D1 database, JWT auth, Postmark email). Schema lives in `worker/schema.sql`.
@@ -55,5 +55,6 @@ Run these review agents before every commit:
 ## Testing
 - E2E tests in `e2e/` directory
 - Unit tests co-located in `src/__tests__/`
-- E2E tests cover: pull CRUD, module rarity updates, tab navigation, import/export, responsive viewports
-- Unit tests cover: selectors, store mutations, validation, config integrity
+- Test-only builders shared by unit AND e2e tests live in `src/__tests__/helpers/` (e.g. synthetic save files). They must not import vitest or `node:*` APIs, since Playwright loads them too. Never commit a real `playerInfo.dat` — it's personal player data.
+- E2E tests cover: pull CRUD, module rarity updates, tab navigation, import/export, Import Player Info, responsive viewports
+- Unit tests cover: selectors, store mutations, validation, config integrity, the save decoder (nrbfReader, incl. malformed-input hardening), save parsing and the raise-only import plan

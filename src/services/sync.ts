@@ -39,8 +39,11 @@
  *   same id exists on both sides, prefer local because the user just typed it.
  * - Module progress: pick the side with the higher rarity (rarities have a
  *   strict order in MODULE_RARITY_ORDER). This embeds a "progress only goes
- *   up" invariant — user can't downgrade a module's rarity, so the higher
- *   value is always the truthful one.
+ *   up" invariant — in-game rarity can't go down, so the higher value is
+ *   treated as the truthful one. CAVEAT: the UI does allow lowering by hand
+ *   (Modules tab, e.g. fixing a typo); such a lowering can be undone by this
+ *   merge if another device or an unpushed cloud copy still has the higher
+ *   value. Import Player Info is raise-only partly for this reason.
  * - bannerDefault: local always wins. It's a UI preference, not user data.
  *
  * Non-obvious gotchas:
@@ -258,8 +261,9 @@ function mergePulls(local: PullRecord[], cloud: PullRecord[]): PullRecord[] {
  *   exist, take whichever has the higher rarity (per MODULE_RARITY_ORDER:
  *   common < rare < epic < legendary < mythic < ancestral).
  *
- * Why rarity-ordering: module progress is monotonic in this app — users
- * can only level UP a module's rarity, never down. So if local says
+ * Why rarity-ordering: module progress is monotonic in the game — a module
+ * only ever levels UP. (Manual lowering in the Modules tab exists for typo
+ * fixes and is NOT protected against this merge; see the header caveat.) So if local says
  * "legendary" and cloud says "epic", local is newer; if local says "epic"
  * and cloud says "legendary", another device upgraded it — cloud wins.
  * No timestamps needed.

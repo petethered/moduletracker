@@ -7,6 +7,8 @@
  *   - src/features/modules/* (module grids, rarity editors)
  *   - src/features/pulls/*   (the add-pull modal's module selector)
  *   - src/features/analytics/* (per-module pull stats)
+ *   - src/features/settings/*  (bulk import name matching; Import Player Info
+ *                               maps save files through `gameIndex`)
  *   - src/store/selectors.ts  (joins pulls -> module metadata)
  *
  * GAME CONTEXT:
@@ -26,6 +28,20 @@
  *     grids. No other file needs to be edited (filters/grids derive from this).
  *   - Removing a module here will orphan any existing pull records pointing at
  *     its id. Selectors must tolerate unknown ids (verify before deleting).
+ *   - `gameIndex` is the module's number in The Tower's own module table — the
+ *     `infoIndex` stored on every ModuleItem in playerInfo.dat. "Import Player
+ *     Info" (src/features/settings/parsePlayerInfo.ts) maps saves to modules
+ *     through it. It is NOT an ordering: the game numbers modules in release
+ *     waves, and this file's order is the UI order. Must be unique (config
+ *     test). Source of truth: the game itself; mytower.app's save importer
+ *     exposes the same table, and indexes 7-51 were cross-checked against a
+ *     real save. The game also has epics the tracker doesn't list yet
+ *     (49 Acceleration Augment, 52 Tactical Barrage) — importing a save that
+ *     holds one lists it under "Skipped modules the tracker doesn't support
+ *     yet (game #N)" rather than failing.
+ *     If the game ever adds a new COMMON or RARE base module, add its index to
+ *     COMMON_AND_RARE_BASE_GAME_INDEXES below, or imports will report it as
+ *     unsupported.
  *   - `uniqueAbility` strings are copied verbatim from the in-game tooltips,
  *     including placeholder values like "X%" or a bare "%" where the number
  *     varies by rarity — don't "fix" those. NOTE: no component renders this
@@ -39,7 +55,7 @@ import type { ModuleDefinition } from "../types";
 /**
  * The full module roster, grouped by `type` in source order.
  *
- * SHAPE: ModuleDefinition[] — each entry is { id, name, type, uniqueAbility }.
+ * SHAPE: ModuleDefinition[] — each entry is { id, name, type, gameIndex, uniqueAbility }.
  *
  * ORDERING INVARIANT:
  *   Entries are grouped by `type` in this fixed order: cannon -> armor ->
@@ -51,7 +67,11 @@ import type { ModuleDefinition } from "../types";
  *   1. Append the entry to the appropriate `// <type>` section below.
  *   2. Pick a unique kebab-case `id` (must not collide with any existing id —
  *      this would silently shadow data in MODULE_BY_ID).
- *   3. That's it — MODULES_BY_TYPE and MODULE_BY_ID are derived automatically,
+ *   3. Set `gameIndex` to the game's number for it. Easiest way to find it:
+ *      import a save holding the module — the result lists it under
+ *      "Skipped modules the tracker doesn't support yet (game #N)" until it's
+ *      in this file.
+ *   4. That's it — MODULES_BY_TYPE and MODULE_BY_ID are derived automatically,
  *      and consumers (pickers, grids, selectors) iterate this array.
  *
  * REMOVING A MODULE:
@@ -67,42 +87,49 @@ export const MODULES: ModuleDefinition[] = [
     id: "astral-deliverance",
     name: "Astral Deliverance",
     type: "cannon",
+    gameIndex: 10,
     uniqueAbility: "Bounce shot range increased by 3% of tower range. Each bounce increases damage.",
   },
   {
     id: "being-annihilator",
     name: "Being Annihilator",
     type: "cannon",
+    gameIndex: 9,
     uniqueAbility: "When you super crit, next attacks are guaranteed super crits.",
   },
   {
     id: "death-penalty",
     name: "Death Penalty",
     type: "cannon",
+    gameIndex: 8,
     uniqueAbility: "Chance to mark enemy for death on spawn, first hit destroys it.",
   },
   {
     id: "havoc-bringer",
     name: "Havoc Bringer",
     type: "cannon",
+    gameIndex: 7,
     uniqueAbility: "Chance for rend armor to instantly go to max.",
   },
   {
     id: "shrink-ray",
     name: "Shrink Ray",
     type: "cannon",
+    gameIndex: 41,
     uniqueAbility: "1% chance to decrease enemy mass.",
   },
   {
     id: "amplifying-strike",
     name: "Amplifying Strike",
     type: "cannon",
+    gameIndex: 45,
     uniqueAbility: "Killing a boss or elite increases Tower Damage by 5x temporarily.",
   },
   {
     id: "gilded-sniper",
     name: "Gilded Sniper",
     type: "cannon",
+    gameIndex: 51,
     uniqueAbility: "On Enemy Death: X% chance to apply all active coin bonuses, even if not in Range.",
   },
   // Armor — defensive slot. Abilities here cluster around damage reduction,
@@ -111,42 +138,49 @@ export const MODULES: ModuleDefinition[] = [
     id: "anti-cube-portal",
     name: "Anti-Cube Portal",
     type: "armor",
+    gameIndex: 20,
     uniqueAbility: "Enemies take increased damage for 7s after hit by shockwave.",
   },
   {
     id: "negative-mass-projector",
     name: "Negative Mass Projector",
     type: "armor",
+    gameIndex: 18,
     uniqueAbility: "Orb hits apply stacking debuff reducing enemy damage and speed.",
   },
   {
     id: "wormhole-redirector",
     name: "Wormhole Redirector",
     type: "armor",
+    gameIndex: 17,
     uniqueAbility: "Health Regen can heal up to % of Package Max Recovery.",
   },
   {
     id: "space-displacer",
     name: "Space Displacer",
     type: "armor",
+    gameIndex: 19,
     uniqueAbility: "Landmines have chance to spawn as Inner Land Mines around tower.",
   },
   {
     id: "sharp-fortitude",
     name: "Sharp Fortitude",
     type: "armor",
+    gameIndex: 42,
     uniqueAbility: "Increase Wall health and regen. Enemies take more damage from wall thorns per hit.",
   },
   {
     id: "orbital-augment",
     name: "Orbital Augment",
     type: "armor",
+    gameIndex: 46,
     uniqueAbility: "Adds orbiting Electrons dealing 15% of enemy remaining health.",
   },
   {
     id: "sentry-protocol",
     name: "Sentry Protocol",
     type: "armor",
+    gameIndex: 50,
     uniqueAbility: "Orb speed is reduced to zero. Orbs instead fire mini orbs.",
   },
   // Generator — utility/economy slot. Abilities here interact with bots,
@@ -155,36 +189,42 @@ export const MODULES: ModuleDefinition[] = [
     id: "singularity-harness",
     name: "Singularity Harness",
     type: "generator",
+    gameIndex: 30,
     uniqueAbility: "Increase bot range. Enemies hit by Flame Bot receive double damage.",
   },
   {
     id: "galaxy-compressor",
     name: "Galaxy Compressor",
     type: "generator",
+    gameIndex: 29,
     uniqueAbility: "Collecting recovery package reduces Ultimate Weapon cooldowns.",
   },
   {
     id: "pulsar-harvester",
     name: "Pulsar Harvester",
     type: "generator",
+    gameIndex: 28,
     uniqueAbility: "Projectile hits can reduce enemy Health and Attack level by 1.",
   },
   {
     id: "black-hole-digestor",
     name: "Black Hole Digestor",
     type: "generator",
+    gameIndex: 27,
     uniqueAbility: "Extra Coins/Kill Bonus for each free upgrade on current wave.",
   },
   {
     id: "project-funding",
     name: "Project Funding",
     type: "generator",
+    gameIndex: 43,
     uniqueAbility: "Tower damage multiplied by % of digits in current cash.",
   },
   {
     id: "restorative-bonus",
     name: "Restorative Bonus",
     type: "generator",
+    gameIndex: 47,
     uniqueAbility: "Packages grant 50% attack speed boost, decaying over 60 seconds.",
   },
   // Core — synergy slot. Abilities here amplify or combine other tower
@@ -193,36 +233,42 @@ export const MODULES: ModuleDefinition[] = [
     id: "om-chip",
     name: "Om Chip",
     type: "core",
+    gameIndex: 40,
     uniqueAbility: "Spotlight rotates to focus boss. Bosses reflect light increasing nearby enemy damage.",
   },
   {
     id: "harmony-conductor",
     name: "Harmony Conductor",
     type: "core",
+    gameIndex: 39,
     uniqueAbility: "Chance of poisoned enemies to miss-attack (halved for bosses).",
   },
   {
     id: "dimension-core",
     name: "Dimension Core",
     type: "core",
+    gameIndex: 38,
     uniqueAbility: "Chain lightning 60% chance to hit initial target. Shock chance and multiplier doubled.",
   },
   {
     id: "multiverse-nexus",
     name: "Multiverse Nexus",
     type: "core",
+    gameIndex: 37,
     uniqueAbility: "Death Wave, Golden Tower and Black Hole always activate together with averaged cooldown.",
   },
   {
     id: "magnetic-hook",
     name: "Magnetic Hook",
     type: "core",
+    gameIndex: 44,
     uniqueAbility: "Inner Land Mines fired at Bosses entering Tower range.",
   },
   {
     id: "primordial-collapse",
     name: "Primordial Collapse",
     type: "core",
+    gameIndex: 48,
     uniqueAbility: "Spawns additional Black Hole. Damage from enemies within decreased.",
   },
 ];
@@ -271,3 +317,28 @@ export const MODULES_BY_TYPE = {
 export const MODULE_BY_ID = Object.fromEntries(
   MODULES.map((m) => [m.id, m])
 );
+
+/**
+ * The game's common- and rare-BASE modules, by gameIndex. The tracker never
+ * tracks these, and Import Player Info ignores them at ANY rarity — rare
+ * modules merge up past Epic, so "rarity >= Epic" alone doesn't mean "epic
+ * module" (found on a real save).
+ *
+ * Lives here, next to MODULES, because it's part of the same game table (and
+ * config.test.ts checks no tracked module's gameIndex lands in it). Each
+ * original type block of ten is 2 commons, 4 rares, then 4 epics:
+ *   cannon    1-2 Energy/Matter Cannon; 3-6 Bounce/Swiftstrike/Rapidreach/Omniboost Blitzer
+ *   armor     11-12 Energy/Matter Barrier; 13-16 Nano Intercept, Photon Counter,
+ *             Solar Reflector, Diamond Nanowall
+ *   generator 21-22 Matter/Energy Converter; 23-26 Stellar Lift, Orbital Sail,
+ *             Solar Dyson Sphere, Antimatter Reactor
+ *   core      31-32 Energy/Matter Chip; 33-36 Chronosync, Eon Mind,
+ *             Galactic Librarian, Matrix Sim
+ * Every module added since (41+) has been an epic.
+ */
+export const COMMON_AND_RARE_BASE_GAME_INDEXES: ReadonlySet<number> = new Set([
+  1, 2, 3, 4, 5, 6,
+  11, 12, 13, 14, 15, 16,
+  21, 22, 23, 24, 25, 26,
+  31, 32, 33, 34, 35, 36,
+]);
