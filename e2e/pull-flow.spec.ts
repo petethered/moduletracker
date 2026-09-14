@@ -37,13 +37,15 @@ test.describe("Add pull flow", () => {
     await expect(page.locator("[data-testid='common-count-6']")).toHaveAttribute("aria-checked", "true");
   });
 
-  test("adds an epic via + Add Epic button (subtracts from rare)", async ({ page }) => {
+  test("adds an epic via + Add Epic button (subtracts from common)", async ({ page }) => {
     await page.click("button:has-text('Add 10x Pull')");
 
     await page.click("[data-testid='add-epic']");
 
-    // Rare should have dropped to 2 (selected button is 2)
-    await expect(page.locator("[data-testid='rare-count-2']")).toHaveAttribute("aria-checked", "true");
+    // Default 7 common / 3 rare -> the new epic takes a COMMON slot: 6 / 3.
+    // Commons are the bulk of every 10x, so that's the drop the epic replaced.
+    await expect(page.locator("[data-testid='common-count-6']")).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("[data-testid='rare-count-3']")).toHaveAttribute("aria-checked", "true");
     await expect(page.locator("[data-testid='epic-select-0']")).toBeVisible();
 
     // NOTE: do NOT click the SearchSelect trigger button here. The just-added
@@ -57,14 +59,26 @@ test.describe("Add pull flow", () => {
     await expect(page.getByRole("heading", { name: "Add 10x Pull" })).not.toBeVisible();
   });
 
-  test("removing an epic adds back to rare", async ({ page }) => {
+  test("removing an epic adds back to common", async ({ page }) => {
     await page.click("button:has-text('Add 10x Pull')");
     await page.click("[data-testid='add-epic']");
-    await expect(page.locator("[data-testid='rare-count-2']")).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("[data-testid='common-count-6']")).toHaveAttribute("aria-checked", "true");
 
     await page.click("[data-testid='epic-remove-0']");
+    await expect(page.locator("[data-testid='common-count-7']")).toHaveAttribute("aria-checked", "true");
     await expect(page.locator("[data-testid='rare-count-3']")).toHaveAttribute("aria-checked", "true");
     await expect(page.locator("[data-testid='epic-select-0']")).not.toBeVisible();
+  });
+
+  test("adding an epic takes from rare once commons are exhausted", async ({ page }) => {
+    await page.click("button:has-text('Add 10x Pull')");
+    // 0 common / 10 rare, so there is no common slot to convert.
+    await page.click("[data-testid='common-count-0']");
+    await expect(page.locator("[data-testid='rare-count-10']")).toHaveAttribute("aria-checked", "true");
+
+    await page.click("[data-testid='add-epic']");
+    await expect(page.locator("[data-testid='rare-count-9']")).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("[data-testid='common-count-0']")).toHaveAttribute("aria-checked", "true");
   });
 
   test("high Common/Rare buttons disable as epics are added", async ({ page }) => {
@@ -77,6 +91,63 @@ test.describe("Add pull flow", () => {
     // Button 8 should be disabled (8 > 10 - 3)
     await expect(page.locator("[data-testid='common-count-8']")).toBeDisabled();
     await expect(page.locator("[data-testid='common-count-7']")).toBeEnabled();
+  });
+
+  // Nested under "Add pull flow" to reuse its storage-clearing beforeEach.
+  test.describe("Save & Continue", () => {
+    test("saves, keeps the modal open, resets the form and shows a toast", async ({ page }) => {
+      await page.click("button:has-text('Add 10x Pull')");
+
+      await page.click("[data-testid='add-epic']");
+      await page.fill("[data-testid='epic-select-0'] input", "Sentry");
+      await page.locator("[data-testid='epic-select-0']").getByText("Sentry Protocol").click();
+
+      await page.click("button:has-text('Save & Continue')");
+
+      // Modal stays open for the next entry.
+      await expect(page.getByRole("heading", { name: "Add 10x Pull" })).toBeVisible();
+
+      // Toast reports what was just saved.
+      const toast = page.getByTestId("toast");
+      await expect(toast).toBeVisible();
+      await expect(toast).toContainText("Sentry Protocol");
+      await expect(toast).toContainText("6 common · 3 rare");
+
+      // Form is back to a fresh entry: no epic rows, default 7 common / 3 rare.
+      await expect(page.locator("[data-testid='epic-select-0']")).not.toBeVisible();
+      await expect(page.locator("[data-testid='common-count-7']")).toHaveAttribute("aria-checked", "true");
+      await expect(page.locator("[data-testid='rare-count-3']")).toHaveAttribute("aria-checked", "true");
+
+      // Enter a second pull in the same session, then close with a normal save.
+      await page.click("button:has-text('Save Pull')");
+      await expect(page.getByRole("heading", { name: "Add 10x Pull" })).not.toBeVisible();
+
+      await page.click("[data-tab='history']");
+      await expect(page.locator("table tbody tr")).toHaveCount(2);
+    });
+
+    test("is not offered when editing an existing pull", async ({ page }) => {
+      await page.click("button:has-text('Add 10x Pull')");
+      await page.click("button:has-text('Save Pull')");
+
+      await page.click("[data-tab='history']");
+      await page.click("[data-testid='edit-pull']");
+      await expect(page.getByRole("heading", { name: "Edit Pull" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save & Continue" })).toHaveCount(0);
+    });
+
+    test("a double-click saves exactly one pull", async ({ page }) => {
+      await page.click("button:has-text('Add 10x Pull')");
+      // After a save the form resets to a VALID 7/3 entry, so without the
+      // cooldown in PullForm the second click of a double-click would save
+      // a phantom blank pull.
+      await page.dblclick("button:has-text('Save & Continue')");
+      await expect(page.getByTestId("toast")).toBeVisible();
+      await page.click("button:has-text('Cancel')");
+
+      await page.click("[data-tab='history']");
+      await expect(page.locator("table tbody tr")).toHaveCount(1);
+    });
   });
 });
 

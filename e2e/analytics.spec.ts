@@ -20,8 +20,8 @@ test.describe("Analytics", () => {
     await page.goto("/");
 
     // Add a pull with an epic. The form defaults to 7 common / 3 rare; clicking
-    // "+ Add Epic" auto-subtracts one from rare, yielding the intended 7/2/1
-    // split. (The old <select data-testid='common-count'> API no longer exists —
+    // "+ Add Epic" auto-subtracts one from COMMON (see epicSlots.ts), yielding
+    // a 6/3/1 split. (The old <select data-testid='common-count'> API no longer exists —
     // counts are a button grid now, and the epic row is added via add-epic.)
     await page.click("button:has-text('Add 10x Pull')");
     await page.click("[data-testid='add-epic']");

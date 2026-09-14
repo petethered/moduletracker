@@ -5,7 +5,8 @@
  *   - Captures the user's input for a single 10x gacha pull: date, banner
  *     type, the list of epic modules received (0..10), and the
  *     common/rare split for the remaining drops.
- *   - Calls onSubmit with a fully-validated Omit<PullRecord, "id"> payload.
+ *   - Calls onSubmit (or onSaveAndContinue, add mode) with a fully-validated
+ *     Omit<PullRecord, "id"> payload.
  *
  * User flow it supports:
  *   - Opened by PullModal in either "add" or "edit" mode. The user expects
@@ -18,16 +19,37 @@
  *        That enforces 0..10 per bucket AND the hard invariant
  *        common + rare + epic === 10 (a 10x pull yields exactly 10 drops).
  *     2. Every epic row has a moduleId chosen (no blank SearchSelects).
- *   Both checks gate the "Save Pull" disabled state and the early-return
- *   in handleSubmit. Don't loosen one without the other.
+ *   Both checks are combined ONCE into `canSave`, which gates the "Save Pull"
+ *   and "Save & Continue" disabled states and the early-return in both save
+ *   handlers. Change the rule in `canSave`, never at a call site.
+ *
+ * --- Save & Continue (add mode only) ---
+ *   For logging a backlog of pulls in one sitting. Rendered only when the
+ *   parent passes onSaveAndContinue (PullModal does so in add mode only;
+ *   "continue" means nothing when editing one existing record). It hands the
+ *   payload to the parent, then resets the form IN PLACE rather than
+ *   remounting it:
+ *     * epics/counts/autoOpen go back to their fresh-form defaults;
+ *     * date and banner are KEPT, since a backlog is usually one day and one
+ *       banner (these are also what the sticky lastUsed* values now hold);
+ *     * keyboard focus stays on the Save & Continue button, so repeated
+ *       entry doesn't lose the user's place. Remounting via PullModal's key
+ *       would destroy the focused button and drop focus to <body>.
+ *     * a short cooldown ignores repeat clicks right after a save. The reset
+ *       form is itself VALID (7/3, no epics), so without it the second click
+ *       of a double-click (or a held Enter key) saves a phantom blank pull.
+ *       Not "disabled until edited": several identical 7/3 pulls in a row is
+ *       a legitimate backlog, and the user must be able to save them.
  *
  * --- Why "epic-first" entry (recent UX decision, do not undo) ---
  *   Real users open the form right after a pull and want to log epics
  *   FIRST — that's the rare/exciting data point. So:
  *     * The Epic Modules section is rendered ABOVE Rare/Common counts.
- *     * Clicking "+ Add Epic" appends a row AND auto-decrements rareCount
- *       (or commonCount if no rares left), so the "remaining 10 drops"
- *       math stays correct without the user touching the count buttons.
+ *     * Clicking "+ Add Epic" appends a row AND converts one non-epic drop
+ *       (COMMON first, then rare), so the "remaining 10 drops" math stays
+ *       correct without the user touching the count buttons. Removing an
+ *       epic returns the slot to common. The rule and its rationale live in
+ *       epicSlots.ts (unit-tested); the handlers here only apply it.
  *     * The new SearchSelect auto-opens (see autoOpenRowId below) so the
  *       user can immediately type/scroll to pick the module — one tap
  *       fewer per epic logged. This was an explicit ask; preserve it.
@@ -57,14 +79,17 @@
  *     log multiple pulls on the same banner in a row.
  *   - commonCount: 7, rareCount: 3 — the empirically most common 10x
  *     outcome with zero epics. Saves taps when the user pulled nothing
- *     interesting.
+ *     interesting. Single-sourced in DEFAULT_COMMON_COUNT/DEFAULT_RARE_COUNT
+ *     because both initial state and the Save & Continue reset use them.
  */
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { DateInput } from "../../components/ui/DateInput";
 import { SearchSelect } from "../../components/ui/SearchSelect";
 import { Button } from "../../components/ui/Button";
 import { MetaLabel } from "../../components/ui/MetaLabel";
+import { BANNER_LABELS } from "../../config/banners";
 import { MODULES } from "../../config/modules";
+import { returnSlotFromEpic, takeSlotForEpic } from "./epicSlots";
 import { validatePullForm } from "./validation";
 import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
@@ -74,9 +99,25 @@ import { useRenderLog, logEvent } from "../../utils/renderLog";
 interface PullFormProps {
   initialData?: PullRecord;
   onSubmit: (data: Omit<PullRecord, "id">) => void;
+  /**
+   * When provided, renders "Save & Continue": saves via this callback and then
+   * resets the form for another entry instead of closing. Add mode only; see
+   * the file header.
+   */
+  onSaveAndContinue?: (data: Omit<PullRecord, "id">) => void;
   onCancel: () => void;
   onDelete?: () => void;
 }
+
+// Fresh-form split for a 10x with no epics. See "Defaults" in the file header.
+const DEFAULT_COMMON_COUNT = 7;
+const DEFAULT_RARE_COUNT = 3;
+
+// Save & Continue ignores repeat clicks for this long after a save. Covers
+// the second click of a double-click (browsers space them well under 500ms)
+// and key-repeat from a held Enter, while being far shorter than any real
+// "read the toast, then log the next pull" gap. See the file header.
+const SAVE_AND_CONTINUE_COOLDOWN_MS = 500;
 
 // Each epic slot tracks its own stable rowId so React keys survive
 // add/remove/reorder. Two rows can have the same moduleId (rare but legal —
@@ -198,7 +239,7 @@ function CountButtonRow({ label, value, max, onSelect, testIdPrefix, labelColor 
   );
 }
 
-export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullFormProps) {
+export function PullForm({ initialData, onSubmit, onSaveAndContinue, onCancel, onDelete }: PullFormProps) {
   // Stable id linking the Banner <label> to its <select>. useId rather than a
   // literal because PullModal and the edit flow can have a PullForm mounted
   // while another modal is open, and duplicate ids would cross-wire labels.
@@ -223,9 +264,9 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   // Default 7/3 split: the empirically most common 10x outcome with zero
   // epics. Use ?? not || so an explicit 0 in initialData survives.
   const [commonCount, setCommonCount] = useState(
-    initialData?.commonCount ?? 7
+    initialData?.commonCount ?? DEFAULT_COMMON_COUNT
   );
-  const [rareCount, setRareCount] = useState(initialData?.rareCount ?? 3);
+  const [rareCount, setRareCount] = useState(initialData?.rareCount ?? DEFAULT_RARE_COUNT);
   // Map each existing epic moduleId to a fresh rowId — initialData stores
   // only moduleIds (PullRecord.epicModules: string[]), so we synthesize
   // rowIds for the form's working state.
@@ -238,9 +279,14 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   // autoOpenRowId triggers SearchSelect.defaultOpen on the row matching
   // this id. Set when the user clicks "+ Add Epic" so the picker pops open
   // immediately — the explicit-UX decision called out in the file header.
-  // Only one row at a time gets this token; we don't bother clearing it
-  // because SearchSelect only reads defaultOpen on mount.
+  // Only one row at a time gets this token. SearchSelect only reads
+  // defaultOpen on mount, so a stale value is harmless; the Save & Continue
+  // reset still clears it so the fresh form carries no leftover state.
   const [autoOpenRowId, setAutoOpenRowId] = useState<string | null>(null);
+  // performance.now() of the last Save & Continue, for the repeat-click
+  // cooldown. A ref, not state: it must never trigger a render, and it must be
+  // readable synchronously by a click that lands before React re-renders.
+  const lastSaveAndContinueAtRef = useRef(-Infinity);
 
   // Derived state — never store these.
   const epicCount = epics.length;
@@ -251,6 +297,9 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
   // Every epic row must have a real moduleId before save. A blank row is
   // possible momentarily after "+ Add Epic" + auto-open + user dismiss.
   const allEpicsSelected = epics.every((r) => r.moduleId !== "");
+  // THE save gate. Used by both save buttons' disabled state and both save
+  // handlers' early-return; see "Validation contract" in the file header.
+  const canSave = errors.length === 0 && allEpicsSelected;
   // "+ Add Epic" only makes sense if there's a non-epic drop to convert
   // (rare or common > 0) and we haven't hit the 10-epic ceiling.
   const canAddEpic = epicCount < 10 && (rareCount > 0 || commonCount > 0);
@@ -281,33 +330,30 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
 
   // Add a new epic slot. Auto-open the SearchSelect so the user can
   // immediately type the module name (epic-first UX, see file header).
-  // Decrements rare first, then common, to convert one of the existing
-  // non-epic drops into an epic — preserves the 10-drop invariant.
+  // takeSlotForEpic converts one existing non-epic drop (common first) into
+  // the epic, preserving the 10-drop invariant. Rule + rationale: epicSlots.ts.
   function handleAddEpic() {
     if (epicCount >= 10) return; // Hard ceiling — also covered by canAddEpic.
-    if (rareCount === 0 && commonCount === 0) return; // Nothing to convert.
+    const next = takeSlotForEpic({ common: commonCount, rare: rareCount });
+    if (!next) return; // Nothing to convert.
     logEvent("PullForm.handleAddEpic", { epicCount, rareCount, commonCount });
     const newRowId = createRowId();
     setEpics([...epics, { rowId: newRowId, moduleId: "" }]);
     // Tag this row for auto-open. SearchSelect.defaultOpen reads it on mount.
     setAutoOpenRowId(newRowId);
-    if (rareCount > 0) {
-      setRareCount(rareCount - 1);
-    } else {
-      setCommonCount(commonCount - 1);
-    }
+    setCommonCount(next.common);
+    setRareCount(next.rare);
   }
 
-  // Remove an epic and add the freed slot back to Rare. WHY rare and not
-  // common: when a user mis-tapped "Add Epic" they almost always meant to
-  // log a rare, not a common (epics get added by converting from rare
-  // first in handleAddEpic, so this is the inverse). If we returned the
-  // slot to common instead, the rare count would silently drop to 0 over
-  // multiple add/remove cycles.
+  // Remove an epic and return the freed slot via returnSlotFromEpic (to
+  // common). It must stay the inverse of takeSlotForEpic — see the INVARIANT
+  // in epicSlots.ts, enforced by its unit test.
   function handleRemoveEpic(rowId: string) {
     logEvent("PullForm.handleRemoveEpic", { rowId, epicCount });
     setEpics(epics.filter((r) => r.rowId !== rowId));
-    setRareCount(rareCount + 1);
+    const next = returnSlotFromEpic({ common: commonCount, rare: rareCount });
+    setCommonCount(next.common);
+    setRareCount(next.rare);
   }
 
   // Update the chosen module on a specific epic row. Identity is by rowId,
@@ -317,25 +363,53 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
     setEpics(epics.map((r) => (r.rowId === rowId ? { ...r, moduleId } : r)));
   }
 
-  // Final guard before calling onSubmit. Mirrors the disabled state of the
-  // Save button — if either check fails we silently bail. The disabled
-  // button should already prevent reaching here, but defence in depth.
-  // Persists the date/banner as "last used" so the next pull is faster.
-  // gemsSpent is hardcoded to 200 — that's the canonical 10x cost in The
-  // Tower; if the game ever changes this, surface it as a settings option
-  // rather than re-hardcoding.
-  function handleSubmit() {
-    if (errors.length > 0 || !allEpicsSelected) return;
-    setLastUsedDate(date);
-    setLastUsedBannerType(bannerType);
-    onSubmit({
+  // Pure: the record to save, from current form state. Callers must check
+  // `canSave` first. gemsSpent is hardcoded to 200 — that's the canonical
+  // 10x cost in The Tower; if the game ever changes this, surface it as a
+  // settings option rather than re-hardcoding.
+  function buildPayload(): Omit<PullRecord, "id"> {
+    return {
       date,
       commonCount,
       rareCount,
       epicModules: epics.map((r) => r.moduleId),
       gemsSpent: 200,
       bannerType,
-    });
+    };
+  }
+
+  // Side effect, kept separate from buildPayload so that one stays pure:
+  // remember this date/banner as the session's sticky defaults so the next
+  // pull is faster. Both save paths call it.
+  function rememberStickyDefaults() {
+    setLastUsedDate(date);
+    setLastUsedBannerType(bannerType);
+  }
+
+  // `canSave` guard mirrors the disabled button; defence in depth.
+  function handleSubmit() {
+    if (!canSave) return;
+    rememberStickyDefaults();
+    onSubmit(buildPayload());
+  }
+
+  // Save, then reset for the next entry. Date and banner deliberately
+  // survive; see "Save & Continue" in the file header.
+  function handleSaveAndContinue() {
+    if (!canSave || !onSaveAndContinue) return;
+    const now = performance.now();
+    if (now - lastSaveAndContinueAtRef.current < SAVE_AND_CONTINUE_COOLDOWN_MS) {
+      logEvent("PullForm.handleSaveAndContinue.ignoredRepeat", {});
+      return;
+    }
+    lastSaveAndContinueAtRef.current = now;
+    logEvent("PullForm.handleSaveAndContinue", { epicCount, rareCount, commonCount });
+    rememberStickyDefaults();
+    onSaveAndContinue(buildPayload());
+    setEpics([]);
+    setCommonCount(DEFAULT_COMMON_COUNT);
+    setRareCount(DEFAULT_RARE_COUNT);
+    setAutoOpenRowId(null);
   }
 
   return (
@@ -354,15 +428,19 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
           onChange={(e) => setBannerType(e.target.value as BannerType)}
           className={selectClass}
         >
-          <option value="standard">Standard</option>
-          <option value="featured">Featured</option>
-          <option value="lucky">Lucky</option>
+          {/* Rendered from the shared label map (config/banners.ts) so the
+              form and the Save & Continue toast can't drift apart. */}
+          {Object.entries(BANNER_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
         </select>
       </div>
 
       {/*
         Epic Modules section — rendered ABOVE Common/Rare deliberately
-        (epic-first UX). Adding an epic auto-decrements Rare/Common, and
+        (epic-first UX). Adding an epic auto-decrements Common (then Rare), and
         the freshly-added row's SearchSelect auto-opens. See file header.
       */}
       <div>
@@ -457,18 +535,29 @@ export function PullForm({ initialData, onSubmit, onCancel, onDelete }: PullForm
             Delete
           </Button>
         )}
-        <div className="flex gap-3 ml-auto">
+        {/* flex-wrap + justify-end: add mode has three buttons, which is tight
+            at ~400px phone widths. Wrapping keeps them right-aligned instead
+            of overflowing the modal. */}
+        <div className="flex flex-wrap justify-end gap-3 ml-auto">
           <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
-          {/*
-            Save is gated by BOTH validation rules (10-drop invariant) AND
-            the all-epics-selected check. Keep both — see file header
-            "Validation contract" section.
-          */}
+          {/* Both save buttons are gated by `canSave` (10-drop invariant AND
+              all epics selected); see "Validation contract" in the header.
+              Save & Continue is add-mode only (onSaveAndContinue prop) and
+              uses secondary styling so "Save Pull" stays the one primary CTA. */}
+          {onSaveAndContinue && (
+            <Button
+              variant="secondary"
+              onClick={handleSaveAndContinue}
+              disabled={!canSave}
+            >
+              Save &amp; Continue
+            </Button>
+          )}
           <Button
             onClick={handleSubmit}
-            disabled={errors.length > 0 || !allEpicsSelected}
+            disabled={!canSave}
           >
             Save Pull
           </Button>

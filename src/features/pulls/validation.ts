@@ -7,7 +7,8 @@
  *
  * User flow it supports:
  *   - PullForm calls this on every render to drive the disabled state of
- *     "Save Pull" and (eventually) inline error messaging.
+ *     both "Save Pull" and "Save & Continue" (via its `canSave` flag) and
+ *     (eventually) inline error messaging.
  *
  * Why pure / framework-free:
  *   - Kept as a plain function (no React, no store) so unit tests in
