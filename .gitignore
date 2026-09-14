@@ -9,3 +9,7 @@ test-results/
 .DS_Store
 .dev.vars
 worker/.wrangler/
+
+# Personal player data — never commit
+playerInfo.dat
+importToFix.json
