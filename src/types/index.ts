@@ -81,7 +81,7 @@ export interface ModuleDefinition {
   name: string;
   /** Logical category — see ModuleType. */
   type: ModuleType;
-  /** Free-form description of the module's unique ability; UI shows verbatim. */
+  /** Verbatim in-game tooltip text for the module's unique ability. Not rendered anywhere yet — see modules.ts header. */
   uniqueAbility: string;
 }
 

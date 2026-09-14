@@ -3,14 +3,14 @@ import { MODULES } from "../config/modules";
 import { MODULE_RARITY_COLORS, MODULE_RARITY_ORDER } from "../config/moduleRarities";
 
 describe("Module config", () => {
-  it("has exactly 25 modules", () => {
-    expect(MODULES).toHaveLength(25);
+  it("has exactly 26 modules", () => {
+    expect(MODULES).toHaveLength(26);
   });
 
-  it("has 6 cannon, 7 armor, 6 generator and 6 core modules", () => {
+  it("has 7 cannon, 7 armor, 6 generator and 6 core modules", () => {
     const byType = { cannon: 0, armor: 0, generator: 0, core: 0 };
     MODULES.forEach((m) => byType[m.type]++);
-    expect(byType.cannon).toBe(6);
+    expect(byType.cannon).toBe(7);
     expect(byType.armor).toBe(7);
     expect(byType.generator).toBe(6);
     expect(byType.core).toBe(6);

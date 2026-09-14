@@ -6,7 +6,8 @@
  * with each tile colored by the module's *current* rarity.
  *
  * Game-domain concept:
- *   The Tower has a fixed roster of epic modules across four types. Players
+ *   The Tower has a finite (but growing) roster of epic modules across four
+ *   types — always derive counts from MODULES, never hardcode them. Players
  *   pull duplicates and merge them up the rarity ladder
  *   (epic -> legendary -> mythic -> ancestral, with stars beyond). This grid
  *   answers two questions at a glance:
@@ -77,8 +78,9 @@ export function ModuleCollectionGrid() {
               {/* Responsive tile grid: 2 cols on phones, 3 on tablets, 6 on
                   desktop. Tile sizing kept tight (px-1.5 py-1.5) to keep the
                   collection compact at desktop widths.
-                  NOTE: type groups are no longer uniformly 6 wide — Armor has 7
-                  modules and deliberately wraps to a second row rather than
+                  NOTE: type groups are not uniformly 6 wide — at desktop (md+)
+                  widths, any group with more than 6 modules deliberately wraps to
+                  a second row rather than
                   shrinking every tile to fit. Do NOT retune the column count to
                   the current largest group; the roster changes, and each group
                   is rendered independently so wrapping is the graceful case. */}

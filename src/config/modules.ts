@@ -26,8 +26,12 @@
  *     grids. No other file needs to be edited (filters/grids derive from this).
  *   - Removing a module here will orphan any existing pull records pointing at
  *     its id. Selectors must tolerate unknown ids (verify before deleting).
- *   - `uniqueAbility` strings are player-facing copy lifted from the in-game
- *     tooltips; keep them concise — they render in tight tooltip/card spaces.
+ *   - `uniqueAbility` strings are copied verbatim from the in-game tooltips,
+ *     including placeholder values like "X%" or a bare "%" where the number
+ *     varies by rarity — don't "fix" those. NOTE: no component renders this
+ *     field today (grep for `uniqueAbility` — only the type and this file hit).
+ *     It is reference data kept for a future tooltip/card; keep it concise so
+ *     it fits one when that lands.
  */
 
 import type { ModuleDefinition } from "../types";
@@ -56,7 +60,9 @@ import type { ModuleDefinition } from "../types";
  */
 export const MODULES: ModuleDefinition[] = [
   // Cannon — primary offensive slot. Module abilities here mostly modify
-  // damage output, crits, or special on-hit effects.
+  // damage output, crits, or on-hit / on-kill effects. Not purely damage:
+  // Gilded Sniper's on-kill effect is economic (coin bonuses), so don't assume
+  // coin/economy modules live only in the Generator group.
   {
     id: "astral-deliverance",
     name: "Astral Deliverance",
@@ -92,6 +98,12 @@ export const MODULES: ModuleDefinition[] = [
     name: "Amplifying Strike",
     type: "cannon",
     uniqueAbility: "Killing a boss or elite increases Tower Damage by 5x temporarily.",
+  },
+  {
+    id: "gilded-sniper",
+    name: "Gilded Sniper",
+    type: "cannon",
+    uniqueAbility: "On Enemy Death: X% chance to apply all active coin bonuses, even if not in Range.",
   },
   // Armor — defensive slot. Abilities here cluster around damage reduction,
   // walls, landmines, shockwaves, and orbiting electrons.
