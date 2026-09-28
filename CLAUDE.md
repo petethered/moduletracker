@@ -23,6 +23,7 @@
 ## Architecture
 - Feature-based folder structure: `src/features/{dashboard,history,modules,analytics,pulls,settings,auth,screenshot}/`
 - Shared UI components: `src/components/ui/`
+- Cross-site nav bar: `src/shared/TowerSitesNav.tsx` — canonical copy lives in tower-summary-graphics (same path); copy it over byte-for-byte, don't edit it here
 - Store slices: `src/store/{pullsSlice,modulesSlice,uiSlice,settingsSlice,authSlice}.ts`
 - Selectors for derived data: `src/store/selectors.ts`
 - Cloud sync services: `src/services/{api,auth,sync}.ts` (talks to the worker)

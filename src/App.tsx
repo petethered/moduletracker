@@ -63,6 +63,7 @@ import { SyncStatus } from "./features/auth/SyncStatus";
 import { SyncInitializer } from "./features/auth/SyncInitializer";
 import { isAuthenticated } from "./services/api";
 import { useRenderLog } from "./utils/renderLog";
+import { TowerSitesNav } from "./shared/TowerSitesNav";
 
 // Lazy boundaries for code-splitting. Each .then(...) shim turns a named
 // export into the default export shape that React.lazy expects. Keep the
@@ -123,6 +124,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[var(--color-navy-900)] text-gray-200">
+      {/* Cross-site bar shared with towersummary.com and effectivepathplanner.com
+          (canonical copy in tower-summary-graphics/src/shared). */}
+      <TowerSitesNav current="modules" />
       {/* Header */}
       <header
         className="flex items-center justify-between px-5 py-4 bg-[var(--color-navy-800)]"
