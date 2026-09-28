@@ -3,17 +3,17 @@ import { COMMON_AND_RARE_BASE_GAME_INDEXES, MODULES } from "../config/modules";
 import { MODULE_RARITY_COLORS, MODULE_RARITY_ORDER } from "../config/moduleRarities";
 
 describe("Module config", () => {
-  it("has exactly 26 modules", () => {
-    expect(MODULES).toHaveLength(26);
+  it("has exactly 27 modules", () => {
+    expect(MODULES).toHaveLength(27);
   });
 
-  it("has 7 cannon, 7 armor, 6 generator and 6 core modules", () => {
+  it("has 7 cannon, 7 armor, 6 generator and 7 core modules", () => {
     const byType = { cannon: 0, armor: 0, generator: 0, core: 0 };
     MODULES.forEach((m) => byType[m.type]++);
     expect(byType.cannon).toBe(7);
     expect(byType.armor).toBe(7);
     expect(byType.generator).toBe(6);
-    expect(byType.core).toBe(6);
+    expect(byType.core).toBe(7);
   });
 
   it("has unique IDs", () => {
@@ -39,9 +39,11 @@ describe("Module config", () => {
     expect(overlap.map((m) => m.id)).toEqual([]);
   });
 
-  // Spot-checks against the game's own index table (verified against a real
-  // playerInfo.dat and mytower.app's importer). Guards against a copy-paste
-  // shifting indexes when a module is added.
+  // Spot-checks against the game's own index table (7-51 verified against a
+  // real playerInfo.dat; 52 from mytower.app's importer + the in-game card —
+  // see the gameIndex note in modules.ts). This only restates what modules.ts
+  // claims, so it guards against a copy-paste shifting indexes when a module
+  // is added, NOT against a wrong index in the first place.
   it("maps game indexes the way playerInfo.dat does", () => {
     const byIndex = Object.fromEntries(MODULES.map((m) => [m.gameIndex, m.id]));
     expect(byIndex[7]).toBe("havoc-bringer");
@@ -50,6 +52,7 @@ describe("Module config", () => {
     expect(byIndex[40]).toBe("om-chip");
     expect(byIndex[50]).toBe("sentry-protocol");
     expect(byIndex[51]).toBe("gilded-sniper");
+    expect(byIndex[52]).toBe("tactical-barrage");
   });
 });
 

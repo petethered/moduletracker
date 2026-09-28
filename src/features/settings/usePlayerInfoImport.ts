@@ -8,7 +8,8 @@
  * writes nothing.
  *
  * Why one batched store action (not updateModuleRarity per module): one
- * persist write and one sync-subscriber pass instead of up to 26. Cloud sync
+ * persist write and one sync-subscriber pass instead of one per raised module
+ * (up to the whole roster). Cloud sync
  * debounces pushes either way, so the cloud still sees a single PUT.
  */
 import { useCallback, useState } from "react";

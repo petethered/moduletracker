@@ -34,11 +34,13 @@
  *     through it. It is NOT an ordering: the game numbers modules in release
  *     waves, and this file's order is the UI order. Must be unique (config
  *     test). Source of truth: the game itself; mytower.app's save importer
- *     exposes the same table, and indexes 7-51 were cross-checked against a
- *     real save. The game also has epics the tracker doesn't list yet
- *     (49 Acceleration Augment, 52 Tactical Barrage) — importing a save that
- *     holds one lists it under "Skipped modules the tracker doesn't support
- *     yet (game #N)" rather than failing.
+ *     exposes the same table. Indexes 7-51 were additionally cross-checked
+ *     against a real save; 52 (Tactical Barrage) comes from that table plus
+ *     the in-game module card and has NOT been seen in a save yet — no test
+ *     can catch a wrong gameIndex, so treat an unverified one with care.
+ *     The game also has an epic the tracker doesn't list yet (49 Acceleration
+ *     Augment) — importing a save that holds it lists it under "Skipped
+ *     modules the tracker doesn't support yet (game #N)" rather than failing.
  *     If the game ever adds a new COMMON or RARE base module, add its index to
  *     COMMON_AND_RARE_BASE_GAME_INDEXES below, or imports will report it as
  *     unsupported.
@@ -46,8 +48,11 @@
  *     including placeholder values like "X%" or a bare "%" where the number
  *     varies by rarity — don't "fix" those. NOTE: no component renders this
  *     field today (grep for `uniqueAbility` — only the type and this file hit).
- *     It is reference data kept for a future tooltip/card; keep it concise so
- *     it fits one when that lands.
+ *     It is reference data kept for a future tooltip/card. VERBATIM WINS OVER
+ *     BREVITY: don't trim an entry to fit a layout. Most are one short
+ *     sentence, but the game's own copy can run long (tactical-barrage is
+ *     ~190 chars, two sentences), so whatever renders this must wrap rather
+ *     than assume ~90 characters.
  */
 
 import type { ModuleDefinition } from "../types";
@@ -270,6 +275,13 @@ export const MODULES: ModuleDefinition[] = [
     type: "core",
     gameIndex: 48,
     uniqueAbility: "Spawns additional Black Hole. Damage from enemies within decreased.",
+  },
+  {
+    id: "tactical-barrage",
+    name: "Tactical Barrage",
+    type: "core",
+    gameIndex: 52,
+    uniqueAbility: "Doubles Smart Missile's Radius and Amplifier lab bonuses. Fires a Homing Missile every 14s, targeting the enemy with highest missile stack and focusing active Smart Missiles to the new target.",
   },
 ];
 

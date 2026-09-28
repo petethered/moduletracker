@@ -6,7 +6,14 @@ import {
   parsePlayerInfo,
   planModuleProgressImport,
 } from "../features/settings/parsePlayerInfo";
+import { MODULES } from "../config/modules";
 import { buildPlayerInfoSave, GameRarity as R } from "./helpers/playerInfoSaveBuilder";
+
+// One past the roster's highest gameIndex: untracked by construction, always
+// greater than 49 (so the ascending-order assertion below holds) and never in
+// COMMON_AND_RARE_BASE_GAME_INDEXES (all <= 36). Derived so that adding a
+// module doesn't silently turn this fixture into a tracked one.
+const UNTRACKED_GAME_INDEX = Math.max(...MODULES.map((m) => m.gameIndex)) + 1;
 
 describe("parsePlayerInfo", () => {
   it("reads epic+ modules from inventory, equipped and assist slots", () => {
@@ -77,13 +84,13 @@ describe("parsePlayerInfo", () => {
     const save = buildPlayerInfoSave({
       inventory: [
         { infoIndex: 49, rarity: R.epic },      // Acceleration Augment — not in the roster
-        { infoIndex: 52, rarity: R.legendary }, // Tactical Barrage — not in the roster
+        { infoIndex: UNTRACKED_GAME_INDEX, rarity: R.legendary }, // stands in for a future module
         { infoIndex: 8, rarity: R.epic },       // Death Penalty
       ],
     });
     expect(parsePlayerInfo(save)).toEqual({
       modules: { "death-penalty": "epic" },
-      unsupportedGameIndexes: [49, 52],
+      unsupportedGameIndexes: [49, UNTRACKED_GAME_INDEX],
     });
   });
 
