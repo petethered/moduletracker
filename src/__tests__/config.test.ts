@@ -3,16 +3,16 @@ import { COMMON_AND_RARE_BASE_GAME_INDEXES, MODULES } from "../config/modules";
 import { MODULE_RARITY_COLORS, MODULE_RARITY_ORDER } from "../config/moduleRarities";
 
 describe("Module config", () => {
-  it("has exactly 27 modules", () => {
-    expect(MODULES).toHaveLength(27);
+  it("has exactly 28 modules", () => {
+    expect(MODULES).toHaveLength(28);
   });
 
-  it("has 7 cannon, 7 armor, 6 generator and 7 core modules", () => {
+  it("has 7 cannon, 7 armor, 7 generator and 7 core modules", () => {
     const byType = { cannon: 0, armor: 0, generator: 0, core: 0 };
     MODULES.forEach((m) => byType[m.type]++);
     expect(byType.cannon).toBe(7);
     expect(byType.armor).toBe(7);
-    expect(byType.generator).toBe(6);
+    expect(byType.generator).toBe(7);
     expect(byType.core).toBe(7);
   });
 
@@ -40,7 +40,7 @@ describe("Module config", () => {
   });
 
   // Spot-checks against the game's own index table (7-51 verified against a
-  // real playerInfo.dat; 52 from mytower.app's importer + the in-game card —
+  // real playerInfo.dat; 52-53 from mytower.app's importer + the in-game card —
   // see the gameIndex note in modules.ts). This only restates what modules.ts
   // claims, so it guards against a copy-paste shifting indexes when a module
   // is added, NOT against a wrong index in the first place.
@@ -53,6 +53,7 @@ describe("Module config", () => {
     expect(byIndex[50]).toBe("sentry-protocol");
     expect(byIndex[51]).toBe("gilded-sniper");
     expect(byIndex[52]).toBe("tactical-barrage");
+    expect(byIndex[53]).toBe("infinity-threshold");
   });
 });
 

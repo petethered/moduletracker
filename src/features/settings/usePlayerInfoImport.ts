@@ -9,8 +9,8 @@
  *
  * Why one batched store action (not updateModuleRarity per module): one
  * persist write and one sync-subscriber pass instead of one per raised module
- * (up to the whole roster). Cloud sync
- * debounces pushes either way, so the cloud still sees a single PUT.
+ * (up to the whole roster). Cloud sync debounces pushes either way, so the
+ * cloud still sees a single PUT.
  */
 import { useCallback, useState } from "react";
 import { useStore } from "../../store";

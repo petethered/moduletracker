@@ -35,9 +35,10 @@
  *     waves, and this file's order is the UI order. Must be unique (config
  *     test). Source of truth: the game itself; mytower.app's save importer
  *     exposes the same table. Indexes 7-51 were additionally cross-checked
- *     against a real save; 52 (Tactical Barrage) comes from that table plus
- *     the in-game module card and has NOT been seen in a save yet — no test
- *     can catch a wrong gameIndex, so treat an unverified one with care.
+ *     against a real save; 52 (Tactical Barrage) and 53 (Infinity Threshold)
+ *     come from that table plus the in-game module card and have NOT been seen
+ *     in a save yet — no test can catch a wrong gameIndex, so treat an
+ *     unverified one with care.
  *     The game also has an epic the tracker doesn't list yet (49 Acceleration
  *     Augment) — importing a save that holds it lists it under "Skipped
  *     modules the tracker doesn't support yet (game #N)" rather than failing.
@@ -49,7 +50,11 @@
  *     varies by rarity — don't "fix" those. NOTE: no component renders this
  *     field today (grep for `uniqueAbility` — only the type and this file hit).
  *     It is reference data kept for a future tooltip/card. VERBATIM WINS OVER
- *     BREVITY: don't trim an entry to fit a layout. Most are one short
+ *     BREVITY: don't trim an entry to fit a layout, and don't tokenise the
+ *     numbers in it to run them through formatNumber — the game doesn't
+ *     localise its own tooltips, so these strings are deliberately exempt
+ *     from the locale-formatting convention (infinity-threshold's "1000" is
+ *     the first 4-digit one). Most are one short
  *     sentence, but the game's own copy can run long (tactical-barrage is
  *     ~190 chars, two sentences), so whatever renders this must wrap rather
  *     than assume ~90 characters.
@@ -231,6 +236,13 @@ export const MODULES: ModuleDefinition[] = [
     type: "generator",
     gameIndex: 47,
     uniqueAbility: "Packages grant 50% attack speed boost, decaying over 60 seconds.",
+  },
+  {
+    id: "infinity-threshold",
+    name: "Infinity Threshold",
+    type: "generator",
+    gameIndex: 53,
+    uniqueAbility: "Free Upgrades to Damage, Health, and Health Regen may exceed the in-run limit by 1000 levels.",
   },
   // Core — synergy slot. Abilities here amplify or combine other tower
   // systems (chain lightning, Death Wave/Golden Tower/Black Hole, etc.).
