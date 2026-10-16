@@ -40,7 +40,7 @@
  *   bootstrap so prediction selectors don't return 0 with empty history.
  */
 
-import type { BannerType, PullRecord } from "../types";
+import type { BannerType, ModuleProgress, PullRecord } from "../types";
 
 /**
  * Sort pulls chronologically (oldest first).
@@ -366,6 +366,31 @@ export function selectUniqueEpicsFound(pulls: PullRecord[]): number {
     }
   }
   return unique.size;
+}
+
+/**
+ * Module ids the user has COLLECTED: pulled at least once (in `pulls`) OR with
+ * a rarity recorded in `moduleProgress`. Owning a module at any rarity proves
+ * the user got it, even when that pull was never logged.
+ *
+ * Why not pulls alone: Import Player Info sets rarities for every module in the
+ * save, but the save's pull log only holds the last 15 ten-pulls, so most owned
+ * modules have no pull in history. A pulls-only "found" left those tiles grey
+ * in the dashboard Collection grid (bug seen on a real import, 2026-10-16).
+ *
+ * Used by: ModuleCollectionGrid (tile colour + "n/total" header).
+ * Deliberately NOT used by selectUniqueEpicsFound's consumers (Unique Epics
+ * stat, coupon-collector prediction): those are statistics over pull history.
+ */
+export function selectCollectedModuleIds(
+  pulls: PullRecord[],
+  moduleProgress: Record<string, ModuleProgress>
+): Set<string> {
+  const ids = new Set<string>(Object.keys(moduleProgress));
+  for (const p of pulls) {
+    for (const moduleId of p.epicModules) ids.add(moduleId);
+  }
+  return ids;
 }
 
 /**

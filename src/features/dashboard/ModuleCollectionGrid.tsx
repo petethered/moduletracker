@@ -11,28 +11,30 @@
  *   pull duplicates and merge them up the rarity ladder
  *   (epic -> legendary -> mythic -> ancestral, with stars beyond). This grid
  *   answers two questions at a glance:
- *     1. "Which modules have I ever pulled?"  -> `found` flag from pull counts.
+ *     1. "Which modules do I have?"  -> `isCollected` from selectCollectedModuleIds:
+ *        pulled at least once OR has a rarity in `moduleProgress`.
  *     2. "What rarity have I gotten each one to?" -> `currentRarity` from
- *        `moduleProgress` (manually advanced by the user as they merge).
+ *        `moduleProgress` (set by hand, or by Import Player Info).
  *
  * Selectors / store reads:
- *   - `useStore.pulls`           — used by `selectModulePullCounts` to count
- *                                  how many copies of each module the user
- *                                  has pulled (>0 means "found").
- *   - `useStore.moduleProgress`  — per-module current rarity tracked manually
- *                                  by the user, persisted to localStorage.
+ *   - `useStore.pulls` + `useStore.moduleProgress` -> selectCollectedModuleIds.
+ *   - `useStore.moduleProgress`  — per-module current rarity, persisted.
  *
  * Why two data sources: a module appearing in `pulls` proves the user *got*
  * it once, but doesn't tell us its present merged rarity (which can only go
- * up via player action). `moduleProgress` is the source of truth for rarity.
+ * up via player action). `moduleProgress` is the source of truth for rarity,
+ * AND having one proves ownership too. That second point matters after a save
+ * import: rarities arrive for every owned module, but the save's pull log only
+ * covers the last 15 ten-pulls. Found-by-pulls-only left those tiles grey.
  */
 
 import { useStore } from "../../store";
 import { MODULES, MODULES_BY_TYPE } from "../../config/modules";
-import { selectModulePullCounts } from "../../store/selectors";
+import { selectCollectedModuleIds } from "../../store/selectors";
 import { getModuleRarityColor } from "../../config/moduleRarities";
 import { TEXT_MUTED } from "../../config/runtimeColors";
 import { MetaLabel } from "../../components/ui/MetaLabel";
+import { formatInteger } from "../../utils/formatNumber";
 import {
   MODULE_TYPE_COLORS,
   MODULE_TYPE_ORDER,
@@ -47,19 +49,23 @@ import {
 export function ModuleCollectionGrid() {
   const pulls = useStore((s) => s.pulls);
   const moduleProgress = useStore((s) => s.moduleProgress);
-  // counts: { [moduleId]: numTimesPulled }. Only modules the user has *ever*
-  // pulled appear as keys, so `Object.keys(counts).length` == "modules found".
-  const counts = selectModulePullCounts(pulls);
-  const foundCount = Object.keys(counts).length;
+  // Collected = pulled at least once OR has a rarity recorded. Rarity counts
+  // because Import Player Info sets rarities for every owned module while the
+  // save only brings in its last 15 pulls (see selectCollectedModuleIds).
+  const collected = selectCollectedModuleIds(pulls, moduleProgress);
+  // Count CATALOG modules only, not collected.size: moduleProgress can hold ids
+  // that aren't in MODULES (old JSON imports, sync, a module later removed
+  // from config), which would push the header past 100% (e.g. "27/26").
+  const collectedCount = MODULES.filter((m) => collected.has(m.id)).length;
   const totalCount = MODULES.length;
 
   return (
     <div className="bg-[var(--color-navy-800)] rounded-xl p-4 border border-[var(--color-navy-500)]">
-      {/* Card header with "found / total" completion fraction. */}
+      {/* Card header with "collected / total" completion fraction. */}
       <div className="flex justify-between items-center mb-3">
         <span className="font-semibold text-sm">Collection</span>
         <span className="text-sm text-gray-400">
-          {foundCount}/{totalCount}
+          {formatInteger(collectedCount)}/{formatInteger(totalCount)}
         </span>
       </div>
 
@@ -86,9 +92,9 @@ export function ModuleCollectionGrid() {
                   is rendered independently so wrapping is the graceful case. */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5">
                 {modules.map((mod) => {
-                  // "Found" = the user has pulled this module at least once.
-                  const found = (counts[mod.id] || 0) > 0;
-                  // Manual progress entry; may be undefined for newly-found
+                  // Collected: pulled at least once, or a rarity is set.
+                  const isCollected = collected.has(mod.id);
+                  // Manual progress entry; may be undefined for pulled-but-unrated
                   // modules where the user hasn't yet set a rarity.
                   const progress = moduleProgress[mod.id];
                   const rarity = progress?.currentRarity;
@@ -99,16 +105,15 @@ export function ModuleCollectionGrid() {
                   const rarityColor = rarity
                     ? getModuleRarityColor(rarity)
                     : typeColor;
-                  // Final styling depends on whether the user has actually
-                  // pulled this module:
-                  //   - Found    -> tinted background + colored border + colored text
-                  //   - Not found -> muted gray with a dim navy background
+                  // Final styling depends on whether the user has this module:
+                  //   - Collected     -> tinted background + colored border + colored text
+                  //   - Not collected -> muted gray with a dim navy background
                   // The `+ "33"` / `+ "88"` are alpha hex suffixes (~20% / ~53%).
-                  const displayColor = found ? rarityColor : TEXT_MUTED;
-                  const bgColor = found
+                  const displayColor = isCollected ? rarityColor : TEXT_MUTED;
+                  const bgColor = isCollected
                     ? rarityColor + "33"
                     : "var(--color-navy-700)";
-                  const borderColor = found
+                  const borderColor = isCollected
                     ? rarityColor + "88"
                     : "var(--color-navy-500)";
 
@@ -130,10 +135,11 @@ export function ModuleCollectionGrid() {
                       </div>
                       {/* Rarity badge logic — three branches:
                             a) Have rarity     -> show rarity name in rarity color.
-                            b) Found, no rarity-> show "epic" placeholder
+                            b) Collected, no rarity (pulled, rarity never set)
+                                               -> show "epic" placeholder
                                                   (epic is the floor for tracked modules
                                                    since all roster modules are epics).
-                            c) Not found       -> render nothing (clean tile). */}
+                            c) Not collected   -> render nothing (clean tile). */}
                       {rarity ? (
                         <div
                           className="text-[8px] sm:text-[9px] md:text-[10px] font-semibold mt-0.5"
@@ -141,7 +147,7 @@ export function ModuleCollectionGrid() {
                         >
                           {rarity}
                         </div>
-                      ) : found ? (
+                      ) : isCollected ? (
                         <div className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-400 mt-0.5">
                           epic
                         </div>

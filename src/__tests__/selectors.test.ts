@@ -12,6 +12,7 @@ import {
   selectPityPullIds,
   selectModulePullCounts,
   selectUniqueEpicsFound,
+  selectCollectedModuleIds,
   selectPullStreaks,
   selectPredictedGemsToComplete,
   selectStatsByBanner,
@@ -374,5 +375,22 @@ describe("selectPullsSinceLastDrawnForModule", () => {
       makePull({ date: "2026-03-05", epicModules: ["other"] }),
     ];
     expect(selectPullsSinceLastDrawnForModule(pulls, "target")).toBe(10);
+  });
+});
+
+describe("selectCollectedModuleIds", () => {
+  it("counts a module as collected if it was pulled OR has a rarity recorded", () => {
+    // Save imports set rarities for every owned module, but only the save's
+    // last 15 pulls reach history: owned-but-never-logged modules must count.
+    const pulls = [makePull({ epicModules: ["death-penalty"] }), makePull({ epicModules: ["death-penalty"] })];
+    const progress = {
+      "havoc-bringer": { moduleId: "havoc-bringer", currentRarity: "5*" as const },
+      "death-penalty": { moduleId: "death-penalty", currentRarity: "3*" as const },
+    };
+    expect([...selectCollectedModuleIds(pulls, progress)].sort()).toEqual(["death-penalty", "havoc-bringer"]);
+  });
+
+  it("is empty with no pulls and no progress", () => {
+    expect(selectCollectedModuleIds([], {}).size).toBe(0);
   });
 });
