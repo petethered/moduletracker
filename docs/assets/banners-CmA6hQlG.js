@@ -1,0 +1,1 @@
+var e={standard:`Standard`,featured:`Featured`,lucky:`Lucky`};export{e as t};
