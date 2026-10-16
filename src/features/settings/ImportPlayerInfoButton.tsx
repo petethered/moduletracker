@@ -3,7 +3,8 @@
  * Same import as the header's "Import Save" button (ImportSaveHeaderButton).
  *
  * User flow:
- *   Pick The Tower's save file (playerInfo.dat) -> Settings CLOSES -> the
+ *   Pick The Tower's save file (playerInfo.dat, or the game-29.1+
+ *   tool_export.json: module levels only) -> Settings CLOSES -> the
  *   shared "Import Save" result modal opens (PlayerInfoImportProvider) and
  *   says what changed — or that nothing did. Settings closes first because two
  *   stacked Modals fight over Escape and focus (see playerInfoImportContext.ts).

@@ -23,7 +23,7 @@ export function ImportSaveHeaderButton() {
         variant="secondary"
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        title="Import pulls and module levels from The Tower's save file (playerInfo.dat)"
+        title="Import pulls and module levels from The Tower's playerInfo.dat (or module levels only from tool_export.json)"
         // aria-label fixes the accessible name at every width; on phones the
         // visible label is just an icon (a 375px header can't fit the brand,
         // two text buttons and the cog — "+ Add Pull" wrapped to 3 lines).

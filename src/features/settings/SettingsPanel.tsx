@@ -20,7 +20,8 @@
  *     expected shape, replace local pulls + (if present) moduleProgress.
  *   - Bulk Import: takes the contents of the textarea. Auto-detects whether the input
  *     is JSON (starts with { or [) or tab-separated text and routes accordingly.
- *   - Import Player Info: reads The Tower's own save (playerInfo.dat), APPENDS pulls from
+ *   - Import Player Info: reads The Tower's own save (playerInfo.dat; or tool_export.json,
+ *     module levels only — it has no pull log, see toolExport.ts), APPENDS pulls from
  *     its pull log that aren't logged yet, and RAISES module rarities to match it. Never
  *     edits/removes existing pulls; never lowers a module. ImportPlayerInfoButton
  *     only starts the import and closes Settings; PlayerInfoImportProvider (App

@@ -161,16 +161,40 @@ export function parsePlayerInfo(bytes: Uint8Array): PlayerInfoModules {
   return extractSaveModules(readPlayerInfoSave(bytes));
 }
 
+/**
+ * One owned module copy, in the game's own numbers, whatever file it came
+ * from: the binary save (extractSaveModules, here) or the game's
+ * tool_export.json (extractToolExportModules, toolExport.ts).
+ */
+export interface GameModuleCopy {
+  /** ModuleItem.infoIndex — the game's module number (= ModuleDefinition.gameIndex). */
+  infoIndex: number;
+  /** Raw game ModuleRarity value (1 Common … 15 Ancestral 5★). */
+  rarity: number;
+}
+
 /** Module rarities from an already-decoded save root (see RULES in the header). */
 export function extractSaveModules(root: NrbfObject): PlayerInfoModules {
-
-  const best = new Map<number, number>();
-  const unsupported = new Set<number>();
+  const copies: GameModuleCopy[] = [];
   for (const item of collectModuleItems(root)) {
     const index = item.members.infoIndex;
     const rarityEnum = item.members.currentRarity;
     const rarity = isNrbfObject(rarityEnum) ? rarityEnum.members.value__ : undefined;
-    if (typeof index !== "number" || typeof rarity !== "number") continue;
+    if (typeof index === "number" && typeof rarity === "number") copies.push({ infoIndex: index, rarity });
+  }
+  return bestModuleRarities(copies);
+}
+
+/**
+ * The RULES (file header) applied to every owned copy: highest copy wins,
+ * below-Epic and common/rare-base modules ignored, unknown modules or tiers
+ * reported as unsupported. Format-neutral so the binary save and the JSON
+ * export can't drift apart on these rules.
+ */
+export function bestModuleRarities(copies: Iterable<GameModuleCopy>): PlayerInfoModules {
+  const best = new Map<number, number>();
+  const unsupported = new Set<number>();
+  for (const { infoIndex: index, rarity } of copies) {
     if (rarity < GAME_RARITY.epic || COMMON_AND_RARE_BASE_GAME_INDEXES.has(index)) continue;
 
     if (!MODULE_BY_GAME_INDEX.has(index) || !(rarity in TRACKER_RARITY_BY_GAME_RARITY)) {

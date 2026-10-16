@@ -12,6 +12,7 @@ import {
   type PlayerInfoSaveSpec,
 } from "../src/__tests__/helpers/playerInfoSaveBuilder";
 import { buildTds1Save } from "../src/__tests__/helpers/tds1SaveBuilder";
+import { buildToolExport } from "../src/__tests__/helpers/toolExportBuilder";
 
 /** The single "Import Save" result modal both buttons open (PlayerInfoImportProvider). */
 const resultDialog = (page: Page) => page.getByRole("dialog", { name: "Import Save" });
@@ -170,5 +171,46 @@ test.describe("Import Save (header button)", () => {
     });
     const dialog = page.getByRole("dialog", { name: "Import Save" });
     await expect(dialog.getByTestId("player-info-headline")).toHaveText("Imported 1 new pull · raised 1 module level.");
+  });
+
+  test("reads tool_export.json: raises module levels, says it has no pulls, re-import changes nothing", async ({ page }) => {
+    const exportFile = {
+      name: "tool_export.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(
+        buildToolExport({
+          inventory: [{ infoIndex: 7, rarity: R.fiveStar }],   // Havoc Bringer
+          equipped: [{ infoIndex: 51, rarity: R.ancestral }],  // Gilded Sniper
+        }),
+      ),
+    };
+    const dialog = page.getByRole("dialog", { name: "Import Save" });
+
+    await page.setInputFiles("[data-testid='player-info-header-input']", exportFile);
+    await expect(dialog.getByTestId("player-info-headline")).toHaveText("Raised 2 module levels.");
+    await expect(dialog.getByTestId("player-info-no-pull-log")).toContainText("doesn't include pull history");
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await page.setInputFiles("[data-testid='player-info-header-input']", exportFile);
+    await expect(dialog.getByTestId("player-info-headline")).toHaveText("Already up to date — nothing changed.");
+    await expect(dialog.getByTestId("player-info-nothing-changed")).toHaveText(
+      "This export changes nothing: your module levels already match it.",
+    );
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await page.click("[data-tab='modules']");
+    await expect(page.locator("[data-testid='rarity-havoc-bringer']")).toContainText("5*");
+    await expect(page.locator("[data-testid='rarity-gilded-sniper']")).toContainText("ancestral");
+  });
+
+  test("points a Module Tracker export at Settings → Import Data", async ({ page }) => {
+    await page.setInputFiles("[data-testid='player-info-header-input']", {
+      name: "module-tracker-2026-10-16.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify({ pulls: [], moduleProgress: {}, exportedAt: "2026-10-16" })),
+    });
+    await expect(page.getByRole("dialog", { name: "Import Save" }).getByTestId("player-info-error")).toContainText(
+      "This is a Module Tracker export",
+    );
   });
 });

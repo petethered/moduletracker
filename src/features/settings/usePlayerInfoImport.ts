@@ -5,9 +5,11 @@
  * Info") reach it through usePlayerInfoImportLauncher — never call this hook
  * from a button (it would get its own state and modal).
  *
- * Flow: file -> decodePlayerInfoFile (decrypt if TDS1, gunzip) -> readPlayerInfoSave (decode ONCE) ->
- *   - extractSaveModules -> planModuleProgressImport -> one setModuleRarities call
- *   - extractSavePulls -> planPullImport -> one addPulls call with `toAdd`
+ * Flow: file -> readImportedFile (readImportedFile.ts: playerInfo.dat or the
+ * game's tool_export.json, told apart by content -> modules + pulls) ->
+ *   - modules -> planModuleProgressImport -> one setModuleRarities call
+ *   - pulls   -> planPullImport -> one addPulls call with `toAdd`
+ *     (always empty for tool_export.json: it has no pull log)
  * Both plans are made against the CURRENT store (getState) and all reading/
  * parsing finishes before anything is written, so a bad file writes nothing.
  * NOT atomic beyond that: if addPulls throws (e.g. localStorage full) after
@@ -15,8 +17,8 @@
  * idempotent and a re-import finishes the job.
  * `unsure` pulls are NOT written; the summary offers "Add anyway" (addUnsurePulls).
  *
- * LAZY: the decoder (decodePlayerInfoFile + tds1SaveContainer, parsePlayerInfo,
- * playerInfoPulls, nrbfReader) is loaded
+ * LAZY: the decoders (readImportedFile -> decodePlayerInfoFile + tds1SaveContainer,
+ * toolExport, parsePlayerInfo, playerInfoPulls, nrbfReader) are loaded
  * with import() on the first file pick. This hook's provider mounts with the
  * app shell, so a static import would put the whole save decoder in the main bundle.
  *
@@ -34,6 +36,7 @@ import { useStore } from "../../store";
 import { logEvent } from "../../utils/renderLog";
 import type { ModuleProgressImportPlan } from "./parsePlayerInfo";
 import type { SavePull } from "./playerInfoPulls";
+import type { ImportedFileKind } from "./readImportedFile";
 
 export interface PullImportOutcome {
   /** Pulls appended to the tracker (oldest first). */
@@ -48,6 +51,8 @@ export interface PullImportOutcome {
 export type PlayerInfoImportResult =
   | {
       status: "done";
+      /** Which file was imported (see readImportedFile.ts); toolExport => no pulls. */
+      fileKind: ImportedFileKind;
       modules: ModuleProgressImportPlan;
       pulls: PullImportOutcome;
       /** Game numbers the tracker doesn't support (modules or pull epics), ascending. */
@@ -72,14 +77,14 @@ export function usePlayerInfoImport() {
       setBusy(true);
       setResult(null);
       try {
-        const [file, save, pullLog] = await Promise.all([
-          import("./decodePlayerInfoFile"),
+        const [reader, save, pullLog] = await Promise.all([
+          import("./readImportedFile"),
           import("./parsePlayerInfo"),
           import("./playerInfoPulls"),
         ]);
-        const root = save.readPlayerInfoSave(await file.decodePlayerInfoFile(new Uint8Array(await picked.arrayBuffer())));
-        const moduleData = save.extractSaveModules(root);
-        const pullData = pullLog.extractSavePulls(root);
+        const { fileKind, moduleData, pullData } = await reader.readImportedFile(
+          new Uint8Array(await picked.arrayBuffer()),
+        );
         // getState(), not subscribed values: plan against the store as it is
         // NOW, not as of the last render.
         const { moduleProgress, pulls } = useStore.getState();
@@ -93,6 +98,7 @@ export function usePlayerInfoImport() {
 
         setResult({
           status: "done",
+          fileKind,
           modules: modulePlan,
           pulls: {
             added: pullPlan.toAdd,

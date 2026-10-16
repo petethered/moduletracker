@@ -11,10 +11,9 @@ import { Button } from "../../components/ui/Button";
 import { MODULE_BY_ID } from "../../config/modules";
 import { formatDisplayDate } from "../../utils/formatDate";
 import { formatInteger } from "../../utils/formatNumber";
+import { importHeadline, isNothingChanged, nothingChangedReason, plural } from "./playerInfoImportSummaryText";
 import type { SavePull } from "./playerInfoPulls";
 import type { PlayerInfoImportResult } from "./usePlayerInfoImport";
-
-const plural = (n: number, word: string) => `${formatInteger(n)} ${n === 1 ? word : `${word}s`}`;
 
 /** "Oct 12, 2026 — 7 common, 2 rare, Havoc Bringer" */
 function describePull(p: SavePull) {
@@ -43,42 +42,29 @@ export function PlayerInfoImportSummary({ result, onAddUnsurePulls }: Props) {
   }
 
   const { modules, pulls } = result;
-  // Nothing was written: say so outright. "Imported 0 new pulls · skipped 15"
-  // read like the upload did nothing (user report), so this case gets its own
-  // headline + a plain reason instead of the counts recap.
-  const nothingChanged = pulls.added.length === 0 && pulls.unsure.length === 0 && modules.raises.length === 0;
-  // One-line recap of every action taken, first thing the user reads. Each
-  // part only appears when non-zero; the sections below give the detail.
-  const headline = nothingChanged
-    ? "Already up to date — nothing changed"
-    : [
-        `Imported ${plural(pulls.added.length, "new pull")}`,
-        pulls.alreadyLogged > 0 && `skipped ${formatInteger(pulls.alreadyLogged)} already logged`,
-        pulls.unsure.length > 0 && `${formatInteger(pulls.unsure.length)} held for review`,
-        modules.raises.length > 0 && `raised ${plural(modules.raises.length, "module level")}`,
-      ]
-        .filter(Boolean)
-        .join(" · ");
+  // Text rules live in playerInfoImportSummaryText.ts (unit-tested).
+  const nothingChanged = isNothingChanged(result);
+  const reason = nothingChangedReason(result);
+  // tool_export.json has no pull log: the pulls section becomes a note.
+  const modulesOnly = result.fileKind === "toolExport";
   return (
     <div className="mt-2 text-xs" data-testid="player-info-result">
       <p className="mb-2 text-sm text-gray-100" data-testid="player-info-headline">
-        {headline}.
+        {importHeadline(result)}.
       </p>
-      {nothingChanged && (
+      {reason && (
         <p className="mb-2 text-gray-300" data-testid="player-info-nothing-changed">
-          {pulls.alreadyLogged > 0
-            ? `All ${plural(pulls.alreadyLogged, "pull")} in this save ${pulls.alreadyLogged === 1 ? "is" : "are"} already logged`
-            : "This save has no new pulls"}
-          {/* Don't claim "match" when some tracker levels are HIGHER than the
-              save — those are listed under "Kept" right below. */}
-          {modules.keptHigher.length > 0
-            ? ", and no module levels needed raising."
-            : ", and your module levels already match it."}
+          {reason}
         </p>
       )}
       {/* --- Pulls --- */}
       <div data-testid="player-info-pulls">
-        {pulls.added.length === 0 ? (
+        {modulesOnly ? (
+          <p className="text-gray-400" data-testid="player-info-no-pull-log">
+            tool_export.json doesn't include pull history, so no pulls were imported. Import playerInfo.dat to
+            log new pulls.
+          </p>
+        ) : pulls.added.length === 0 ? (
           // Redundant with the nothing-changed line above, so only shown when
           // something ELSE changed (e.g. module levels were raised).
           !nothingChanged && <p className="text-green-400">No new pulls in the save.</p>
