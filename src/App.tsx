@@ -11,6 +11,8 @@
  * User flows it supports:
  *   - Tab navigation (dashboard / history / modules / analytics) via TabBar.
  *     Logo click also routes to dashboard as a "home" affordance.
+ *   - Import Save button -> ImportSaveHeaderButton (pulls + module levels
+ *     from The Tower's playerInfo.dat; summary in its own modal).
  *   - Add 10x Pull button -> openAddPullModal() -> lazy-loaded PullModal.
  *   - Settings cog -> toggleSettings() -> lazy-loaded SettingsPanel.
  *   - First-run storage choice (local vs cloud) via StorageChoiceModal.
@@ -61,6 +63,7 @@ import { StorageChoiceModal } from "./features/auth/StorageChoiceModal";
 import { AuthModal } from "./features/auth/AuthModal";
 import { SyncStatus } from "./features/auth/SyncStatus";
 import { SyncInitializer } from "./features/auth/SyncInitializer";
+import { ImportSaveHeaderButton } from "./features/settings/ImportSaveHeaderButton";
 import { isAuthenticated } from "./services/api";
 import { useRenderLog } from "./utils/renderLog";
 import { TowerSitesNav } from "./shared/TowerSitesNav";
@@ -129,12 +132,14 @@ function App() {
       <TowerSitesNav current="modules" />
       {/* Header */}
       <header
-        className="flex items-center justify-between px-5 py-4 bg-[var(--color-navy-800)]"
+        className="flex items-center justify-between gap-2 px-2 min-[360px]:px-3 sm:px-5 py-4 bg-[var(--color-navy-800)]"
         style={{
           borderBottom: "1px solid rgba(240, 192, 64, 0.08)",
         }}
       >
-        <h1 className="text-lg text-[var(--color-accent-gold)]">
+        {/* Phone widths: smaller brand + tighter padding so brand, Import Save,
+            Add Pull and the cog fit on one row down to 320px (padding overrides on <Button> lose to its base px-4, so shrink the brand). */}
+        <h1 className="text-xs min-[360px]:text-sm sm:text-lg text-[var(--color-accent-gold)] whitespace-nowrap">
           <button
             onClick={() => setActiveTab("dashboard")}
             className="cursor-pointer"
@@ -149,9 +154,11 @@ function App() {
             ModuleTracker.com
           </button>
         </h1>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <SyncStatus />
-          <Button onClick={openAddPullModal}><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>
+          {/* Import Save: logs new pulls from playerInfo.dat (see ImportSaveHeaderButton). */}
+          <ImportSaveHeaderButton />
+          <Button onClick={openAddPullModal} className="whitespace-nowrap"><span className="hidden sm:inline">+ Add 10x Pull</span><span className="sm:hidden">+ Add Pull</span></Button>
           <button
             onClick={toggleSettings}
             className="text-gray-400 hover:text-[var(--color-accent-gold)] text-lg transition-colors duration-200"

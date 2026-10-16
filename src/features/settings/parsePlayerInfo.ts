@@ -18,9 +18,10 @@
  *                        Also not in inventory; absent in older saves.
  *   Each ModuleItem has `infoIndex` (the game's module number, matched to
  *   ModuleDefinition.gameIndex) and `currentRarity` (an enum: `value__`).
- *   Other places that mention infoIndex (moduleRecords = pull history,
- *   modulePresets = guids only) are deliberately ignored: they describe
- *   modules the player may have since merged away.
+ *   Other places that mention infoIndex are deliberately ignored HERE:
+ *   moduleRecords (the pull log) and modulePresets (guids only) describe
+ *   modules the player may have since merged away. The pull log is read
+ *   separately, as pulls, by playerInfoPulls.ts.
  *
  * RULES:
  *   - A module's progress is the HIGHEST rarity among its copies (players hold
@@ -40,7 +41,7 @@
  *     update reshapes a slot) must not downgrade real progress. A lower save
  *     value is reported as "kept" so the user can fix a typo by hand.
  */
-import { COMMON_AND_RARE_BASE_GAME_INDEXES, MODULES } from "../../config/modules";
+import { COMMON_AND_RARE_BASE_GAME_INDEXES, MODULE_BY_GAME_INDEX, MODULES } from "../../config/modules";
 import { MODULE_RARITY_ORDER } from "../../config/moduleRarities";
 import type { ModuleProgress, ModuleRarity } from "../../types";
 import { isNrbfObject, readNrbf, type NrbfObject, type NrbfValue } from "../../utils/nrbfReader";
@@ -81,9 +82,11 @@ const TRACKER_RARITY_BY_GAME_RARITY: Record<number, ModuleRarity> = {
   14: "4*",
   15: "5*",
 };
-const GAME_RARITY_EPIC = 4;
-
-const MODULE_BY_GAME_INDEX = new Map(MODULES.map((m) => [m.gameIndex, m]));
+/**
+ * The game's ModuleRarity values the readers compare against. Shared with
+ * playerInfoPulls.ts (pull-log drops are only ever common, rare or epic).
+ */
+export const GAME_RARITY = { common: 1, rare: 2, epic: 4 } as const;
 
 /**
  * Real saves are ~200 KB decompressed. The cap only exists so a malicious or
@@ -198,10 +201,12 @@ function collectModuleItems(root: NrbfObject): NrbfObject[] {
 }
 
 /**
- * Extract module rarities from decompressed save bytes.
+ * Decode decompressed save bytes into the validated root PlayerData object.
+ * Split out from parsePlayerInfo so the import decodes ONCE and hands the root
+ * to both readers: extractSaveModules (here) and extractSavePulls (playerInfoPulls.ts).
  * @throws PlayerInfoFormatError if the bytes aren't a readable The Tower save.
  */
-export function parsePlayerInfo(bytes: Uint8Array): PlayerInfoModules {
+export function readPlayerInfoSave(bytes: Uint8Array): NrbfObject {
   let root: NrbfValue;
   try {
     root = readNrbf(bytes).root;
@@ -214,6 +219,21 @@ export function parsePlayerInfo(bytes: Uint8Array): PlayerInfoModules {
   if (!isNrbfObject(root) || root.$class !== "SaveLoad+PlayerData") {
     throw new PlayerInfoFormatError(NOT_A_SAVE);
   }
+  return root;
+}
+
+/**
+ * Extract module rarities from decompressed save bytes. Convenience wrapper
+ * (decode + extractSaveModules) kept for the unit tests; the app's import
+ * decodes once and calls the readers itself (usePlayerInfoImport).
+ * @throws PlayerInfoFormatError if the bytes aren't a readable The Tower save.
+ */
+export function parsePlayerInfo(bytes: Uint8Array): PlayerInfoModules {
+  return extractSaveModules(readPlayerInfoSave(bytes));
+}
+
+/** Module rarities from an already-decoded save root (see RULES in the header). */
+export function extractSaveModules(root: NrbfObject): PlayerInfoModules {
 
   const best = new Map<number, number>();
   const unsupported = new Set<number>();
@@ -222,7 +242,7 @@ export function parsePlayerInfo(bytes: Uint8Array): PlayerInfoModules {
     const rarityEnum = item.members.currentRarity;
     const rarity = isNrbfObject(rarityEnum) ? rarityEnum.members.value__ : undefined;
     if (typeof index !== "number" || typeof rarity !== "number") continue;
-    if (rarity < GAME_RARITY_EPIC || COMMON_AND_RARE_BASE_GAME_INDEXES.has(index)) continue;
+    if (rarity < GAME_RARITY.epic || COMMON_AND_RARE_BASE_GAME_INDEXES.has(index)) continue;
 
     if (!MODULE_BY_GAME_INDEX.has(index) || !(rarity in TRACKER_RARITY_BY_GAME_RARITY)) {
       unsupported.add(index);

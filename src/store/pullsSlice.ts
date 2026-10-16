@@ -40,6 +40,7 @@ import type { PullRecord } from "../types";
  *
  * Actions:
  *   addPull       — append; assigns id.
+ *   addPulls      — append many in one write (Import Player Info); assigns ids.
  *   updatePull    — patch in place by id; preserves array position.
  *   deletePull    — remove by id.
  *   importPulls   — wholesale replacement (used by file import + cloud sync rehydrate).
@@ -49,6 +50,11 @@ export interface PullsSlice {
   pulls: PullRecord[];
   /** Append a new pull. Caller supplies everything except `id`; we assign a UUID v4. */
   addPull: (pull: Omit<PullRecord, "id">) => void;
+  /**
+   * Append several pulls, in order, in ONE state update: one persist write and
+   * one sync-subscriber pass instead of one per pull (save imports add up to 15).
+   */
+  addPulls: (pulls: Omit<PullRecord, "id">[]) => void;
   /** Patch fields on an existing pull. No-ops silently if id not found (intentional — callers may race deletes). */
   updatePull: (id: string, pull: Partial<Omit<PullRecord, "id">>) => void;
   /** Remove a pull by id. */
@@ -74,6 +80,12 @@ export const createPullsSlice: StateCreator<
       // Push (not unshift) preserves insertion order — selectors rely on this for
       // same-date tiebreaking.
       state.pulls.push({ ...pull, id: uuidv4() });
+    }),
+
+  addPulls: (pulls) =>
+    set((state) => {
+      // Same rules as addPull: ids assigned here, push keeps insertion order.
+      for (const pull of pulls) state.pulls.push({ ...pull, id: uuidv4() });
     }),
 
   updatePull: (id, updates) =>

@@ -1,68 +1,131 @@
 /**
- * usePlayerInfoImport — state + orchestration for "Import Player Info".
- * ImportPlayerInfoButton only renders what this returns.
+ * usePlayerInfoImport — state + orchestration for "Import Player Info"
+ * (Settings button AND the header's "Import Save" button; both render
+ * PlayerInfoImportSummary from what this returns).
  *
- * Flow: file -> decompressPlayerInfo -> parsePlayerInfo -> planModuleProgressImport
- * against the CURRENT store -> one setModuleRarities call with the raises.
- * All reading/parsing finishes before anything is written, so a bad file
- * writes nothing.
+ * Flow: file -> decompressPlayerInfo -> readPlayerInfoSave (decode ONCE) ->
+ *   - extractSaveModules -> planModuleProgressImport -> one setModuleRarities call
+ *   - extractSavePulls -> planPullImport -> one addPulls call with `toAdd`
+ * Both plans are made against the CURRENT store (getState) and all reading/
+ * parsing finishes before anything is written, so a bad file writes nothing.
+ * NOT atomic beyond that: if addPulls throws (e.g. localStorage full) after
+ * the module raises were written, those raises stay. Harmless — raising is
+ * idempotent and a re-import finishes the job.
+ * `unsure` pulls are NOT written; the summary offers "Add anyway" (addUnsurePulls).
  *
- * Why one batched store action (not updateModuleRarity per module): one
- * persist write and one sync-subscriber pass instead of one per raised module
- * (up to the whole roster). Cloud sync debounces pushes either way, so the
- * cloud still sees a single PUT.
+ * LAZY: the decoder (parsePlayerInfo, playerInfoPulls, nrbfReader) is loaded
+ * with import() on the first file pick. The header button mounts with the app
+ * shell, so a static import would put the whole save decoder in the main bundle.
+ *
+ * Why batched store actions (not updateModuleRarity / addPull per item): one
+ * persist write and one sync-subscriber pass instead of one per change. Cloud
+ * sync debounces pushes either way, so the cloud still sees a single PUT.
+ *
+ * KNOWN LIMIT: duplicates are only detected against THIS device's pulls.
+ * Importing the same save on two devices before either syncs adds the pulls
+ * on both, with different ids, and sync's union-by-id merge keeps both copies.
+ * Importing after a sync is fine (the plan sees the merged pulls).
  */
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useStore } from "../../store";
 import { logEvent } from "../../utils/renderLog";
-import {
-  PlayerInfoFormatError,
-  decompressPlayerInfo,
-  parsePlayerInfo,
-  planModuleProgressImport,
-  type ModuleProgressImportPlan,
-} from "./parsePlayerInfo";
+import type { ModuleProgressImportPlan } from "./parsePlayerInfo";
+import type { SavePull } from "./playerInfoPulls";
+
+export interface PullImportOutcome {
+  /** Pulls appended to the tracker (oldest first). */
+  added: SavePull[];
+  alreadyLogged: number;
+  /** Held back; the user may add them with addUnsurePulls. */
+  unsure: SavePull[];
+  /** See SavePullsResult.skippedPulls (partial, or an unknown epic/rarity). */
+  skippedPulls: number;
+}
 
 export type PlayerInfoImportResult =
-  | ({ status: "done"; unsupportedGameIndexes: number[] } & ModuleProgressImportPlan)
+  | {
+      status: "done";
+      modules: ModuleProgressImportPlan;
+      pulls: PullImportOutcome;
+      /** Game numbers the tracker doesn't support (modules or pull epics), ascending. */
+      unsupportedGameIndexes: number[];
+    }
   | { status: "error"; message: string };
 
 const UNEXPECTED_ERROR = "Something went wrong reading that file. Please try again.";
 
 export function usePlayerInfoImport() {
   const setModuleRarities = useStore((s) => s.setModuleRarities);
+  const addPulls = useStore((s) => s.addPulls);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<PlayerInfoImportResult | null>(null);
+  // The unsure pulls already added for the CURRENT result. A ref, not state:
+  // two fast clicks on "Add anyway" can both run before the re-render that
+  // empties `unsure`, and must not add the same pulls twice.
+  const unsureAddedFor = useRef<PlayerInfoImportResult | null>(null);
 
   const importFile = useCallback(
     async (file: File) => {
       setBusy(true);
       setResult(null);
       try {
-        const bytes = await decompressPlayerInfo(new Uint8Array(await file.arrayBuffer()));
-        const { modules, unsupportedGameIndexes } = parsePlayerInfo(bytes);
-        // getState(), not a subscribed value: plan against the store as it is
+        const [save, pullLog] = await Promise.all([import("./parsePlayerInfo"), import("./playerInfoPulls")]);
+        const root = save.readPlayerInfoSave(await save.decompressPlayerInfo(new Uint8Array(await file.arrayBuffer())));
+        const moduleData = save.extractSaveModules(root);
+        const pullData = pullLog.extractSavePulls(root);
+        // getState(), not subscribed values: plan against the store as it is
         // NOW, not as of the last render.
-        const plan = planModuleProgressImport(useStore.getState().moduleProgress, modules);
-        if (plan.raises.length > 0) {
-          setModuleRarities(Object.fromEntries(plan.raises.map((c) => [c.moduleId, c.to])));
+        const { moduleProgress, pulls } = useStore.getState();
+        const modulePlan = save.planModuleProgressImport(moduleProgress, moduleData.modules);
+        const pullPlan = pullLog.planPullImport(pulls, pullData.pulls);
+
+        if (modulePlan.raises.length > 0) {
+          setModuleRarities(Object.fromEntries(modulePlan.raises.map((c) => [c.moduleId, c.to])));
         }
-        setResult({ status: "done", unsupportedGameIndexes, ...plan });
+        if (pullPlan.toAdd.length > 0) addPulls(pullPlan.toAdd.map(pullLog.savePullToPullRecord));
+
+        setResult({
+          status: "done",
+          modules: modulePlan,
+          pulls: {
+            added: pullPlan.toAdd,
+            alreadyLogged: pullPlan.alreadyLogged,
+            unsure: pullPlan.unsure,
+            skippedPulls: pullData.skippedPulls,
+          },
+          unsupportedGameIndexes: [...new Set([...moduleData.unsupportedGameIndexes, ...pullData.unsupportedGameIndexes])].sort(
+            (a, b) => a - b,
+          ),
+        });
       } catch (err) {
         // Only PlayerInfoFormatError messages are written for players. Anything
         // else (e.g. localStorage full, a stack overflow on a pathological
-        // file) gets a generic message; the details go to the dev log.
+        // file, the lazy chunk failing to load) gets a generic message; the
+        // details go to the dev log. Checked by name, not instanceof, so this
+        // works even if the parser chunk never loaded.
         logEvent("PlayerInfoImport.failed", { error: String((err as Error)?.cause ?? err) });
         setResult({
           status: "error",
-          message: err instanceof PlayerInfoFormatError ? err.message : UNEXPECTED_ERROR,
+          message: (err as Error)?.name === "PlayerInfoFormatError" ? (err as Error).message : UNEXPECTED_ERROR,
         });
       } finally {
         setBusy(false);
       }
     },
-    [setModuleRarities],
+    [setModuleRarities, addPulls],
   );
 
-  return { busy, result, importFile };
+  /** The user confirmed the held-back pulls: append them (once) and move them to `added`. */
+  const addUnsurePulls = useCallback(async () => {
+    if (result?.status !== "done" || result.pulls.unsure.length === 0) return;
+    if (unsureAddedFor.current === result) return;
+    unsureAddedFor.current = result;
+    // Already loaded by importFile, so this resolves from the module cache.
+    const { savePullToPullRecord } = await import("./playerInfoPulls");
+    addPulls(result.pulls.unsure.map(savePullToPullRecord));
+    const added = [...result.pulls.added, ...result.pulls.unsure].sort((a, b) => a.obtainedAt - b.obtainedAt);
+    setResult({ ...result, pulls: { ...result.pulls, added, unsure: [] } });
+  }, [result, addPulls]);
+
+  return { busy, result, importFile, addUnsurePulls };
 }

@@ -7,6 +7,7 @@ import { test, expect } from "./fixtures";
 // personal player data and must never be committed as a fixture.
 import {
   buildPlayerInfoSave,
+  buildPullDrops,
   GameRarity as R,
   type PlayerInfoSaveSpec,
 } from "../src/__tests__/helpers/playerInfoSaveBuilder";
@@ -70,5 +71,56 @@ test.describe("Import Player Info", () => {
       buffer: Buffer.from('{"pulls": []}'),
     });
     await expect(page.getByTestId("player-info-error")).toContainText("doesn't look like a The Tower save");
+  });
+});
+
+// Local-time start (the browser runs in the same TZ as Playwright locally), so
+// the imported pulls land on 2026-10-12 in the History table.
+const OCT_12_9AM = new Date(2026, 9, 12, 9, 0).getTime();
+
+async function uploadSaveFromHeader(page: Page, spec: PlayerInfoSaveSpec) {
+  await page.setInputFiles("[data-testid='player-info-header-input']", {
+    name: "playerInfo.dat",
+    mimeType: "application/octet-stream",
+    buffer: gzipSync(buildPlayerInfoSave(spec)),
+  });
+}
+
+test.describe("Import Save (header button)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+  });
+
+  test("sits left of + Add 10x Pull", async ({ page }) => {
+    // Regexes match both labels: "Import Save" (aria-label, every width) and "+ Add 10x Pull"/"+ Add Pull" (mobile).
+    const importBox = await page.getByRole("button", { name: "Import Save" }).boundingBox();
+    const addBox = await page.getByRole("button", { name: /^\+ Add (10x )?Pull$/ }).boundingBox();
+    expect(importBox!.x).toBeLessThan(addBox!.x);
+  });
+
+  test("imports new pulls, then skips them on re-import", async ({ page }) => {
+    const save: PlayerInfoSaveSpec = {
+      pullDrops: buildPullDrops(
+        [{ common: 8, rare: 2 }, { common: 7, rare: 2, epics: [7] }], // 7 = Havoc Bringer
+        OCT_12_9AM,
+        "Infinity Threshold Banner",
+      ),
+    };
+    await uploadSaveFromHeader(page, save);
+    const dialog = page.getByRole("dialog", { name: "Import Save" });
+    await expect(dialog.getByTestId("player-info-headline")).toHaveText("Imported 2 new pulls.");
+    await expect(dialog.getByTestId("player-info-pulls")).toContainText("Havoc Bringer");
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await uploadSaveFromHeader(page, save);
+    await expect(dialog.getByTestId("player-info-headline")).toHaveText(
+      "Imported 0 new pulls · skipped 2 already logged.",
+    );
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await page.click("[data-tab='history']");
+    await expect(page.getByText("Havoc Bringer")).toHaveCount(1);
   });
 });

@@ -95,6 +95,7 @@ import { useStore } from "../../store";
 import type { BannerType, PullRecord } from "../../types";
 import { getLocalDateString } from "../../utils/formatDate";
 import { useRenderLog, logEvent } from "../../utils/renderLog";
+import { GEMS_PER_10X_PULL } from "../../config/banners";
 
 interface PullFormProps {
   initialData?: PullRecord;
@@ -364,16 +365,15 @@ export function PullForm({ initialData, onSubmit, onSaveAndContinue, onCancel, o
   }
 
   // Pure: the record to save, from current form state. Callers must check
-  // `canSave` first. gemsSpent is hardcoded to 200 — that's the canonical
-  // 10x cost in The Tower; if the game ever changes this, surface it as a
-  // settings option rather than re-hardcoding.
+  // `canSave` first. gemsSpent is always GEMS_PER_10X_PULL (the canonical
+  // 10x cost, shared with the save import — see src/config/banners.ts).
   function buildPayload(): Omit<PullRecord, "id"> {
     return {
       date,
       commonCount,
       rareCount,
       epicModules: epics.map((r) => r.moduleId),
-      gemsSpent: 200,
+      gemsSpent: GEMS_PER_10X_PULL,
       bannerType,
     };
   }

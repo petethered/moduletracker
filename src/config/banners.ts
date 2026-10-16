@@ -23,6 +23,14 @@
  */
 import type { BannerType } from "../types";
 
+/**
+ * Gems a 10x module pull costs in The Tower. Used wherever the tracker records
+ * a pull without asking for its cost: PullForm (manual entry) and the save
+ * import (playerInfoPulls.ts). If the game ever changes it, surface it as a
+ * setting rather than re-hardcoding.
+ */
+export const GEMS_PER_10X_PULL = 200;
+
 export const BANNER_LABELS: Record<BannerType, string> = {
   standard: "Standard",
   featured: "Featured",

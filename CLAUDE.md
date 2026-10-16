@@ -57,5 +57,5 @@ Run these review agents before every commit:
 - E2E tests in `e2e/` directory
 - Unit tests co-located in `src/__tests__/`
 - Test-only builders shared by unit AND e2e tests live in `src/__tests__/helpers/` (e.g. synthetic save files). They must not import vitest or `node:*` APIs, since Playwright loads them too. Never commit a real `playerInfo.dat` — it's personal player data.
-- E2E tests cover: pull CRUD, module rarity updates, tab navigation, import/export, Import Player Info, responsive viewports
-- Unit tests cover: selectors, store mutations, validation, config integrity, the save decoder (nrbfReader, incl. malformed-input hardening), save parsing and the raise-only import plan
+- E2E tests cover: pull CRUD, module rarity updates, tab navigation, import/export, Import Player Info (Settings + header "Import Save": module levels and new pulls), responsive viewports
+- Unit tests cover: selectors, store mutations, validation, config integrity, the save decoder (nrbfReader, incl. malformed-input hardening), save parsing and the raise-only import plan, the save's pull log and the pull reconcile plan (playerInfoPulls)

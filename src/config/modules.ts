@@ -343,6 +343,13 @@ export const MODULE_BY_ID = Object.fromEntries(
 );
 
 /**
+ * Tracked modules by the game's own module number (gameIndex). Used by Import
+ * Player Info to map save-file entries (ModuleItem / ModuleRegistry
+ * `infoIndex`) to tracker modules.
+ */
+export const MODULE_BY_GAME_INDEX = new Map(MODULES.map((m) => [m.gameIndex, m]));
+
+/**
  * The game's common- and rare-BASE modules, by gameIndex. The tracker never
  * tracks these, and Import Player Info ignores them at ANY rarity — rare
  * modules merge up past Epic, so "rarity >= Epic" alone doesn't mean "epic

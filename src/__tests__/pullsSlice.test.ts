@@ -34,6 +34,15 @@ describe("pullsSlice", () => {
     expect(pulls[0].epicModules).toEqual(["death-penalty"]);
   });
 
+  it("appends several pulls at once, in order, each with its own id", () => {
+    const base = { date: "2026-10-12", rareCount: 2, epicModules: [], gemsSpent: 200, bannerType: "standard" as const };
+    store.getState().addPull({ ...base, commonCount: 5, rareCount: 5 });
+    store.getState().addPulls([{ ...base, commonCount: 8 }, { ...base, commonCount: 7, rareCount: 3 }]);
+    const pulls = store.getState().pulls;
+    expect(pulls.map((p) => p.commonCount)).toEqual([5, 8, 7]);
+    expect(new Set(pulls.map((p) => p.id)).size).toBe(3);
+  });
+
   it("updates a pull", () => {
     store.getState().addPull({
       date: "2026-03-30",

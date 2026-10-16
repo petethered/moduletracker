@@ -5,8 +5,8 @@
  *   The catch-all settings screen. Hosts:
  *     1. AccountSettings (cloud sync sub-panel)
  *     2. Data Management — JSON export, JSON file import, Import Player Info
- *        (module levels from the game's playerInfo.dat; see
- *        ImportPlayerInfoButton), Screenshot export
+ *        (new pulls + module levels from the game's playerInfo.dat; see
+ *        ImportPlayerInfoButton — also in the header as "Import Save"), Screenshot export
  *     3. Bulk Import — paste tab-separated text OR exported JSON
  *     4. Danger Zone — Reset all data
  *
@@ -20,9 +20,10 @@
  *     expected shape, replace local pulls + (if present) moduleProgress.
  *   - Bulk Import: takes the contents of the textarea. Auto-detects whether the input
  *     is JSON (starts with { or [) or tab-separated text and routes accordingly.
- *   - Import Player Info: reads The Tower's own save (playerInfo.dat) and RAISES module
- *     rarities to match it. Only ever touches moduleProgress, never pulls; never lowers.
- *     Self-contained in ImportPlayerInfoButton (+ usePlayerInfoImport, parsePlayerInfo).
+ *   - Import Player Info: reads The Tower's own save (playerInfo.dat), APPENDS pulls from
+ *     its pull log that aren't logged yet, and RAISES module rarities to match it. Never
+ *     edits/removes existing pulls; never lowers a module. Self-contained in
+ *     ImportPlayerInfoButton (+ usePlayerInfoImport, parsePlayerInfo, playerInfoPulls).
  *   - Reset: clears pulls + moduleProgress after a ConfirmDialog. Destructive.
  *
  * Bulk import policy (important):
@@ -45,8 +46,8 @@
  *   File picker is the canonical way to round-trip exports. Bulk import textarea exists
  *   so users can paste community spreadsheets directly without intermediate save-as-file.
  *   The auto-detection (JSON vs TSV) keeps the textarea ergonomic for both audiences.
- *   Import Player Info is a different kind of import: it MERGES game state into module
- *   progress (raise-only) instead of replacing or appending pull history, and keeps
+ *   Import Player Info is a different kind of import: it MERGES game state (append-only
+ *   pulls, raise-only module progress) instead of replacing everything, and keeps
  *   Settings open to show its summary. See ImportPlayerInfoButton.tsx's header.
  *
  * Gotchas:
