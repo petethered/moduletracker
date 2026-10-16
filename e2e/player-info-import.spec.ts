@@ -11,6 +11,7 @@ import {
   GameRarity as R,
   type PlayerInfoSaveSpec,
 } from "../src/__tests__/helpers/playerInfoSaveBuilder";
+import { buildTds1Save } from "../src/__tests__/helpers/tds1SaveBuilder";
 
 async function uploadSave(page: Page, spec: PlayerInfoSaveSpec) {
   await page.setInputFiles("[data-testid='player-info-input']", {
@@ -122,5 +123,22 @@ test.describe("Import Save (header button)", () => {
 
     await page.click("[data-tab='history']");
     await expect(page.getByText("Havoc Bringer")).toHaveCount(1);
+  });
+
+  test("reads a game-29.1+ encrypted (TDS1) save, decrypted in the browser", async ({ page }) => {
+    const gz = gzipSync(
+      buildPlayerInfoSave({
+        inventory: [{ infoIndex: 7, rarity: R.fiveStar }],
+        // 29.1.1 dropped `origin` from pull records; null mirrors that.
+        pullDrops: buildPullDrops([{ common: 9, rare: 1 }], OCT_12_9AM, null),
+      }),
+    );
+    await page.setInputFiles("[data-testid='player-info-header-input']", {
+      name: "playerInfo.dat",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from(await buildTds1Save(gz)),
+    });
+    const dialog = page.getByRole("dialog", { name: "Import Save" });
+    await expect(dialog.getByTestId("player-info-headline")).toHaveText("Imported 1 new pull · raised 1 module level.");
   });
 });

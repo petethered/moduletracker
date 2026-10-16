@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { gzipSync } from "node:zlib";
+import { PlayerInfoFormatError, decodePlayerInfoFile } from "../features/settings/decodePlayerInfoFile";
 import {
-  PlayerInfoFormatError,
-  decompressPlayerInfo,
   parsePlayerInfo,
   planModuleProgressImport,
 } from "../features/settings/parsePlayerInfo";
@@ -123,26 +122,26 @@ describe("parsePlayerInfo", () => {
   });
 });
 
-describe("decompressPlayerInfo", () => {
+describe("decodePlayerInfoFile", () => {
   it("gunzips a compressed save", async () => {
     const save = buildPlayerInfoSave({ inventory: [{ infoIndex: 7, rarity: R.epic }] });
-    const out = await decompressPlayerInfo(gzipSync(save));
+    const out = await decodePlayerInfoFile(gzipSync(save));
     expect(Array.from(out)).toEqual(Array.from(save));
   });
 
   it("passes an already-decompressed save through unchanged", async () => {
     const save = buildPlayerInfoSave({});
-    expect(await decompressPlayerInfo(save)).toBe(save);
+    expect(await decodePlayerInfoFile(save)).toBe(save);
   });
 
   it("rejects a corrupt gzip file with a friendly error", async () => {
     const corrupt = gzipSync(buildPlayerInfoSave({})).slice(0, 40);
-    await expect(decompressPlayerInfo(corrupt)).rejects.toThrow(PlayerInfoFormatError);
+    await expect(decodePlayerInfoFile(corrupt)).rejects.toThrow(PlayerInfoFormatError);
   });
 
   it("stops decompressing past the size cap (gzip bomb guard)", async () => {
     const bomb = gzipSync(new Uint8Array(1_000_000)); // ~1 KB that inflates to 1 MB
-    await expect(decompressPlayerInfo(bomb, 100_000)).rejects.toThrow(/too large/i);
+    await expect(decodePlayerInfoFile(bomb, 100_000)).rejects.toThrow(/too large/i);
   });
 });
 

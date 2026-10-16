@@ -3,7 +3,8 @@
  * (playerInfo.dat) for Settings → "Import Player Info".
  *
  * PIPELINE (usePlayerInfoImport drives it):
- *   file bytes -> decompressPlayerInfo (gunzip, size-capped) -> parsePlayerInfo
+ *   file bytes -> decodePlayerInfoFile (decodePlayerInfoFile.ts: decrypt a
+ *   game-29.1+ TDS1 container if present, then gunzip, size-capped) -> parsePlayerInfo
  *   (readNrbf: generic .NET decode, src/utils/nrbfReader.ts; then find the
  *   modules and map them to tracker ids/rarities) -> planModuleProgressImport
  *   (what to raise, what to keep) -> store.setModuleRarities.
@@ -45,22 +46,7 @@ import { COMMON_AND_RARE_BASE_GAME_INDEXES, MODULE_BY_GAME_INDEX, MODULES } from
 import { MODULE_RARITY_ORDER } from "../../config/moduleRarities";
 import type { ModuleProgress, ModuleRarity } from "../../types";
 import { isNrbfObject, readNrbf, type NrbfObject, type NrbfValue } from "../../utils/nrbfReader";
-
-/**
- * A problem the USER should see. Messages are plain language. Any other error
- * reaching the UI is unexpected and gets a generic message instead of internals.
- */
-export class PlayerInfoFormatError extends Error {
-  /** `cause` keeps the technical error for logs/debugging. */
-  constructor(message: string, options?: ErrorOptions) {
-    super(message, options);
-    this.name = "PlayerInfoFormatError";
-  }
-}
-
-const NOT_A_SAVE = "This file doesn't look like a The Tower save (playerInfo.dat).";
-const UNREADABLE_SAVE =
-  "Couldn't read this save file. It may be damaged, or from a game version the tracker doesn't support yet.";
+import { NOT_A_SAVE, PlayerInfoFormatError, UNREADABLE_SAVE } from "./decodePlayerInfoFile";
 
 /**
  * The game's ModuleRarity enum -> the tracker's ladder. Verified against a real
@@ -87,12 +73,6 @@ const TRACKER_RARITY_BY_GAME_RARITY: Record<number, ModuleRarity> = {
  * playerInfoPulls.ts (pull-log drops are only ever common, rare or epic).
  */
 export const GAME_RARITY = { common: 1, rare: 2, epic: 4 } as const;
-
-/**
- * Real saves are ~200 KB decompressed. The cap only exists so a malicious or
- * corrupt gzip ("zip bomb") can't inflate until the tab runs out of memory.
- */
-const MAX_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
 
 export interface PlayerInfoModules {
   /** Tracker module id -> highest rarity held in the save (epic and above). */
@@ -123,57 +103,6 @@ export interface ModuleProgressImportPlan {
   raises: ModuleProgressChange[];
   /** Modules where the save is LOWER than the tracker. Not applied; shown to the user. */
   keptHigher: KeptHigherRarity[];
-}
-
-/**
- * Gunzip playerInfo.dat if it's compressed (as the game writes it). Bytes that
- * don't start with the gzip magic number are returned as-is, so an already
- * extracted save also works.
- * @throws PlayerInfoFormatError for corrupt gzip or output over `maxBytes`.
- */
-export async function decompressPlayerInfo(
-  bytes: Uint8Array,
-  maxBytes = MAX_DECOMPRESSED_BYTES,
-): Promise<Uint8Array> {
-  if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) return bytes;
-
-  // Platform DecompressionStream (all current browsers, Node 18+) keeps a gzip
-  // library out of the bundle. A hand-built ReadableStream rather than
-  // Blob.stream(): identical in browsers, and jsdom (unit tests) lacks the latter.
-  const source = new ReadableStream<BufferSource>({
-    start(controller) {
-      controller.enqueue(bytes as Uint8Array<ArrayBuffer>);
-      controller.close();
-    },
-  });
-  const reader = source.pipeThrough(new DecompressionStream("gzip")).getReader();
-
-  // Read chunk by chunk so the size cap is enforced BEFORE memory is spent.
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
-        await reader.cancel();
-        throw new PlayerInfoFormatError("This file is too large to be a The Tower save.");
-      }
-      chunks.push(value);
-    }
-  } catch (err) {
-    if (err instanceof PlayerInfoFormatError) throw err;
-    throw new PlayerInfoFormatError(UNREADABLE_SAVE);
-  }
-
-  const out = new Uint8Array(total);
-  let offset = 0;
-  for (const c of chunks) {
-    out.set(c, offset);
-    offset += c.byteLength;
-  }
-  return out;
 }
 
 /** Collect every ModuleItem the player owns: inventory (live part), main slots, assist slots. */

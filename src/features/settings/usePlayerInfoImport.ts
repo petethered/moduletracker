@@ -3,7 +3,7 @@
  * (Settings button AND the header's "Import Save" button; both render
  * PlayerInfoImportSummary from what this returns).
  *
- * Flow: file -> decompressPlayerInfo -> readPlayerInfoSave (decode ONCE) ->
+ * Flow: file -> decodePlayerInfoFile (decrypt if TDS1, gunzip) -> readPlayerInfoSave (decode ONCE) ->
  *   - extractSaveModules -> planModuleProgressImport -> one setModuleRarities call
  *   - extractSavePulls -> planPullImport -> one addPulls call with `toAdd`
  * Both plans are made against the CURRENT store (getState) and all reading/
@@ -13,7 +13,8 @@
  * idempotent and a re-import finishes the job.
  * `unsure` pulls are NOT written; the summary offers "Add anyway" (addUnsurePulls).
  *
- * LAZY: the decoder (parsePlayerInfo, playerInfoPulls, nrbfReader) is loaded
+ * LAZY: the decoder (decodePlayerInfoFile + tds1SaveContainer, parsePlayerInfo,
+ * playerInfoPulls, nrbfReader) is loaded
  * with import() on the first file pick. The header button mounts with the app
  * shell, so a static import would put the whole save decoder in the main bundle.
  *
@@ -65,12 +66,16 @@ export function usePlayerInfoImport() {
   const unsureAddedFor = useRef<PlayerInfoImportResult | null>(null);
 
   const importFile = useCallback(
-    async (file: File) => {
+    async (picked: File) => {
       setBusy(true);
       setResult(null);
       try {
-        const [save, pullLog] = await Promise.all([import("./parsePlayerInfo"), import("./playerInfoPulls")]);
-        const root = save.readPlayerInfoSave(await save.decompressPlayerInfo(new Uint8Array(await file.arrayBuffer())));
+        const [file, save, pullLog] = await Promise.all([
+          import("./decodePlayerInfoFile"),
+          import("./parsePlayerInfo"),
+          import("./playerInfoPulls"),
+        ]);
+        const root = save.readPlayerInfoSave(await file.decodePlayerInfoFile(new Uint8Array(await picked.arrayBuffer())));
         const moduleData = save.extractSaveModules(root);
         const pullData = pullLog.extractSavePulls(root);
         // getState(), not subscribed values: plan against the store as it is

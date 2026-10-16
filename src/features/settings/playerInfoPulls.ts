@@ -13,7 +13,11 @@
  *     - dateObtained: .NET DateTime ticks, UTC. Verified on a real save:
  *       lastCloudSaveTime matched the file's mtime to 0.1 s read as UTC.
  *     - origin: banner name ("Infinity Threshold Banner"). null in saves from
- *       before ~Sept 2026.
+ *       before ~Sept 2026, and the member is GONE again from game 29.1.1
+ *       (verified on a real 29.1.1 save, 2026-10-16), so those pulls can't be
+ *       told apart by banner: they all import as "standard" (BANNER below).
+ *   Game 29.1+ saves arrive inside an encrypted TDS1 container; that is
+ *   unwrapped before this code sees anything (tds1SaveContainer.ts).
  *   It is a ROLLING WINDOW of the last 150 drops (= 15 ten-pulls): three real
  *   saves all had _size 150 while _version kept climbing. Older pulls are gone,
  *   so the import keeps the tracker current; it can't backfill history.
@@ -27,6 +31,9 @@
  *
  * BANNER: "lucky" if the banner name contains "lucky" (any case), else
  * "standard" — the user's rule; they log named/featured banners as standard.
+ * No banner name (old saves, and 29.1.1+) => "standard". Banner is NOT part of
+ * the match signature, so a lucky pull logged by hand still matches its
+ * import and is never duplicated; only NEW lucky pulls import as standard.
  * GEMS: GEMS_PER_10X_PULL (200), the same cost PullForm records.
  *
  * RECONCILING (planPullImport) — the user may already have typed some of
