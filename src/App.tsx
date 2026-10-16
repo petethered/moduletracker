@@ -64,6 +64,7 @@ import { AuthModal } from "./features/auth/AuthModal";
 import { SyncStatus } from "./features/auth/SyncStatus";
 import { SyncInitializer } from "./features/auth/SyncInitializer";
 import { ImportSaveHeaderButton } from "./features/settings/ImportSaveHeaderButton";
+import { PlayerInfoImportProvider } from "./features/settings/PlayerInfoImportProvider";
 import { isAuthenticated } from "./services/api";
 import { useRenderLog } from "./utils/renderLog";
 import { TowerSitesNav } from "./shared/TowerSitesNav";
@@ -126,6 +127,9 @@ function App() {
   }, [storageChoice, user]);
 
   return (
+    // One Import Player Info instance + result modal for the header button AND
+    // Settings' button (see src/features/settings/playerInfoImportContext.ts).
+    <PlayerInfoImportProvider>
     <div className="min-h-screen bg-[var(--color-navy-900)] text-gray-200">
       {/* Cross-site bar shared with towersummary.com and effectivepathplanner.com
           (canonical copy in tower-summary-graphics/src/shared). */}
@@ -243,6 +247,7 @@ function App() {
         resetToken={resetToken}
       />
     </div>
+    </PlayerInfoImportProvider>
   );
 }
 

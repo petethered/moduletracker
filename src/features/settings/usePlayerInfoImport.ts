@@ -1,7 +1,9 @@
 /**
- * usePlayerInfoImport — state + orchestration for "Import Player Info"
- * (Settings button AND the header's "Import Save" button; both render
- * PlayerInfoImportSummary from what this returns).
+ * usePlayerInfoImport — state + orchestration for "Import Player Info".
+ * Used ONCE, by PlayerInfoImportProvider (App root), which renders the single
+ * result modal. Both buttons (header "Import Save", Settings "Import Player
+ * Info") reach it through usePlayerInfoImportLauncher — never call this hook
+ * from a button (it would get its own state and modal).
  *
  * Flow: file -> decodePlayerInfoFile (decrypt if TDS1, gunzip) -> readPlayerInfoSave (decode ONCE) ->
  *   - extractSaveModules -> planModuleProgressImport -> one setModuleRarities call
@@ -15,8 +17,8 @@
  *
  * LAZY: the decoder (decodePlayerInfoFile + tds1SaveContainer, parsePlayerInfo,
  * playerInfoPulls, nrbfReader) is loaded
- * with import() on the first file pick. The header button mounts with the app
- * shell, so a static import would put the whole save decoder in the main bundle.
+ * with import() on the first file pick. This hook's provider mounts with the
+ * app shell, so a static import would put the whole save decoder in the main bundle.
  *
  * Why batched store actions (not updateModuleRarity / addPull per item): one
  * persist write and one sync-subscriber pass instead of one per change. Cloud

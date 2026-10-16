@@ -1,7 +1,7 @@
 /**
  * PlayerInfoImportSummary — renders the outcome of an Import Player Info run
- * (see usePlayerInfoImport). Shared by the Settings button and the header's
- * "Import Save" modal so both explain an import identically.
+ * (see usePlayerInfoImport). Rendered by the single "Import Save" result
+ * modal in PlayerInfoImportProvider, which both import buttons open.
  *
  * Sections, in order: error | pulls (added / already logged / unsure with an
  * "Add anyway" button / skipped) | modules (updated / kept higher) | unsupported.
@@ -43,25 +43,45 @@ export function PlayerInfoImportSummary({ result, onAddUnsurePulls }: Props) {
   }
 
   const { modules, pulls } = result;
+  // Nothing was written: say so outright. "Imported 0 new pulls · skipped 15"
+  // read like the upload did nothing (user report), so this case gets its own
+  // headline + a plain reason instead of the counts recap.
+  const nothingChanged = pulls.added.length === 0 && pulls.unsure.length === 0 && modules.raises.length === 0;
   // One-line recap of every action taken, first thing the user reads. Each
   // part only appears when non-zero; the sections below give the detail.
-  const headline = [
-    `Imported ${plural(pulls.added.length, "new pull")}`,
-    pulls.alreadyLogged > 0 && `skipped ${formatInteger(pulls.alreadyLogged)} already logged`,
-    pulls.unsure.length > 0 && `${formatInteger(pulls.unsure.length)} held for review`,
-    modules.raises.length > 0 && `raised ${plural(modules.raises.length, "module level")}`,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const headline = nothingChanged
+    ? "Already up to date — nothing changed"
+    : [
+        `Imported ${plural(pulls.added.length, "new pull")}`,
+        pulls.alreadyLogged > 0 && `skipped ${formatInteger(pulls.alreadyLogged)} already logged`,
+        pulls.unsure.length > 0 && `${formatInteger(pulls.unsure.length)} held for review`,
+        modules.raises.length > 0 && `raised ${plural(modules.raises.length, "module level")}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
   return (
     <div className="mt-2 text-xs" data-testid="player-info-result">
       <p className="mb-2 text-sm text-gray-100" data-testid="player-info-headline">
         {headline}.
       </p>
+      {nothingChanged && (
+        <p className="mb-2 text-gray-300" data-testid="player-info-nothing-changed">
+          {pulls.alreadyLogged > 0
+            ? `All ${plural(pulls.alreadyLogged, "pull")} in this save ${pulls.alreadyLogged === 1 ? "is" : "are"} already logged`
+            : "This save has no new pulls"}
+          {/* Don't claim "match" when some tracker levels are HIGHER than the
+              save — those are listed under "Kept" right below. */}
+          {modules.keptHigher.length > 0
+            ? ", and no module levels needed raising."
+            : ", and your module levels already match it."}
+        </p>
+      )}
       {/* --- Pulls --- */}
       <div data-testid="player-info-pulls">
         {pulls.added.length === 0 ? (
-          <p className="text-green-400">No new pulls in the save.</p>
+          // Redundant with the nothing-changed line above, so only shown when
+          // something ELSE changed (e.g. module levels were raised).
+          !nothingChanged && <p className="text-green-400">No new pulls in the save.</p>
         ) : (
           <>
             {/* "already logged" count lives in the headline only. */}
@@ -104,7 +124,7 @@ export function PlayerInfoImportSummary({ result, onAddUnsurePulls }: Props) {
       {/* --- Modules --- */}
       <div className="mt-3">
         {modules.raises.length === 0 ? (
-          <p className="text-green-400">Module levels are already up to date.</p>
+          !nothingChanged && <p className="text-green-400">Module levels are already up to date.</p>
         ) : (
           <>
             <p className="text-green-400">Updated {plural(modules.raises.length, "module")}:</p>

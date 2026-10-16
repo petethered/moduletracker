@@ -22,8 +22,9 @@
  *     is JSON (starts with { or [) or tab-separated text and routes accordingly.
  *   - Import Player Info: reads The Tower's own save (playerInfo.dat), APPENDS pulls from
  *     its pull log that aren't logged yet, and RAISES module rarities to match it. Never
- *     edits/removes existing pulls; never lowers a module. Self-contained in
- *     ImportPlayerInfoButton (+ usePlayerInfoImport, parsePlayerInfo, playerInfoPulls).
+ *     edits/removes existing pulls; never lowers a module. ImportPlayerInfoButton
+ *     only starts the import and closes Settings; PlayerInfoImportProvider (App
+ *     root) runs it and shows the result modal (see usePlayerInfoImport).
  *   - Reset: clears pulls + moduleProgress after a ConfirmDialog. Destructive.
  *
  * Bulk import policy (important):
@@ -47,8 +48,9 @@
  *   so users can paste community spreadsheets directly without intermediate save-as-file.
  *   The auto-detection (JSON vs TSV) keeps the textarea ergonomic for both audiences.
  *   Import Player Info is a different kind of import: it MERGES game state (append-only
- *   pulls, raise-only module progress) instead of replacing everything, and keeps
- *   Settings open to show its summary. See ImportPlayerInfoButton.tsx's header.
+ *   pulls, raise-only module progress) instead of replacing everything. Picking a
+ *   file CLOSES Settings and the app-level "Import Save" modal shows the result
+ *   (PlayerInfoImportProvider). See ImportPlayerInfoButton.tsx's header.
  *
  * Gotchas:
  *   - We reset `e.target.value = ""` after file load so the SAME file can be re-selected

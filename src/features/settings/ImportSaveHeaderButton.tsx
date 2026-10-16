@@ -3,23 +3,19 @@
  * "+ Add 10x Pull". The one-tap way to log pulls from The Tower's save
  * (playerInfo.dat) instead of typing them in.
  *
- * Same import as Settings → Import Player Info (usePlayerInfoImport): new
- * pulls appended, already-logged ones skipped, module rarities raised.
- * Difference is only where the summary shows: the header has no room, so a
- * Modal opens once the file has been read. Each instance owns its own hook
- * state, so the two buttons don't share a summary.
+ * Same import as Settings → Import Player Info: new pulls appended,
+ * already-logged ones skipped, module rarities raised. Both buttons only
+ * START the import; PlayerInfoImportProvider (App.tsx) runs it and shows the
+ * one "Import Save" result modal.
  */
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "../../components/ui/Button";
-import { Modal } from "../../components/ui/Modal";
 import { PlayerInfoFileInput } from "./PlayerInfoFileInput";
-import { PlayerInfoImportSummary } from "./PlayerInfoImportSummary";
-import { usePlayerInfoImport } from "./usePlayerInfoImport";
+import { usePlayerInfoImportLauncher } from "./playerInfoImportContext";
 
 export function ImportSaveHeaderButton() {
-  const { busy, result, importFile, addUnsurePulls } = usePlayerInfoImport();
+  const { busy, startImport } = usePlayerInfoImportLauncher();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -48,21 +44,7 @@ export function ImportSaveHeaderButton() {
           </>
         )}
       </Button>
-      <PlayerInfoFileInput
-        inputRef={inputRef}
-        testId="player-info-header-input"
-        onFile={(file) => {
-          // Open first: the summary renders as soon as the import resolves.
-          setOpen(true);
-          void importFile(file);
-        }}
-      />
-      <Modal isOpen={open && !busy && result !== null} onClose={() => setOpen(false)} title="Import Save">
-        <PlayerInfoImportSummary result={result} onAddUnsurePulls={addUnsurePulls} />
-        <div className="mt-4 flex justify-end">
-          <Button onClick={() => setOpen(false)}>Done</Button>
-        </div>
-      </Modal>
+      <PlayerInfoFileInput inputRef={inputRef} testId="player-info-header-input" onFile={startImport} />
     </>
   );
 }
